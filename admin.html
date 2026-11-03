@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HIRAYA Admin — Rodnel & Divine</title>
-<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+<title>HIRAYA Portal — Rodnel & Divine</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #f5f0eb;
@@ -23,179 +23,180 @@
   --danger-bg: #fce4ec;
   --info: #1565c0;
   --info-bg: #e3f2fd;
-  --periwinkle: #A7A4D8;
-  --lavender: #C8B4E2;
-  --mauve: #A78BAA;
-  --taupe: #B8A6A0;
-  --champagne: #C9B99F;
-  --olive: #8E887A;
+  --warn: #e65100;
+  --warn-bg: #fff3e0;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
-/* Login Screen */
-.login-screen {
-  display: flex; align-items: center; justify-content: center;
-  min-height: 100vh; padding: 20px;
-}
-.login-box {
-  background: var(--card); border-radius: 16px; padding: 48px 40px;
-  max-width: 400px; width: 100%; text-align: center;
-  box-shadow: 0 4px 24px rgba(92,74,61,0.08);
-}
-.login-box img { width: 100px; margin-bottom: 16px; }
-.login-box h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--earth); margin-bottom: 4px; }
-.login-box .sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px; }
-.login-box input {
-  width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px;
-  font-family: 'Jost', sans-serif; font-size: 0.95rem; margin-bottom: 12px;
-  text-align: center; letter-spacing: 2px;
-}
-.login-box input:focus { border-color: var(--gold); outline: none; }
-.login-box .error { color: var(--danger); font-size: 0.8rem; margin-bottom: 12px; display: none; }
+/* LOGIN */
+.login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+.login-box{background:var(--card);border-radius:16px;padding:48px 40px;max-width:400px;width:100%;text-align:center;box-shadow:0 4px 24px rgba(92,74,61,0.08);}
+.login-box img{width:100px;margin-bottom:16px;}
+.login-box h1{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--earth);margin-bottom:4px;}
+.login-box .sub{font-size:0.85rem;color:var(--text-muted);margin-bottom:24px;}
+.login-box input{width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:10px;font-family:'Jost',sans-serif;font-size:0.95rem;margin-bottom:12px;text-align:center;letter-spacing:2px;}
+.login-box input:focus{border-color:var(--gold);outline:none;}
+.login-box .error{color:var(--danger);font-size:0.8rem;margin-bottom:12px;display:none;}
 
-/* Common */
-.btn {
-  display: inline-block; padding: 10px 24px; border: none; border-radius: 10px;
-  font-family: 'Jost', sans-serif; font-size: 0.85rem; font-weight: 600;
-  cursor: pointer; transition: all 0.2s;
-}
-.btn-gold { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #fff; }
-.btn-gold:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(196,162,101,0.3); }
-.btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--earth); }
-.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
-.btn-danger { background: var(--danger); color: #fff; }
-.btn-sm { padding: 6px 14px; font-size: 0.8rem; }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+/* LAYOUT */
+.app{display:none;}
+.sidebar{position:fixed;top:0;left:0;width:220px;height:100vh;background:var(--earth);padding:20px 0;overflow-y:auto;z-index:200;}
+.sidebar-logo{text-align:center;padding:8px 16px 20px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:8px;}
+.sidebar-logo img{width:60px;margin-bottom:6px;}
+.sidebar-logo h2{font-family:'Cormorant Garamond',serif;font-size:1rem;color:#e8d5c4;letter-spacing:1px;}
+.sidebar-logo span{font-size:0.65rem;color:rgba(255,255,255,0.4);letter-spacing:3px;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 20px;color:rgba(255,255,255,0.6);font-size:0.82rem;cursor:pointer;transition:all 0.2s;border-left:3px solid transparent;}
+.nav-item:hover{color:rgba(255,255,255,0.9);background:rgba(255,255,255,0.05);}
+.nav-item.active{color:#fff;background:rgba(255,255,255,0.1);border-left-color:var(--gold);}
+.nav-item .icon{font-size:1.1rem;width:22px;text-align:center;}
+.nav-section{font-size:0.65rem;color:rgba(255,255,255,0.3);letter-spacing:2px;text-transform:uppercase;padding:16px 20px 6px;}
+.sidebar-footer{position:absolute;bottom:0;left:0;right:0;padding:12px 16px;border-top:1px solid rgba(255,255,255,0.1);text-align:center;}
+.sidebar-footer button{background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);padding:6px 16px;border-radius:8px;font-family:'Jost',sans-serif;font-size:0.75rem;cursor:pointer;}
+.sidebar-footer button:hover{color:#fff;border-color:rgba(255,255,255,0.5);}
 
-/* Dashboard Layout */
-.dashboard { display: none; }
-.topbar {
-  background: var(--card); border-bottom: 1px solid var(--border);
-  padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; z-index: 100;
-}
-.topbar-left { display: flex; align-items: center; gap: 12px; }
-.topbar-left img { height: 36px; }
-.topbar-left h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--earth); }
-.topbar-left span { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 3px; text-transform: uppercase; }
-.topbar-right { display: flex; align-items: center; gap: 12px; }
+.content{margin-left:220px;padding:24px;min-height:100vh;}
+.page{display:none;}
+.page.active{display:block;}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--earth);margin-bottom:4px;}
+.page-sub{font-size:0.82rem;color:var(--text-muted);margin-bottom:24px;}
 
-.main { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+/* CARDS */
+.card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(92,74,61,0.04);margin-bottom:16px;}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.card-header h3{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--earth);}
 
-/* Stats Cards */
-.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
-.stat-card {
-  background: var(--card); border-radius: 12px; padding: 20px;
-  text-align: center; box-shadow: 0 2px 8px rgba(92,74,61,0.04);
-}
-.stat-num { font-size: 2rem; font-weight: 700; color: var(--earth); line-height: 1; }
-.stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
-.stat-card.confirmed .stat-num { color: var(--success); }
-.stat-card.declined .stat-num { color: var(--danger); }
-.stat-card.pending .stat-num { color: var(--gold); }
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:none;border-radius:10px;font-family:'Jost',sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#fff;}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(196,162,101,0.3);}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--earth);}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-sm{padding:5px 12px;font-size:0.75rem;}
+.btn:disabled{opacity:0.5;cursor:not-allowed;}
 
-/* Tabs */
-.tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--card); border-radius: 12px; padding: 4px; }
-.tab {
-  flex: 1; padding: 10px; text-align: center; border-radius: 10px;
-  font-size: 0.85rem; font-weight: 500; cursor: pointer; color: var(--text-muted);
-  transition: all 0.2s;
-}
-.tab.active { background: var(--earth); color: #fff; }
-.tab:hover:not(.active) { color: var(--earth); }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:24px;}
+.stat-card{background:var(--card);border-radius:12px;padding:18px;text-align:center;box-shadow:0 2px 8px rgba(92,74,61,0.04);}
+.stat-num{font-size:1.8rem;font-weight:700;line-height:1;}
+.stat-label{font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+.stat-card.green .stat-num{color:var(--success);}
+.stat-card.red .stat-num{color:var(--danger);}
+.stat-card.gold .stat-num{color:var(--gold);}
+.stat-card.blue .stat-num{color:var(--info);}
 
-/* Table */
-.card {
-  background: var(--card); border-radius: 12px; padding: 20px;
-  box-shadow: 0 2px 8px rgba(92,74,61,0.04); margin-bottom: 16px;
-}
-.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.card-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; color: var(--earth); }
-.search-bar {
-  display: flex; gap: 8px; margin-bottom: 16px;
-}
-.search-bar input {
-  flex: 1; padding: 10px 16px; border: 1.5px solid var(--border); border-radius: 10px;
-  font-family: 'Jost', sans-serif; font-size: 0.85rem;
-}
-.search-bar input:focus { border-color: var(--gold); outline: none; }
+/* TABLE */
+.table-wrap{overflow-x:auto;}
+table.dt{width:100%;border-collapse:collapse;font-size:0.8rem;}
+table.dt th{text-align:left;padding:10px 12px;border-bottom:2px solid var(--border);color:var(--text-muted);font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;}
+table.dt td{padding:10px 12px;border-bottom:1px solid #f0ebe6;vertical-align:middle;}
+table.dt tr:hover td{background:var(--cream);}
+.status{display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.s-confirmed{background:var(--success-bg);color:var(--success);}
+.s-declined{background:var(--danger-bg);color:var(--danger);}
+.s-sent{background:var(--info-bg);color:var(--info);}
+.s-pending{background:var(--warn-bg);color:var(--warn);}
+.s-proxy{background:#e8eaf6;color:#283593;}
+.s-expired{background:#f3e5f5;color:#6a1b9a;}
+.s-paid{background:var(--success-bg);color:var(--success);}
+.s-partial{background:var(--warn-bg);color:var(--warn);}
+.s-unpaid{background:var(--danger-bg);color:var(--danger);}
+.s-done{background:var(--success-bg);color:var(--success);}
+.s-todo{background:var(--warn-bg);color:var(--warn);}
+.s-overdue{background:var(--danger-bg);color:var(--danger);}
+.actions-cell{display:flex;gap:4px;flex-wrap:wrap;}
+.actions-cell .btn{padding:4px 10px;font-size:0.7rem;}
 
-.guest-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-.guest-table th {
-  text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--border);
-  color: var(--text-muted); font-weight: 600; font-size: 0.75rem;
-  text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
-}
-.guest-table td { padding: 10px 12px; border-bottom: 1px solid #f0ebe6; vertical-align: middle; }
-.guest-table tr:hover td { background: var(--cream); }
-.guest-table .status {
-  display: inline-block; padding: 3px 10px; border-radius: 20px;
-  font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
-}
-.status-confirmed { background: var(--success-bg); color: var(--success); }
-.status-declined { background: var(--danger-bg); color: var(--danger); }
-.status-sent { background: var(--info-bg); color: var(--info); }
-.status-pending { background: #fff3e0; color: #e65100; }
-.status-expired { background: #f3e5f5; color: #6a1b9a; }
-.status-proxy { background: #e8eaf6; color: #283593; }
+/* SEARCH */
+.search-bar{display:flex;gap:8px;margin-bottom:16px;}
+.search-bar input,.search-bar select{padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Jost',sans-serif;font-size:0.82rem;}
+.search-bar input{flex:1;}
+.search-bar input:focus,.search-bar select:focus{border-color:var(--gold);outline:none;}
 
-.actions-cell { display: flex; gap: 4px; flex-wrap: wrap; }
-.actions-cell .btn { padding: 4px 10px; font-size: 0.72rem; }
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:999;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--card);border-radius:16px;padding:32px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;}
+.modal h3{font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:var(--earth);margin-bottom:20px;}
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:0.78rem;color:var(--text-muted);margin-bottom:4px;font-weight:500;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'Jost',sans-serif;font-size:0.88rem;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold);outline:none;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;}
 
-.table-wrap { overflow-x: auto; }
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;padding:14px 24px;border-radius:10px;font-size:0.85rem;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:9999;transform:translateY(100px);opacity:0;transition:all 0.3s;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:var(--success);color:#fff;}
+.toast.error{background:var(--danger);color:#fff;}
 
-/* Modal */
-.modal-overlay {
-  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
-  z-index: 999; align-items: center; justify-content: center; padding: 20px;
-}
-.modal-overlay.open { display: flex; }
-.modal {
-  background: var(--card); border-radius: 16px; padding: 32px;
-  max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;
-}
-.modal h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--earth); margin-bottom: 20px; }
-.modal .form-group { margin-bottom: 14px; }
-.modal label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
-.modal input, .modal select, .modal textarea {
-  width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px;
-  font-family: 'Jost', sans-serif; font-size: 0.9rem;
-}
-.modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--gold); outline: none; }
-.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+/* LOADING */
+.loading{text-align:center;padding:40px;color:var(--text-muted);}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
 
-/* Toast */
-.toast {
-  position: fixed; bottom: 24px; right: 24px; padding: 14px 24px;
-  border-radius: 10px; font-size: 0.85rem; font-weight: 500;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12); z-index: 9999;
-  transform: translateY(100px); opacity: 0; transition: all 0.3s;
-}
-.toast.show { transform: translateY(0); opacity: 1; }
-.toast.success { background: var(--success); color: #fff; }
-.toast.error { background: var(--danger); color: #fff; }
+/* BUDGET */
+.budget-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;}
+.budget-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:8px;}
+.budget-bar-fill{height:100%;border-radius:4px;transition:width 0.5s;}
+.budget-bar-fill.ok{background:var(--success);}
+.budget-bar-fill.warn{background:var(--warn);}
+.budget-bar-fill.over{background:var(--danger);}
 
-/* Loading */
-.loading { text-align: center; padding: 40px; color: var(--text-muted); }
-.spinner {
-  width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--gold);
-  border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
+/* CHECKLIST */
+.check-item{display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid #f0ebe6;cursor:pointer;}
+.check-item:hover{background:var(--cream);}
+.check-box{width:22px;height:22px;border:2px solid var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s;}
+.check-item.done .check-box{background:var(--success);border-color:var(--success);color:#fff;}
+.check-item.done .check-text{text-decoration:line-through;color:var(--text-muted);}
+.check-text{flex:1;font-size:0.85rem;}
+.check-date{font-size:0.72rem;color:var(--text-muted);}
+.check-cat{font-size:0.68rem;padding:2px 8px;border-radius:10px;background:var(--cream);color:var(--earth-light);}
 
-/* Responsive */
-@media (max-width: 768px) {
-  .stats-grid { grid-template-columns: repeat(3, 1fr); }
-  .tabs { flex-wrap: wrap; }
-  .tab { flex: unset; min-width: 80px; }
-  .topbar { flex-direction: column; gap: 8px; }
-  .topbar-right { width: 100%; justify-content: flex-end; }
-  .guest-table { font-size: 0.75rem; }
-  .guest-table th, .guest-table td { padding: 8px 6px; }
-  .modal { padding: 24px 20px; }
+/* TIMELINE */
+.tl-item{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid #f0ebe6;}
+.tl-time{width:80px;text-align:right;flex-shrink:0;}
+.tl-time .time{font-size:0.9rem;font-weight:600;color:var(--earth);}
+.tl-time .dur{font-size:0.7rem;color:var(--text-muted);}
+.tl-dot{width:14px;height:14px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:4px;border:3px solid var(--cream);}
+.tl-body h4{font-size:0.9rem;color:var(--earth);margin-bottom:2px;}
+.tl-body p{font-size:0.78rem;color:var(--text-muted);line-height:1.5;}
+
+/* ENTOURAGE */
+.ent-group{margin-bottom:20px;}
+.ent-group h4{font-size:0.85rem;color:var(--earth);margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid var(--gold);display:inline-block;}
+.ent-member{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid #f0ebe6;font-size:0.85rem;}
+.ent-member:hover{background:var(--cream);}
+.ent-role{font-size:0.72rem;color:var(--text-muted);}
+
+/* COUNTDOWN */
+.countdown-banner{background:linear-gradient(135deg,var(--earth),var(--earth-light));border-radius:12px;padding:24px;text-align:center;margin-bottom:24px;color:#fff;}
+.countdown-banner h2{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:#e8d5c4;margin-bottom:12px;}
+.countdown-nums{display:flex;justify-content:center;gap:20px;}
+.countdown-unit{text-align:center;}
+.countdown-unit .num{font-size:2rem;font-weight:700;color:var(--gold-light);line-height:1;}
+.countdown-unit .label{font-size:0.65rem;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.6);margin-top:2px;}
+
+/* PROGRESS RING */
+.progress-ring{width:100px;height:100px;margin:0 auto;}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{width:60px;padding:10px 0;}
+  .sidebar-logo h2,.sidebar-logo span,.nav-item span,.nav-section,.sidebar-footer{display:none;}
+  .sidebar-logo{padding:8px 0 12px;}
+  .sidebar-logo img{width:36px;}
+  .nav-item{padding:12px 0;justify-content:center;border-left:none;border-right:3px solid transparent;}
+  .nav-item.active{border-right-color:var(--gold);border-left-color:transparent;}
+  .nav-item .icon{font-size:1.3rem;}
+  .content{margin-left:60px;padding:16px;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  .form-row{grid-template-columns:1fr;}
+  .countdown-nums{gap:12px;}
+  .countdown-unit .num{font-size:1.4rem;}
+  .modal{padding:24px 16px;}
 }
 </style>
 </head>
@@ -205,526 +206,772 @@ body { font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text
 <div class="login-screen" id="loginScreen">
   <div class="login-box">
     <img src="logo-rd-web.png" alt="R&D">
-    <h1>Hiraya Admin</h1>
-    <p class="sub">Wedding Management Dashboard</p>
+    <h1>Hiraya Portal</h1>
+    <p class="sub">Wedding Management System</p>
     <input type="password" id="adminKeyInput" placeholder="Admin Key" autofocus>
     <div class="error" id="loginError">Invalid admin key. Try again.</div>
     <button class="btn btn-gold" style="width:100%" onclick="login()">Sign In</button>
   </div>
 </div>
 
-<!-- DASHBOARD -->
-<div class="dashboard" id="dashboard">
-  <!-- Topbar -->
-  <div class="topbar">
-    <div class="topbar-left">
+<!-- APP -->
+<div class="app" id="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
       <img src="logo-rd-web.png" alt="R&D">
-      <div>
-        <h2>Hiraya Admin</h2>
-        <span>Wedding Dashboard</span>
-      </div>
+      <h2>Hiraya</h2>
+      <span>Wedding Portal</span>
     </div>
-    <div class="topbar-right">
-      <button class="btn btn-outline btn-sm" onclick="loadData()">↻ Refresh</button>
-      <button class="btn btn-outline btn-sm" onclick="logout()">Sign Out</button>
+    <div class="nav-section">Overview</div>
+    <div class="nav-item active" data-page="overview" onclick="navigate('overview')"><span class="icon">📊</span><span>Dashboard</span></div>
+    <div class="nav-section">Planning</div>
+    <div class="nav-item" data-page="checklist" onclick="navigate('checklist')"><span class="icon">✅</span><span>Checklist</span></div>
+    <div class="nav-item" data-page="budget" onclick="navigate('budget')"><span class="icon">💰</span><span>Budget</span></div>
+    <div class="nav-item" data-page="timeline" onclick="navigate('timeline')"><span class="icon">📅</span><span>Program</span></div>
+    <div class="nav-item" data-page="entourage" onclick="navigate('entourage')"><span class="icon">👥</span><span>Entourage</span></div>
+    <div class="nav-item" data-page="suppliers" onclick="navigate('suppliers')"><span class="icon">🏪</span><span>Suppliers</span></div>
+    <div class="nav-section">Guest Mgmt</div>
+    <div class="nav-item" data-page="guests" onclick="navigate('guests')"><span class="icon">📋</span><span>Guest List</span></div>
+    <div class="nav-item" data-page="tables" onclick="navigate('tables')"><span class="icon">🪑</span><span>Tables</span></div>
+    <div class="nav-item" data-page="invites" onclick="navigate('invites')"><span class="icon">💌</span><span>Send Invites</span></div>
+    <div class="sidebar-footer">
+      <button onclick="logout()">Sign Out</button>
     </div>
   </div>
 
-  <div class="main">
-    <!-- Stats -->
-    <div class="stats-grid" id="statsGrid">
-      <div class="stat-card"><div class="stat-num" id="statTotal">-</div><div class="stat-label">Total Guests</div></div>
-      <div class="stat-card confirmed"><div class="stat-num" id="statConfirmed">-</div><div class="stat-label">Confirmed</div></div>
-      <div class="stat-card declined"><div class="stat-num" id="statDeclined">-</div><div class="stat-label">Declined</div></div>
-      <div class="stat-card"><div class="stat-num" id="statProxy">-</div><div class="stat-label">Proxy</div></div>
-      <div class="stat-card pending"><div class="stat-num" id="statSent">-</div><div class="stat-label">Sent</div></div>
-      <div class="stat-card"><div class="stat-num" id="statPending">-</div><div class="stat-label">Pending</div></div>
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ========== OVERVIEW ========== -->
+    <div class="page active" id="pg-overview">
+      <h1 class="page-title">Wedding Dashboard</h1>
+      <p class="page-sub">Rodnel & Divine · Oktubre 15, 2027 · Calumpit, Bulacan</p>
+
+      <div class="countdown-banner" id="countdown"></div>
+
+      <div class="stats-row" id="overviewStats"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="card">
+          <div class="card-header"><h3>RSVP Progress</h3></div>
+          <div id="rsvpProgress" style="text-align:center;padding:10px;">
+            <canvas id="rsvpChart" width="200" height="200"></canvas>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Budget Overview</h3></div>
+          <div id="budgetOverview"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header"><h3>Upcoming Tasks</h3></div>
+        <div id="upcomingTasks"></div>
+      </div>
     </div>
 
-    <!-- Tabs -->
-    <div class="tabs">
-      <div class="tab active" data-tab="guests" onclick="switchTab('guests')">Guest List</div>
-      <div class="tab" data-tab="tables" onclick="switchTab('tables')">Tables</div>
-      <div class="tab" data-tab="send" onclick="switchTab('send')">Send Invites</div>
-    </div>
-
-    <!-- GUEST LIST TAB -->
-    <div class="tab-content active" id="tab-guests">
+    <!-- ========== CHECKLIST ========== -->
+    <div class="page" id="pg-checklist">
+      <h1 class="page-title">Wedding Checklist</h1>
+      <p class="page-sub">I-track lahat ng kailangang gawin bago ang kasal</p>
       <div class="card">
         <div class="card-header">
-          <h3>Guest List</h3>
-          <button class="btn btn-gold btn-sm" onclick="openAddModal()">+ Add Guest</button>
+          <h3>Tasks <span id="checkCount" style="font-family:Jost;font-size:0.8rem;color:var(--text-muted);"></span></h3>
+          <button class="btn btn-gold btn-sm" onclick="openModal('task')">+ Add Task</button>
         </div>
         <div class="search-bar">
-          <input type="text" id="searchInput" placeholder="Search by name, email, group, or status..." oninput="filterGuests()">
+          <input type="text" id="checkSearch" placeholder="Search tasks..." oninput="renderChecklist()">
+          <select id="checkFilter" onchange="renderChecklist()">
+            <option value="all">All</option>
+            <option value="todo">To Do</option>
+            <option value="done">Done</option>
+            <option value="overdue">Overdue</option>
+          </select>
+          <select id="checkCatFilter" onchange="renderChecklist()">
+            <option value="all">All Categories</option>
+          </select>
+        </div>
+        <div id="checklistBody"></div>
+      </div>
+    </div>
+
+    <!-- ========== BUDGET ========== -->
+    <div class="page" id="pg-budget">
+      <h1 class="page-title">Budget Tracker</h1>
+      <p class="page-sub">I-monitor ang gastos at payments para sa kasal</p>
+
+      <div class="budget-summary" id="budgetSummary"></div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Expenses</h3>
+          <button class="btn btn-gold btn-sm" onclick="openModal('expense')">+ Add Expense</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="budgetSearch" placeholder="Search expenses..." oninput="renderBudget()">
+          <select id="budgetCatFilter" onchange="renderBudget()">
+            <option value="all">All Categories</option>
+          </select>
         </div>
         <div class="table-wrap">
-          <table class="guest-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Group</th>
-                <th>Email</th>
-                <th>Table</th>
-                <th>Code</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="guestTableBody">
-              <tr><td colspan="7" class="loading"><div class="spinner"></div>Loading...</td></tr>
-            </tbody>
+          <table class="dt">
+            <thead><tr><th>Item</th><th>Category</th><th>Estimated</th><th>Actual</th><th>Paid</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="budgetBody"></tbody>
           </table>
         </div>
       </div>
     </div>
 
-    <!-- TABLES TAB -->
-    <div class="tab-content" id="tab-tables">
+    <!-- ========== PROGRAM/TIMELINE ========== -->
+    <div class="page" id="pg-timeline">
+      <h1 class="page-title">Wedding Day Program</h1>
+      <p class="page-sub">Timeline ng mga events sa araw ng kasal</p>
       <div class="card">
         <div class="card-header">
-          <h3>Table Assignments</h3>
+          <h3>Program Flow</h3>
+          <button class="btn btn-gold btn-sm" onclick="openModal('program')">+ Add Event</button>
         </div>
-        <div id="tableView">
-          <div class="loading"><div class="spinner"></div>Loading tables...</div>
+        <div id="timelineBody"></div>
+      </div>
+    </div>
+
+    <!-- ========== ENTOURAGE ========== -->
+    <div class="page" id="pg-entourage">
+      <h1 class="page-title">Entourage</h1>
+      <p class="page-sub">Mga kasama sa wedding party</p>
+      <div class="card">
+        <div class="card-header">
+          <h3>Wedding Party</h3>
+          <button class="btn btn-gold btn-sm" onclick="openModal('entourage')">+ Add Member</button>
+        </div>
+        <div id="entourageBody"></div>
+      </div>
+    </div>
+
+    <!-- ========== SUPPLIERS ========== -->
+    <div class="page" id="pg-suppliers">
+      <h1 class="page-title">Suppliers & Vendors</h1>
+      <p class="page-sub">Manage lahat ng suppliers para sa kasal</p>
+      <div class="card">
+        <div class="card-header">
+          <h3>Suppliers</h3>
+          <button class="btn btn-gold btn-sm" onclick="openModal('supplier')">+ Add Supplier</button>
+        </div>
+        <div class="table-wrap">
+          <table class="dt">
+            <thead><tr><th>Supplier</th><th>Category</th><th>Contact</th><th>Package</th><th>Cost</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="supplierBody"></tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <!-- SEND INVITES TAB -->
-    <div class="tab-content" id="tab-send">
+    <!-- ========== GUEST LIST ========== -->
+    <div class="page" id="pg-guests">
+      <h1 class="page-title">Guest List</h1>
+      <p class="page-sub">Manage lahat ng imbitado</p>
       <div class="card">
         <div class="card-header">
-          <h3>Send Invitations</h3>
+          <h3>Guests <span id="guestCount" style="font-family:Jost;font-size:0.8rem;color:var(--text-muted);"></span></h3>
+          <button class="btn btn-gold btn-sm" onclick="openModal('guest')">+ Add Guest</button>
         </div>
+        <div class="search-bar">
+          <input type="text" id="guestSearch" placeholder="Search by name, email, group, or status..." oninput="filterGuests()">
+        </div>
+        <div class="table-wrap">
+          <table class="dt">
+            <thead><tr><th>Name</th><th>Group</th><th>Email</th><th>Table</th><th>Code</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="guestBody"><tr><td colspan="7" class="loading"><div class="spinner"></div>Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TABLES ========== -->
+    <div class="page" id="pg-tables">
+      <h1 class="page-title">Table Assignments</h1>
+      <p class="page-sub">I-assign ang bawat guest sa kanilang table</p>
+      <div class="card">
+        <div id="tableView"><div class="loading"><div class="spinner"></div>Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- ========== SEND INVITES ========== -->
+    <div class="page" id="pg-invites">
+      <h1 class="page-title">Send Invitations</h1>
+      <p class="page-sub">I-send ang invitation email sa mga guest</p>
+      <div class="card">
         <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">
           I-send ang invitation email sa mga guest na hindi pa naka-receive. Kasama sa email ang unique invite link at dress code.
         </p>
-        <div id="unsent-list"></div>
+        <div id="unsentList"></div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- ADD/EDIT GUEST MODAL -->
-<div class="modal-overlay" id="guestModal">
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<!-- UNIVERSAL MODAL -->
+<div class="modal-overlay" id="modal">
   <div class="modal">
-    <h3 id="modalTitle">Add Guest</h3>
-    <input type="hidden" id="editGuestId">
-    <div class="form-group">
-      <label>Buong Pangalan *</label>
-      <input type="text" id="mFullName" placeholder="e.g. Juan Dela Cruz" required>
-    </div>
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="mEmail" placeholder="e.g. juan@email.com">
-    </div>
-    <div class="form-group">
-      <label>Phone</label>
-      <input type="text" id="mPhone" placeholder="e.g. 09171234567">
-    </div>
-    <div class="form-group">
-      <label>Group</label>
-      <input type="text" id="mGroup" placeholder="e.g. Bride Family, Groom Friends, Ninong/Ninang" list="groupList">
-      <datalist id="groupList">
-        <option value="Bride Family">
-        <option value="Groom Family">
-        <option value="Bride Friends">
-        <option value="Groom Friends">
-        <option value="Ninong/Ninang">
-        <option value="Colleagues">
-        <option value="Church">
-      </datalist>
-    </div>
-    <div class="form-group">
-      <label>Table Number</label>
-      <input type="number" id="mTable" placeholder="e.g. 1" min="1">
-    </div>
-    <div class="form-group">
-      <label>Notes</label>
-      <textarea id="mNotes" rows="2" placeholder="Optional notes..."></textarea>
-    </div>
+    <h3 id="modalTitle">Add</h3>
+    <div id="modalBody"></div>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-gold" id="modalSaveBtn" onclick="saveGuest()">Add Guest</button>
+      <button class="btn btn-gold" id="modalSave" onclick="saveModal()">Save</button>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbzTed1IVGpD7anZrIZqHC6-9mr0nH6fBxEjq6p_JKYX7HcGPweH5RthWSQ9NEwZ8MQewg/exec';
-const SITE_URL = 'https://baynisandy.github.io/hiraya-wedding/';
-let adminKey = '';
-let allGuests = [];
+// ============ CONFIG ============
+const API_URL='https://script.google.com/macros/s/AKfycbzTed1IVGpD7anZrIZqHC6-9mr0nH6fBxEjq6p_JKYX7HcGPweH5RthWSQ9NEwZ8MQewg/exec';
+const SITE_URL='https://baynisandy.github.io/hiraya-wedding/';
+const WEDDING_DATE=new Date('2027-10-15T06:00:00+08:00');
+let adminKey='';
+let allGuests=[];
+let currentModal='';
+let editId=null;
 
-// ===== AUTH =====
-document.getElementById('adminKeyInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') login();
-});
+// ============ LOCAL DATA (localStorage) ============
+const LS_KEY='hiraya_portal_';
+function lsGet(key){try{return JSON.parse(localStorage.getItem(LS_KEY+key))||[];}catch(e){return[];}}
+function lsSet(key,data){try{localStorage.setItem(LS_KEY+key,JSON.stringify(data));}catch(e){}}
+function genId(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
 
-function login() {
-  adminKey = document.getElementById('adminKeyInput').value.trim();
-  if (!adminKey) return;
-  document.getElementById('loginError').style.display = 'none';
+// ============ AUTH ============
+document.getElementById('adminKeyInput').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+function login(){
+  adminKey=document.getElementById('adminKeyInput').value.trim();
+  if(!adminKey)return;
+  document.getElementById('loginError').style.display='none';
+  apiGet('admin_stats',{}).then(d=>{
+    if(d.status===200){
+      document.getElementById('loginScreen').style.display='none';
+      document.getElementById('app').style.display='block';
+      loadAll();
+    }else{document.getElementById('loginError').style.display='block';}
+  }).catch(()=>{document.getElementById('loginError').style.display='block';});
+}
+function logout(){adminKey='';allGuests=[];document.getElementById('app').style.display='none';document.getElementById('loginScreen').style.display='flex';document.getElementById('adminKeyInput').value='';}
 
-  // Test the key by fetching stats
-  apiGet('admin_stats', {})
-    .then(data => {
-      if (data.status === 200) {
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-        loadData();
-      } else {
-        document.getElementById('loginError').style.display = 'block';
-      }
-    })
-    .catch(() => {
-      document.getElementById('loginError').style.display = 'block';
-    });
+// ============ API ============
+function apiGet(action,params){const u=new URL(API_URL);u.searchParams.set('action',action);u.searchParams.set('admin_key',adminKey);Object.keys(params).forEach(k=>u.searchParams.set(k,params[k]));return fetch(u).then(r=>r.json());}
+function apiPost(action,payload){payload.action=action;payload.admin_key=adminKey;return fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)}).then(r=>r.json());}
+
+// ============ NAVIGATION ============
+function navigate(page){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===page));
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='pg-'+page));
 }
 
-function logout() {
-  adminKey = '';
-  allGuests = [];
-  document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('adminKeyInput').value = '';
-}
-
-// ===== API =====
-function apiGet(action, params) {
-  const url = new URL(API_URL);
-  url.searchParams.set('action', action);
-  url.searchParams.set('admin_key', adminKey);
-  Object.keys(params).forEach(k => url.searchParams.set(k, params[k]));
-  return fetch(url).then(r => r.json());
-}
-
-function apiPost(action, payload) {
-  payload.action = action;
-  payload.admin_key = adminKey;
-  return fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(payload)
-  }).then(r => r.json());
-}
-
-// ===== DATA LOADING =====
-function loadData() {
-  loadStats();
+// ============ LOAD ALL ============
+function loadAll(){
+  updateCountdown();
   loadGuests();
+  renderChecklist();
+  renderBudget();
+  renderTimeline();
+  renderEntourage();
+  renderSuppliers();
 }
 
-function loadStats() {
-  apiGet('admin_stats', {}).then(data => {
-    if (data.status === 200) {
-      const s = data.stats;
-      document.getElementById('statTotal').textContent = s.total;
-      document.getElementById('statConfirmed').textContent = s.confirmed;
-      document.getElementById('statDeclined').textContent = s.declined;
-      document.getElementById('statProxy').textContent = s.proxy || 0;
-      document.getElementById('statSent').textContent = s.sent;
-      document.getElementById('statPending').textContent = s.pending;
-    }
+// ============ COUNTDOWN ============
+function updateCountdown(){
+  const now=new Date();
+  const diff=WEDDING_DATE-now;
+  const days=Math.floor(diff/(1000*60*60*24));
+  const hours=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+  const mins=Math.floor((diff%(1000*60*60))/(1000*60));
+  document.getElementById('countdown').innerHTML=`
+    <h2>Rodnel & Divine Wedding</h2>
+    <div class="countdown-nums">
+      <div class="countdown-unit"><div class="num">${days}</div><div class="label">Days</div></div>
+      <div class="countdown-unit"><div class="num">${hours}</div><div class="label">Hours</div></div>
+      <div class="countdown-unit"><div class="num">${mins}</div><div class="label">Minutes</div></div>
+    </div>`;
+}
+
+// ============ OVERVIEW ============
+function renderOverview(){
+  const guests=allGuests;
+  const confirmed=guests.filter(g=>g.invite_status==='confirmed').length;
+  const declined=guests.filter(g=>g.invite_status==='declined').length;
+  const proxy=guests.filter(g=>g.invite_status==='proxy').length;
+  const pending=guests.filter(g=>!g.invite_status||g.invite_status==='pending'||g.invite_status==='sent').length;
+  const budget=lsGet('budget');
+  const totalBudget=budget.reduce((s,b)=>s+Number(b.estimated||0),0);
+  const totalSpent=budget.reduce((s,b)=>s+Number(b.actual||0),0);
+  const tasks=lsGet('checklist');
+  const doneTasks=tasks.filter(t=>t.done).length;
+
+  document.getElementById('overviewStats').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${guests.length}</div><div class="stat-label">Total Guests</div></div>
+    <div class="stat-card green"><div class="stat-num">${confirmed+proxy}</div><div class="stat-label">Attending</div></div>
+    <div class="stat-card red"><div class="stat-num">${declined}</div><div class="stat-label">Declined</div></div>
+    <div class="stat-card gold"><div class="stat-num">${pending}</div><div class="stat-label">Awaiting</div></div>
+    <div class="stat-card blue"><div class="stat-num">${tasks.length?Math.round(doneTasks/tasks.length*100):0}%</div><div class="stat-label">Tasks Done</div></div>
+    <div class="stat-card"><div class="stat-num">₱${formatNum(totalSpent)}</div><div class="stat-label">Total Spent</div></div>`;
+
+  // RSVP donut
+  drawDonut('rsvpChart',[
+    {val:confirmed,color:'#2e7d32',label:'Confirmed'},
+    {val:proxy,color:'#283593',label:'Proxy'},
+    {val:declined,color:'#c62828',label:'Declined'},
+    {val:pending,color:'#e65100',label:'Pending'}
+  ]);
+
+  // Budget overview
+  const pct=totalBudget?Math.round(totalSpent/totalBudget*100):0;
+  document.getElementById('budgetOverview').innerHTML=`
+    <div style="text-align:center;padding:20px;">
+      <div style="font-size:2rem;font-weight:700;color:${pct>100?'var(--danger)':pct>80?'var(--warn)':'var(--earth)'};">₱${formatNum(totalSpent)}</div>
+      <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">of ₱${formatNum(totalBudget)} budget (${pct}%)</div>
+      <div class="budget-bar" style="max-width:300px;margin:0 auto;">
+        <div class="budget-bar-fill ${pct>100?'over':pct>80?'warn':'ok'}" style="width:${Math.min(pct,100)}%"></div>
+      </div>
+    </div>`;
+
+  // Upcoming tasks
+  const upcoming=tasks.filter(t=>!t.done&&t.due).sort((a,b)=>new Date(a.due)-new Date(b.due)).slice(0,5);
+  document.getElementById('upcomingTasks').innerHTML=upcoming.length?upcoming.map(t=>{
+    const d=new Date(t.due);const overdue=d<new Date();
+    return`<div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #f0ebe6;">
+      <span style="font-size:0.85rem;">${esc(t.text)}</span>
+      <span style="font-size:0.75rem;color:${overdue?'var(--danger)':'var(--text-muted)'};">${d.toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'})}</span>
+    </div>`;
+  }).join(''):'<p style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.85rem;">Walang upcoming tasks. Add tasks sa Checklist!</p>';
+}
+
+// ============ DONUT CHART ============
+function drawDonut(id,segments){
+  const canvas=document.getElementById(id);if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const cx=100,cy=90,r=70,r2=45;
+  const total=segments.reduce((s,x)=>s+x.val,0);
+  ctx.clearRect(0,0,200,200);
+  if(!total){ctx.fillStyle='var(--border)';ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.arc(cx,cy,r2,0,Math.PI*2,true);ctx.fill();return;}
+  let start=-Math.PI/2;
+  segments.forEach(seg=>{
+    if(!seg.val)return;
+    const angle=(seg.val/total)*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx+r2*Math.cos(start),cy+r2*Math.sin(start));
+    ctx.arc(cx,cy,r,start,start+angle);ctx.arc(cx,cy,r2,start+angle,start,true);
+    ctx.fillStyle=seg.color;ctx.fill();start+=angle;
+  });
+  // Legend
+  let ly=180;
+  ctx.font='11px Jost';
+  segments.forEach(seg=>{
+    if(!seg.val)return;
+    ctx.fillStyle=seg.color;ctx.fillRect(10,ly-8,10,10);
+    ctx.fillStyle='#3d3028';ctx.fillText(`${seg.label}: ${seg.val}`,26,ly);ly+=16;
   });
 }
 
-function loadGuests() {
-  document.getElementById('guestTableBody').innerHTML =
-    '<tr><td colspan="7" class="loading"><div class="spinner"></div>Loading...</td></tr>';
+// ============ CHECKLIST ============
+function renderChecklist(){
+  const items=lsGet('checklist');
+  const search=(document.getElementById('checkSearch')?.value||'').toLowerCase();
+  const filter=document.getElementById('checkFilter')?.value||'all';
+  const cat=document.getElementById('checkCatFilter')?.value||'all';
+  const now=new Date();
 
-  apiGet('admin_guests', {}).then(data => {
-    if (data.status === 200) {
-      allGuests = data.guests;
-      renderGuests(allGuests);
-      renderTables(allGuests);
-      renderUnsentList(allGuests);
-    }
-  });
-}
-
-function renderGuests(guests) {
-  const tbody = document.getElementById('guestTableBody');
-  if (!guests.length) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted);">Walang guests pa. Click "+ Add Guest" para magsimula.</td></tr>';
-    return;
+  // Populate category filter
+  const cats=[...new Set(items.map(i=>i.category).filter(Boolean))];
+  const catSel=document.getElementById('checkCatFilter');
+  if(catSel){
+    const cv=catSel.value;
+    catSel.innerHTML='<option value="all">All Categories</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+    catSel.value=cv;
   }
 
-  tbody.innerHTML = guests.map(g => {
-    const statusClass = 'status-' + (g.invite_status || 'pending');
-    const statusLabel = g.invite_status || 'pending';
-    return `<tr>
-      <td><strong>${esc(g.full_name)}</strong></td>
-      <td>${esc(g.group_label || '-')}</td>
-      <td style="font-size:0.78rem;">${esc(g.email || '-')}</td>
-      <td style="text-align:center;">${g.table_number || '-'}</td>
-      <td><code style="font-size:0.75rem;background:var(--cream);padding:2px 6px;border-radius:4px;">${esc(g.invite_code)}</code></td>
-      <td><span class="status ${statusClass}">${statusLabel}</span></td>
+  let filtered=items;
+  if(search)filtered=filtered.filter(i=>i.text.toLowerCase().includes(search));
+  if(filter==='done')filtered=filtered.filter(i=>i.done);
+  else if(filter==='todo')filtered=filtered.filter(i=>!i.done);
+  else if(filter==='overdue')filtered=filtered.filter(i=>!i.done&&i.due&&new Date(i.due)<now);
+  if(cat!=='all')filtered=filtered.filter(i=>i.category===cat);
+
+  const doneCount=items.filter(i=>i.done).length;
+  const el=document.getElementById('checkCount');
+  if(el)el.textContent=`(${doneCount}/${items.length} done)`;
+
+  document.getElementById('checklistBody').innerHTML=filtered.length?filtered.map(i=>{
+    const overdue=!i.done&&i.due&&new Date(i.due)<now;
+    return`<div class="check-item ${i.done?'done':''}" onclick="toggleCheck('${i.id}')">
+      <div class="check-box">${i.done?'✓':''}</div>
+      <div class="check-text">${esc(i.text)}</div>
+      ${i.category?`<span class="check-cat">${esc(i.category)}</span>`:''}
+      ${i.due?`<span class="check-date" style="${overdue?'color:var(--danger);font-weight:600':''}">${overdue?'OVERDUE · ':''}${new Date(i.due).toLocaleDateString('en-PH',{month:'short',day:'numeric'})}</span>`:''}
+      <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();editCheck('${i.id}')">Edit</button>
+      <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();deleteItem('checklist','${i.id}')">×</button>
+    </div>`;
+  }).join(''):'<p style="text-align:center;padding:30px;color:var(--text-muted);">Walang tasks pa. Click "+ Add Task" para magsimula!</p>';
+}
+
+function toggleCheck(id){const items=lsGet('checklist');const i=items.find(x=>x.id===id);if(i){i.done=!i.done;lsSet('checklist',items);renderChecklist();renderOverview();}}
+function editCheck(id){const items=lsGet('checklist');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('task',i);}}
+
+// ============ BUDGET ============
+function renderBudget(){
+  const items=lsGet('budget');
+  const search=(document.getElementById('budgetSearch')?.value||'').toLowerCase();
+  const cat=document.getElementById('budgetCatFilter')?.value||'all';
+
+  const cats=[...new Set(items.map(i=>i.category).filter(Boolean))];
+  const catSel=document.getElementById('budgetCatFilter');
+  if(catSel){const cv=catSel.value;catSel.innerHTML='<option value="all">All Categories</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');catSel.value=cv;}
+
+  let filtered=items;
+  if(search)filtered=filtered.filter(i=>i.item.toLowerCase().includes(search)||((i.category||'').toLowerCase().includes(search)));
+  if(cat!=='all')filtered=filtered.filter(i=>i.category===cat);
+
+  const totalEst=items.reduce((s,b)=>s+Number(b.estimated||0),0);
+  const totalAct=items.reduce((s,b)=>s+Number(b.actual||0),0);
+  const totalPaid=items.reduce((s,b)=>s+Number(b.paid||0),0);
+  const remaining=totalEst-totalAct;
+  const unpaid=totalAct-totalPaid;
+
+  document.getElementById('budgetSummary').innerHTML=`
+    <div class="stat-card"><div class="stat-num" style="color:var(--earth);">₱${formatNum(totalEst)}</div><div class="stat-label">Total Budget</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--warn);">₱${formatNum(totalAct)}</div><div class="stat-label">Actual Cost</div></div>
+    <div class="stat-card green"><div class="stat-num">₱${formatNum(totalPaid)}</div><div class="stat-label">Paid</div></div>
+    <div class="stat-card ${unpaid>0?'red':''}"><div class="stat-num">₱${formatNum(unpaid>0?unpaid:0)}</div><div class="stat-label">Unpaid</div></div>
+    <div class="stat-card ${remaining<0?'red':'blue'}"><div class="stat-num">₱${formatNum(Math.abs(remaining))}</div><div class="stat-label">${remaining<0?'Over Budget':'Remaining'}</div></div>`;
+
+  document.getElementById('budgetBody').innerHTML=filtered.length?filtered.map(b=>{
+    const payStatus=Number(b.paid||0)>=Number(b.actual||0)&&Number(b.actual)>0?'paid':Number(b.paid)>0?'partial':'unpaid';
+    return`<tr>
+      <td><strong>${esc(b.item)}</strong>${b.notes?`<br><span style="font-size:0.72rem;color:var(--text-muted);">${esc(b.notes)}</span>`:''}</td>
+      <td>${esc(b.category||'-')}</td>
+      <td style="text-align:right;">₱${formatNum(b.estimated||0)}</td>
+      <td style="text-align:right;">₱${formatNum(b.actual||0)}</td>
+      <td style="text-align:right;">₱${formatNum(b.paid||0)}</td>
+      <td><span class="status s-${payStatus}">${payStatus}</span></td>
       <td class="actions-cell">
-        <button class="btn btn-outline btn-sm" onclick="openEditModal('${g.guest_id}')">Edit</button>
-        ${g.invite_status === 'expired' || g.invite_status === 'confirmed' || g.invite_status === 'declined' ?
-          `<button class="btn btn-outline btn-sm" onclick="reopenInvite('${g.guest_id}')">Reopen</button>` : ''}
-        ${g.email && (g.invite_status === 'pending' || g.invite_status === 'sent') ?
-          `<button class="btn btn-outline btn-sm" onclick="sendInvite('${g.guest_id}')">Send</button>` : ''}
+        <button class="btn btn-outline btn-sm" onclick="editBudgetItem('${b.id}')">Edit</button>
+        <button class="btn btn-outline btn-sm" onclick="deleteItem('budget','${b.id}')">×</button>
       </td>
     </tr>`;
-  }).join('');
+  }).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">Walang expenses pa. Click "+ Add Expense"!</td></tr>';
+
+  renderOverview();
 }
 
-function filterGuests() {
-  const q = document.getElementById('searchInput').value.toLowerCase();
-  if (!q) return renderGuests(allGuests);
-  renderGuests(allGuests.filter(g =>
-    (g.full_name || '').toLowerCase().includes(q) ||
-    (g.email || '').toLowerCase().includes(q) ||
-    (g.group_label || '').toLowerCase().includes(q) ||
-    (g.invite_status || '').toLowerCase().includes(q) ||
-    (g.invite_code || '').toLowerCase().includes(q)
-  ));
-}
+function editBudgetItem(id){const items=lsGet('budget');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('expense',i);}}
 
-// ===== TABLE VIEW =====
-function renderTables(guests) {
-  const byTable = {};
-  guests.forEach(g => {
-    const t = g.table_number || 'Unassigned';
-    if (!byTable[t]) byTable[t] = [];
-    byTable[t].push(g);
-  });
-
-  const container = document.getElementById('tableView');
-  const tables = Object.keys(byTable).sort((a, b) => {
-    if (a === 'Unassigned') return 1;
-    if (b === 'Unassigned') return -1;
-    return Number(a) - Number(b);
-  });
-
-  container.innerHTML = tables.map(t => {
-    const members = byTable[t];
-    const confirmed = members.filter(m => m.invite_status === 'confirmed').length;
-    return `
-      <div style="background:var(--cream);border-radius:10px;padding:16px;margin-bottom:12px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <strong style="color:var(--earth);">${t === 'Unassigned' ? '📋 Unassigned' : '🪑 Table ' + t}</strong>
-          <span style="font-size:0.8rem;color:var(--text-muted);">${confirmed}/${members.length} confirmed</span>
-        </div>
-        ${members.map(m => {
-          const sc = 'status-' + (m.invite_status || 'pending');
-          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
-            <span style="font-size:0.85rem;">${esc(m.full_name)}</span>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span class="status ${sc}" style="font-size:0.7rem;">${m.invite_status || 'pending'}</span>
-              <input type="number" value="${m.table_number || ''}" min="1" style="width:50px;padding:4px;border:1px solid var(--border);border-radius:6px;font-size:0.8rem;text-align:center;" onchange="assignTable('${m.guest_id}', this.value)">
-            </div>
-          </div>`;
-        }).join('')}
+// ============ TIMELINE/PROGRAM ============
+function renderTimeline(){
+  const items=lsGet('timeline').sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+  document.getElementById('timelineBody').innerHTML=items.length?items.map(t=>
+    `<div class="tl-item">
+      <div class="tl-time"><div class="time">${esc(t.time||'')}</div><div class="dur">${esc(t.duration||'')}</div></div>
+      <div class="tl-dot"></div>
+      <div class="tl-body"><h4>${esc(t.event)}</h4><p>${esc(t.details||'')}</p>
+        <div style="margin-top:6px;"><button class="btn btn-outline btn-sm" onclick="editTimelineItem('${t.id}')">Edit</button> <button class="btn btn-outline btn-sm" onclick="deleteItem('timeline','${t.id}')">×</button></div>
       </div>
-    `;
-  }).join('');
+    </div>`
+  ).join(''):'<p style="text-align:center;padding:30px;color:var(--text-muted);">Walang program events pa. Click "+ Add Event"!</p>';
 }
 
-function assignTable(guestId, tableNum) {
-  apiPost('admin_assign_table', {
-    assignments: [{ guest_id: guestId, table_number: tableNum }]
-  }).then(data => {
-    if (data.status === 200) {
-      toast('Table assigned!', 'success');
-      loadData();
-    } else {
-      toast(data.error || 'Error assigning table', 'error');
-    }
+function editTimelineItem(id){const items=lsGet('timeline');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('program',i);}}
+
+// ============ ENTOURAGE ============
+function renderEntourage(){
+  const items=lsGet('entourage');
+  const groups={};
+  items.forEach(m=>{const g=m.role_group||'Others';if(!groups[g])groups[g]=[];groups[g].push(m);});
+  const order=['Principal Sponsors','Secondary Sponsors','Best Man & Maid of Honor','Groomsmen & Bridesmaids','Flower Girls & Ring Bearers','Bible & Cord & Veil','Candle & Coin','Others'];
+  const sorted=order.filter(g=>groups[g]).concat(Object.keys(groups).filter(g=>!order.includes(g)));
+
+  document.getElementById('entourageBody').innerHTML=sorted.length?sorted.map(g=>
+    `<div class="ent-group"><h4>${esc(g)}</h4>
+      ${groups[g].map(m=>
+        `<div class="ent-member">
+          <div><strong>${esc(m.name)}</strong> <span class="ent-role">${esc(m.specific_role||'')}</span></div>
+          <div>
+            ${m.contact?`<span style="font-size:0.75rem;color:var(--text-muted);margin-right:8px;">${esc(m.contact)}</span>`:''}
+            <button class="btn btn-outline btn-sm" onclick="editEntourage('${m.id}')">Edit</button>
+            <button class="btn btn-outline btn-sm" onclick="deleteItem('entourage','${m.id}')">×</button>
+          </div>
+        </div>`
+      ).join('')}
+    </div>`
+  ).join(''):'<p style="text-align:center;padding:30px;color:var(--text-muted);">Walang entourage members pa. Click "+ Add Member"!</p>';
+}
+
+function editEntourage(id){const items=lsGet('entourage');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('entourage',i);}}
+
+// ============ SUPPLIERS ============
+function renderSuppliers(){
+  const items=lsGet('suppliers');
+  document.getElementById('supplierBody').innerHTML=items.length?items.map(s=>{
+    const payStatus=s.status||'unpaid';
+    return`<tr>
+      <td><strong>${esc(s.name)}</strong>${s.notes?`<br><span style="font-size:0.72rem;color:var(--text-muted);">${esc(s.notes)}</span>`:''}</td>
+      <td>${esc(s.category||'-')}</td>
+      <td><div style="font-size:0.82rem;">${esc(s.contact_name||'')}</div><div style="font-size:0.72rem;color:var(--text-muted);">${esc(s.phone||'')} ${s.email?'· '+esc(s.email):''}</div></td>
+      <td style="font-size:0.82rem;">${esc(s.package||'-')}</td>
+      <td style="text-align:right;">₱${formatNum(s.cost||0)}</td>
+      <td><span class="status s-${payStatus}">${payStatus}</span></td>
+      <td class="actions-cell">
+        <button class="btn btn-outline btn-sm" onclick="editSupplier('${s.id}')">Edit</button>
+        <button class="btn btn-outline btn-sm" onclick="deleteItem('suppliers','${s.id}')">×</button>
+      </td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">Walang suppliers pa. Click "+ Add Supplier"!</td></tr>';
+}
+
+function editSupplier(id){const items=lsGet('suppliers');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('supplier',i);}}
+
+// ============ GUESTS (API-backed) ============
+function loadGuests(){
+  apiGet('admin_guests',{}).then(d=>{
+    if(d.status===200){allGuests=d.guests;renderGuestTable(allGuests);renderTables(allGuests);renderUnsentList(allGuests);renderOverview();}
   });
 }
 
-// ===== SEND INVITES =====
-function renderUnsentList(guests) {
-  const unsent = guests.filter(g => g.email && g.invite_status === 'pending');
-  const container = document.getElementById('unsent-list');
+function renderGuestTable(guests){
+  document.getElementById('guestCount').textContent=`(${guests.length})`;
+  document.getElementById('guestBody').innerHTML=guests.length?guests.map(g=>{
+    const sc='s-'+(g.invite_status||'pending');
+    return`<tr>
+      <td><strong>${esc(g.full_name)}</strong></td>
+      <td>${esc(g.group_label||'-')}</td>
+      <td style="font-size:0.78rem;">${esc(g.email||'-')}</td>
+      <td style="text-align:center;">${g.table_number||'-'}</td>
+      <td><code style="font-size:0.73rem;background:var(--cream);padding:2px 6px;border-radius:4px;">${esc(g.invite_code)}</code></td>
+      <td><span class="status ${sc}">${g.invite_status||'pending'}</span></td>
+      <td class="actions-cell">
+        <button class="btn btn-outline btn-sm" onclick="editGuest('${g.guest_id}')">Edit</button>
+        ${['expired','confirmed','declined'].includes(g.invite_status)?`<button class="btn btn-outline btn-sm" onclick="reopenInvite('${g.guest_id}')">Reopen</button>`:''}
+        ${g.email&&['pending','sent'].includes(g.invite_status||'pending')?`<button class="btn btn-outline btn-sm" onclick="sendInvite('${g.guest_id}')">Send</button>`:''}
+      </td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">Walang guests pa.</td></tr>';
+}
 
-  if (!unsent.length) {
-    container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;">Lahat ng guests na may email ay na-send na ang invite, o walang pending.</p>';
-    return;
-  }
+function filterGuests(){
+  const q=(document.getElementById('guestSearch')?.value||'').toLowerCase();
+  if(!q)return renderGuestTable(allGuests);
+  renderGuestTable(allGuests.filter(g=>(g.full_name||'').toLowerCase().includes(q)||(g.email||'').toLowerCase().includes(q)||(g.group_label||'').toLowerCase().includes(q)||(g.invite_status||'').toLowerCase().includes(q)||(g.invite_code||'').toLowerCase().includes(q)));
+}
 
-  container.innerHTML = `
+function editGuest(id){const g=allGuests.find(x=>x.guest_id===id);if(g){editId=id;openModal('guest',g);}}
+
+function reopenInvite(id){if(!confirm('I-reopen ang invite code para sa guest na ito?'))return;apiPost('admin_reopen',{guest_id:id}).then(d=>{if(d.status===200){toast(d.message,'success');loadGuests();}else toast(d.error||'Error','error');});}
+
+function sendInvite(id){if(!confirm('I-send ang invitation email?'))return;apiPost('admin_send_invite',{guest_id:id,base_url:SITE_URL}).then(d=>{if(d.status===200){toast(d.message,'success');loadGuests();}else toast(d.error||'Error','error');});}
+
+// ============ TABLES ============
+function renderTables(guests){
+  const byTable={};
+  guests.forEach(g=>{const t=g.table_number||'Unassigned';if(!byTable[t])byTable[t]=[];byTable[t].push(g);});
+  const tables=Object.keys(byTable).sort((a,b)=>{if(a==='Unassigned')return 1;if(b==='Unassigned')return -1;return Number(a)-Number(b);});
+  document.getElementById('tableView').innerHTML=tables.map(t=>{
+    const members=byTable[t];const conf=members.filter(m=>['confirmed','proxy'].includes(m.invite_status)).length;
+    return`<div style="background:var(--cream);border-radius:10px;padding:16px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <strong style="color:var(--earth);">${t==='Unassigned'?'📋 Unassigned':'🪑 Table '+t}</strong>
+        <span style="font-size:0.8rem;color:var(--text-muted);">${conf}/${members.length} confirmed</span>
+      </div>
+      ${members.map(m=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:0.85rem;">${esc(m.full_name)}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="status s-${m.invite_status||'pending'}" style="font-size:0.68rem;">${m.invite_status||'pending'}</span>
+          <input type="number" value="${m.table_number||''}" min="1" style="width:50px;padding:4px;border:1px solid var(--border);border-radius:6px;font-size:0.8rem;text-align:center;" onchange="assignTable('${m.guest_id}',this.value)">
+        </div>
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function assignTable(id,num){apiPost('admin_assign_table',{assignments:[{guest_id:id,table_number:num}]}).then(d=>{if(d.status===200){toast('Table assigned!','success');loadGuests();}else toast(d.error||'Error','error');});}
+
+// ============ SEND INVITES ============
+function renderUnsentList(guests){
+  const unsent=guests.filter(g=>g.email&&(!g.invite_status||g.invite_status==='pending'));
+  document.getElementById('unsentList').innerHTML=unsent.length?`
     <div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
       <span style="font-size:0.85rem;color:var(--text-muted);">${unsent.length} guest(s) na hindi pa na-send</span>
-      <button class="btn btn-gold btn-sm" onclick="sendAllInvites()">Send All (${unsent.length})</button>
+      <button class="btn btn-gold btn-sm" onclick="sendAll()">Send All (${unsent.length})</button>
     </div>
-    ${unsent.map(g => `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid var(--border);">
-        <div>
-          <strong style="font-size:0.85rem;">${esc(g.full_name)}</strong>
-          <span style="font-size:0.78rem;color:var(--text-muted);margin-left:8px;">${esc(g.email)}</span>
-        </div>
-        <button class="btn btn-outline btn-sm" onclick="sendInvite('${g.guest_id}')">Send</button>
+    ${unsent.map(g=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid var(--border);">
+      <div><strong style="font-size:0.85rem;">${esc(g.full_name)}</strong><span style="font-size:0.78rem;color:var(--text-muted);margin-left:8px;">${esc(g.email)}</span></div>
+      <button class="btn btn-outline btn-sm" onclick="sendInvite('${g.guest_id}')">Send</button>
+    </div>`).join('')}`
+  :'<p style="text-align:center;padding:20px;color:var(--text-muted);">Lahat ng guests na may email ay na-send na, o walang pending.</p>';
+}
+
+function sendAll(){
+  const unsent=allGuests.filter(g=>g.email&&(!g.invite_status||g.invite_status==='pending'));
+  if(!confirm(`I-send sa ${unsent.length} guests?`))return;
+  let sent=0;
+  const go=(i)=>{if(i>=unsent.length){toast(`${sent} invitation(s) sent!`,'success');loadGuests();return;}
+    apiPost('admin_send_invite',{guest_id:unsent[i].guest_id,base_url:SITE_URL}).then(d=>{if(d.status===200)sent++;setTimeout(()=>go(i+1),1500);}).catch(()=>setTimeout(()=>go(i+1),1500));};
+  go(0);toast('Sending invitations...','success');
+}
+
+// ============ MODAL SYSTEM ============
+function openModal(type,data){
+  currentModal=type;editId=data?editId:null;
+  const isEdit=!!data;
+  const d=data||{};
+  let title='',html='';
+
+  if(type==='task'){
+    title=isEdit?'Edit Task':'Add Task';
+    html=`
+      <div class="form-group"><label>Task *</label><input type="text" id="f_text" value="${esc(d.text||'')}" placeholder="e.g. Book photographer"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Category</label><input type="text" id="f_category" value="${esc(d.category||'')}" placeholder="e.g. Venue, Attire" list="taskCats">
+          <datalist id="taskCats"><option value="Venue"><option value="Attire"><option value="Catering"><option value="Photo/Video"><option value="Flowers"><option value="Invitations"><option value="Entertainment"><option value="Transportation"><option value="Legal"><option value="Ceremony"><option value="Reception"><option value="Honeymoon"></datalist></div>
+        <div class="form-group"><label>Due Date</label><input type="date" id="f_due" value="${d.due||''}"></div>
       </div>
-    `).join('')}
-  `;
+      <div class="form-group"><label>Notes</label><textarea id="f_notes" rows="2" placeholder="Optional notes...">${esc(d.notes||'')}</textarea></div>`;
+  } else if(type==='expense'){
+    title=isEdit?'Edit Expense':'Add Expense';
+    html=`
+      <div class="form-group"><label>Item *</label><input type="text" id="f_item" value="${esc(d.item||'')}" placeholder="e.g. Catering for 150 pax"></div>
+      <div class="form-group"><label>Category</label><input type="text" id="f_category" value="${esc(d.category||'')}" placeholder="e.g. Venue, Catering" list="budgetCats">
+        <datalist id="budgetCats"><option value="Venue"><option value="Catering"><option value="Photo/Video"><option value="Attire"><option value="Flowers & Decor"><option value="Entertainment"><option value="Invitations"><option value="Transportation"><option value="Cake"><option value="Favors"><option value="Officiant"><option value="Rings"><option value="Hair & Makeup"><option value="Miscellaneous"></datalist></div>
+      <div class="form-row">
+        <div class="form-group"><label>Estimated (₱)</label><input type="number" id="f_estimated" value="${d.estimated||''}" placeholder="0"></div>
+        <div class="form-group"><label>Actual Cost (₱)</label><input type="number" id="f_actual" value="${d.actual||''}" placeholder="0"></div>
+      </div>
+      <div class="form-group"><label>Amount Paid (₱)</label><input type="number" id="f_paid" value="${d.paid||''}" placeholder="0"></div>
+      <div class="form-group"><label>Notes</label><textarea id="f_notes" rows="2" placeholder="Payment details, deadlines...">${esc(d.notes||'')}</textarea></div>`;
+  } else if(type==='program'){
+    title=isEdit?'Edit Program Event':'Add Program Event';
+    html=`
+      <div class="form-group"><label>Event Name *</label><input type="text" id="f_event" value="${esc(d.event||'')}" placeholder="e.g. Bridal March"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Time</label><input type="time" id="f_time" value="${d.time||''}"></div>
+        <div class="form-group"><label>Duration</label><input type="text" id="f_duration" value="${esc(d.duration||'')}" placeholder="e.g. 15 mins"></div>
+      </div>
+      <div class="form-group"><label>Details</label><textarea id="f_details" rows="2" placeholder="Notes about this event...">${esc(d.details||'')}</textarea></div>`;
+  } else if(type==='entourage'){
+    title=isEdit?'Edit Entourage Member':'Add Entourage Member';
+    html=`
+      <div class="form-group"><label>Name *</label><input type="text" id="f_name" value="${esc(d.name||'')}"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Group</label><select id="f_role_group">
+          <option value="">Select...</option>
+          <option ${d.role_group==='Principal Sponsors'?'selected':''}>Principal Sponsors</option>
+          <option ${d.role_group==='Secondary Sponsors'?'selected':''}>Secondary Sponsors</option>
+          <option ${d.role_group==='Best Man & Maid of Honor'?'selected':''}>Best Man & Maid of Honor</option>
+          <option ${d.role_group==='Groomsmen & Bridesmaids'?'selected':''}>Groomsmen & Bridesmaids</option>
+          <option ${d.role_group==='Flower Girls & Ring Bearers'?'selected':''}>Flower Girls & Ring Bearers</option>
+          <option ${d.role_group==='Bible & Cord & Veil'?'selected':''}>Bible & Cord & Veil</option>
+          <option ${d.role_group==='Candle & Coin'?'selected':''}>Candle & Coin</option>
+          <option ${d.role_group==='Others'?'selected':''}>Others</option>
+        </select></div>
+        <div class="form-group"><label>Specific Role</label><input type="text" id="f_specific_role" value="${esc(d.specific_role||'')}" placeholder="e.g. Ninong, Bridesmaid"></div>
+      </div>
+      <div class="form-group"><label>Contact</label><input type="text" id="f_contact" value="${esc(d.contact||'')}" placeholder="Phone or email"></div>`;
+  } else if(type==='supplier'){
+    title=isEdit?'Edit Supplier':'Add Supplier';
+    html=`
+      <div class="form-group"><label>Supplier Name *</label><input type="text" id="f_name" value="${esc(d.name||'')}"></div>
+      <div class="form-group"><label>Category</label><input type="text" id="f_category" value="${esc(d.category||'')}" placeholder="e.g. Catering, Photo/Video" list="supplierCats">
+        <datalist id="supplierCats"><option value="Venue"><option value="Catering"><option value="Photo/Video"><option value="Flowers & Decor"><option value="Entertainment/DJ"><option value="Hair & Makeup"><option value="Cake"><option value="Transportation"><option value="Attire"><option value="Officiant"><option value="Coordinator"><option value="Invitations/Print"></datalist></div>
+      <div class="form-row">
+        <div class="form-group"><label>Contact Person</label><input type="text" id="f_contact_name" value="${esc(d.contact_name||'')}"></div>
+        <div class="form-group"><label>Phone</label><input type="text" id="f_phone" value="${esc(d.phone||'')}"></div>
+      </div>
+      <div class="form-group"><label>Email</label><input type="email" id="f_email" value="${esc(d.email||'')}"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Package</label><input type="text" id="f_package" value="${esc(d.package||'')}" placeholder="e.g. Gold Package"></div>
+        <div class="form-group"><label>Cost (₱)</label><input type="number" id="f_cost" value="${d.cost||''}"></div>
+      </div>
+      <div class="form-group"><label>Payment Status</label><select id="f_status"><option value="unpaid" ${d.status==='unpaid'?'selected':''}>Unpaid</option><option value="partial" ${d.status==='partial'?'selected':''}>Partial</option><option value="paid" ${d.status==='paid'?'selected':''}>Paid</option></select></div>
+      <div class="form-group"><label>Notes</label><textarea id="f_notes" rows="2">${esc(d.notes||'')}</textarea></div>`;
+  } else if(type==='guest'){
+    title=isEdit?'Edit Guest':'Add Guest';
+    html=`
+      <div class="form-group"><label>Buong Pangalan *</label><input type="text" id="f_full_name" value="${esc(d.full_name||'')}"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="f_email" value="${esc(d.email||'')}"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Phone</label><input type="text" id="f_phone" value="${esc(d.phone||'')}"></div>
+        <div class="form-group"><label>Group</label><input type="text" id="f_group" value="${esc(d.group_label||'')}" list="grpList">
+          <datalist id="grpList"><option value="Bride Family"><option value="Groom Family"><option value="Bride Friends"><option value="Groom Friends"><option value="Ninong/Ninang"><option value="Colleagues"><option value="Church"></datalist></div>
+      </div>
+      <div class="form-group"><label>Table Number</label><input type="number" id="f_table" value="${d.table_number||''}" min="1"></div>
+      <div class="form-group"><label>Notes</label><textarea id="f_notes" rows="2">${esc(d.notes||'')}</textarea></div>`;
+  }
+
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalBody').innerHTML=html;
+  document.getElementById('modalSave').textContent=isEdit?'Save Changes':title.replace('Add','Add');
+  document.getElementById('modal').classList.add('open');
 }
 
-function sendInvite(guestId) {
-  if (!confirm('I-send ang invitation email sa guest na ito?')) return;
-  apiPost('admin_send_invite', { guest_id: guestId, base_url: SITE_URL })
-    .then(data => {
-      if (data.status === 200) {
-        toast(data.message, 'success');
-        loadData();
-      } else {
-        toast(data.error || 'Failed to send', 'error');
-      }
-    });
-}
+function closeModal(){document.getElementById('modal').classList.remove('open');editId=null;currentModal='';}
 
-function sendAllInvites() {
-  const unsent = allGuests.filter(g => g.email && g.invite_status === 'pending');
-  if (!confirm(`I-send ang invitation sa ${unsent.length} guests?`)) return;
+function saveModal(){
+  const btn=document.getElementById('modalSave');btn.disabled=true;btn.textContent='Saving...';
 
-  let sent = 0;
-  const sendNext = (i) => {
-    if (i >= unsent.length) {
-      toast(`${sent} invitation(s) sent!`, 'success');
-      loadData();
-      return;
+  if(currentModal==='task'){
+    const text=gv('f_text');if(!text){toast('Ilagay ang task','error');btn.disabled=false;btn.textContent='Save';return;}
+    const items=lsGet('checklist');
+    if(editId){const i=items.find(x=>x.id===editId);if(i){i.text=text;i.category=gv('f_category');i.due=gv('f_due');i.notes=gv('f_notes');}}
+    else items.push({id:genId(),text,category:gv('f_category'),due:gv('f_due'),notes:gv('f_notes'),done:false});
+    lsSet('checklist',items);renderChecklist();renderOverview();toast('Task saved!','success');closeModal();btn.disabled=false;
+  } else if(currentModal==='expense'){
+    const item=gv('f_item');if(!item){toast('Ilagay ang item','error');btn.disabled=false;btn.textContent='Save';return;}
+    const items=lsGet('budget');
+    const obj={item,category:gv('f_category'),estimated:gv('f_estimated'),actual:gv('f_actual'),paid:gv('f_paid'),notes:gv('f_notes')};
+    if(editId){const i=items.find(x=>x.id===editId);if(i)Object.assign(i,obj);}
+    else{obj.id=genId();items.push(obj);}
+    lsSet('budget',items);renderBudget();toast('Expense saved!','success');closeModal();btn.disabled=false;
+  } else if(currentModal==='program'){
+    const event=gv('f_event');if(!event){toast('Ilagay ang event name','error');btn.disabled=false;btn.textContent='Save';return;}
+    const items=lsGet('timeline');
+    const obj={event,time:gv('f_time'),duration:gv('f_duration'),details:gv('f_details')};
+    if(editId){const i=items.find(x=>x.id===editId);if(i)Object.assign(i,obj);}
+    else{obj.id=genId();items.push(obj);}
+    lsSet('timeline',items);renderTimeline();toast('Event saved!','success');closeModal();btn.disabled=false;
+  } else if(currentModal==='entourage'){
+    const name=gv('f_name');if(!name){toast('Ilagay ang pangalan','error');btn.disabled=false;btn.textContent='Save';return;}
+    const items=lsGet('entourage');
+    const obj={name,role_group:gv('f_role_group'),specific_role:gv('f_specific_role'),contact:gv('f_contact')};
+    if(editId){const i=items.find(x=>x.id===editId);if(i)Object.assign(i,obj);}
+    else{obj.id=genId();items.push(obj);}
+    lsSet('entourage',items);renderEntourage();toast('Member saved!','success');closeModal();btn.disabled=false;
+  } else if(currentModal==='supplier'){
+    const name=gv('f_name');if(!name){toast('Ilagay ang supplier name','error');btn.disabled=false;btn.textContent='Save';return;}
+    const items=lsGet('suppliers');
+    const obj={name,category:gv('f_category'),contact_name:gv('f_contact_name'),phone:gv('f_phone'),email:gv('f_email'),package:gv('f_package'),cost:gv('f_cost'),status:gv('f_status'),notes:gv('f_notes')};
+    if(editId){const i=items.find(x=>x.id===editId);if(i)Object.assign(i,obj);}
+    else{obj.id=genId();items.push(obj);}
+    lsSet('suppliers',items);renderSuppliers();toast('Supplier saved!','success');closeModal();btn.disabled=false;
+  } else if(currentModal==='guest'){
+    const name=gv('f_full_name');if(!name){toast('Ilagay ang pangalan','error');btn.disabled=false;btn.textContent='Save';return;}
+    if(editId){
+      apiPost('admin_update_guest',{guest_id:editId,fields:{full_name:name,email:gv('f_email'),phone:gv('f_phone'),group_label:gv('f_group'),table_number:gv('f_table'),notes:gv('f_notes')}}).then(d=>{
+        btn.disabled=false;if(d.status===200){toast('Guest updated!','success');closeModal();loadGuests();}else{toast(d.error||'Error','error');btn.textContent='Save Changes';}});
+    }else{
+      apiPost('admin_add_guest',{full_name:name,email:gv('f_email'),phone:gv('f_phone'),group_label:gv('f_group'),table_number:gv('f_table'),notes:gv('f_notes')}).then(d=>{
+        btn.disabled=false;if(d.status===200){toast(`Guest added! Code: ${d.invite_code}`,'success');closeModal();loadGuests();}else{toast(d.error||'Error','error');btn.textContent='Add Guest';}});
     }
-    apiPost('admin_send_invite', { guest_id: unsent[i].guest_id, base_url: SITE_URL })
-      .then(data => {
-        if (data.status === 200) sent++;
-        // Small delay to avoid rate limiting
-        setTimeout(() => sendNext(i + 1), 1500);
-      })
-      .catch(() => setTimeout(() => sendNext(i + 1), 1500));
-  };
-  sendNext(0);
-  toast('Sending invitations...', 'success');
-}
-
-function reopenInvite(guestId) {
-  if (!confirm('I-reopen ang invite code para sa guest na ito? (+7 days)')) return;
-  apiPost('admin_reopen', { guest_id: guestId })
-    .then(data => {
-      if (data.status === 200) {
-        toast(data.message, 'success');
-        loadData();
-      } else {
-        toast(data.error || 'Error', 'error');
-      }
-    });
-}
-
-// ===== ADD/EDIT MODAL =====
-function openAddModal() {
-  document.getElementById('modalTitle').textContent = 'Add Guest';
-  document.getElementById('modalSaveBtn').textContent = 'Add Guest';
-  document.getElementById('editGuestId').value = '';
-  document.getElementById('mFullName').value = '';
-  document.getElementById('mEmail').value = '';
-  document.getElementById('mPhone').value = '';
-  document.getElementById('mGroup').value = '';
-  document.getElementById('mTable').value = '';
-  document.getElementById('mNotes').value = '';
-  document.getElementById('guestModal').classList.add('open');
-}
-
-function openEditModal(guestId) {
-  const g = allGuests.find(x => x.guest_id === guestId);
-  if (!g) return;
-  document.getElementById('modalTitle').textContent = 'Edit Guest';
-  document.getElementById('modalSaveBtn').textContent = 'Save Changes';
-  document.getElementById('editGuestId').value = guestId;
-  document.getElementById('mFullName').value = g.full_name || '';
-  document.getElementById('mEmail').value = g.email || '';
-  document.getElementById('mPhone').value = g.phone || '';
-  document.getElementById('mGroup').value = g.group_label || '';
-  document.getElementById('mTable').value = g.table_number || '';
-  document.getElementById('mNotes').value = g.notes || '';
-  document.getElementById('guestModal').classList.add('open');
-}
-
-function closeModal() {
-  document.getElementById('guestModal').classList.remove('open');
-}
-
-function saveGuest() {
-  const guestId = document.getElementById('editGuestId').value;
-  const fullName = document.getElementById('mFullName').value.trim();
-  if (!fullName) { toast('Ilagay ang pangalan', 'error'); return; }
-
-  const btn = document.getElementById('modalSaveBtn');
-  btn.disabled = true;
-  btn.textContent = 'Saving...';
-
-  if (guestId) {
-    // Edit
-    apiPost('admin_update_guest', {
-      guest_id: guestId,
-      fields: {
-        full_name: fullName,
-        email: document.getElementById('mEmail').value.trim(),
-        phone: document.getElementById('mPhone').value.trim(),
-        group_label: document.getElementById('mGroup').value.trim(),
-        table_number: document.getElementById('mTable').value.trim(),
-        notes: document.getElementById('mNotes').value.trim()
-      }
-    }).then(data => {
-      btn.disabled = false;
-      if (data.status === 200) {
-        toast('Guest updated!', 'success');
-        closeModal();
-        loadData();
-      } else {
-        toast(data.error || 'Error', 'error');
-        btn.textContent = 'Save Changes';
-      }
-    });
-  } else {
-    // Add
-    apiPost('admin_add_guest', {
-      full_name: fullName,
-      email: document.getElementById('mEmail').value.trim(),
-      phone: document.getElementById('mPhone').value.trim(),
-      group_label: document.getElementById('mGroup').value.trim(),
-      table_number: document.getElementById('mTable').value.trim(),
-      notes: document.getElementById('mNotes').value.trim()
-    }).then(data => {
-      btn.disabled = false;
-      if (data.status === 200) {
-        toast(`Guest added! Code: ${data.invite_code}`, 'success');
-        closeModal();
-        loadData();
-      } else {
-        toast(data.error || 'Error', 'error');
-        btn.textContent = 'Add Guest';
-      }
-    });
   }
 }
 
-// ===== TABS =====
-function switchTab(tabName) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tabName));
-}
+function deleteItem(store,id){if(!confirm('Are you sure you want to delete this?'))return;let items=lsGet(store);items=items.filter(x=>x.id!==id);lsSet(store,items);
+  if(store==='checklist')renderChecklist();else if(store==='budget')renderBudget();else if(store==='timeline')renderTimeline();else if(store==='entourage')renderEntourage();else if(store==='suppliers')renderSuppliers();renderOverview();toast('Deleted!','success');}
 
-// ===== TOAST =====
-function toast(msg, type) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast ' + type + ' show';
-  setTimeout(() => el.classList.remove('show'), 3500);
-}
-
-// ===== UTIL =====
-function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+// ============ UTILS ============
+function gv(id){const el=document.getElementById(id);return el?el.value.trim():'';}
+function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function formatNum(n){return Number(n||0).toLocaleString();}
+function toast(msg,type){const el=document.getElementById('toast');el.textContent=msg;el.className='toast '+type+' show';setTimeout(()=>el.classList.remove('show'),3500);}
 
 // Close modal on backdrop click
-document.getElementById('guestModal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
 </script>
 </body>
 </html>
