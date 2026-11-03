@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HIRAYA Admin — Rodnel & Divine</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f0eb;
+  --card: #ffffff;
+  --earth: #5c4a3d;
+  --earth-light: #8e6f5e;
+  --gold: #c4a265;
+  --gold-light: #d4b87a;
+  --cream: #faf8f5;
+  --text: #3d3028;
+  --text-muted: #a0917f;
+  --border: #e8e0d8;
+  --success: #2e7d32;
+  --success-bg: #e8f5e9;
+  --danger: #c62828;
+  --danger-bg: #fce4ec;
+  --info: #1565c0;
+  --info-bg: #e3f2fd;
+  --periwinkle: #A7A4D8;
+  --lavender: #C8B4E2;
+  --mauve: #A78BAA;
+  --taupe: #B8A6A0;
+  --champagne: #C9B99F;
+  --olive: #8E887A;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Jost', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* Login Screen */
+.login-screen {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 20px;
+}
+.login-box {
+  background: var(--card); border-radius: 16px; padding: 48px 40px;
+  max-width: 400px; width: 100%; text-align: center;
+  box-shadow: 0 4px 24px rgba(92,74,61,0.08);
+}
+.login-box img { width: 100px; margin-bottom: 16px; }
+.login-box h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--earth); margin-bottom: 4px; }
+.login-box .sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 24px; }
+.login-box input {
+  width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px;
+  font-family: 'Jost', sans-serif; font-size: 0.95rem; margin-bottom: 12px;
+  text-align: center; letter-spacing: 2px;
+}
+.login-box input:focus { border-color: var(--gold); outline: none; }
+.login-box .error { color: var(--danger); font-size: 0.8rem; margin-bottom: 12px; display: none; }
+
+/* Common */
+.btn {
+  display: inline-block; padding: 10px 24px; border: none; border-radius: 10px;
+  font-family: 'Jost', sans-serif; font-size: 0.85rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-gold { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #fff; }
+.btn-gold:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(196,162,101,0.3); }
+.btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--earth); }
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Dashboard Layout */
+.dashboard { display: none; }
+.topbar {
+  background: var(--card); border-bottom: 1px solid var(--border);
+  padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-left img { height: 36px; }
+.topbar-left h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; color: var(--earth); }
+.topbar-left span { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 3px; text-transform: uppercase; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+
+.main { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+
+/* Stats Cards */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--card); border-radius: 12px; padding: 20px;
+  text-align: center; box-shadow: 0 2px 8px rgba(92,74,61,0.04);
+}
+.stat-num { font-size: 2rem; font-weight: 700; color: var(--earth); line-height: 1; }
+.stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+.stat-card.confirmed .stat-num { color: var(--success); }
+.stat-card.declined .stat-num { color: var(--danger); }
+.stat-card.pending .stat-num { color: var(--gold); }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--card); border-radius: 12px; padding: 4px; }
+.tab {
+  flex: 1; padding: 10px; text-align: center; border-radius: 10px;
+  font-size: 0.85rem; font-weight: 500; cursor: pointer; color: var(--text-muted);
+  transition: all 0.2s;
+}
+.tab.active { background: var(--earth); color: #fff; }
+.tab:hover:not(.active) { color: var(--earth); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Table */
+.card {
+  background: var(--card); border-radius: 12px; padding: 20px;
+  box-shadow: 0 2px 8px rgba(92,74,61,0.04); margin-bottom: 16px;
+}
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.card-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; color: var(--earth); }
+.search-bar {
+  display: flex; gap: 8px; margin-bottom: 16px;
+}
+.search-bar input {
+  flex: 1; padding: 10px 16px; border: 1.5px solid var(--border); border-radius: 10px;
+  font-family: 'Jost', sans-serif; font-size: 0.85rem;
+}
+.search-bar input:focus { border-color: var(--gold); outline: none; }
+
+.guest-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.guest-table th {
+  text-align: left; padding: 10px 12px; border-bottom: 2px solid var(--border);
+  color: var(--text-muted); font-weight: 600; font-size: 0.75rem;
+  text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+}
+.guest-table td { padding: 10px 12px; border-bottom: 1px solid #f0ebe6; vertical-align: middle; }
+.guest-table tr:hover td { background: var(--cream); }
+.guest-table .status {
+  display: inline-block; padding: 3px 10px; border-radius: 20px;
+  font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.status-confirmed { background: var(--success-bg); color: var(--success); }
+.status-declined { background: var(--danger-bg); color: var(--danger); }
+.status-sent { background: var(--info-bg); color: var(--info); }
+.status-pending { background: #fff3e0; color: #e65100; }
+.status-expired { background: #f3e5f5; color: #6a1b9a; }
+.status-proxy { background: #e8eaf6; color: #283593; }
+
+.actions-cell { display: flex; gap: 4px; flex-wrap: wrap; }
+.actions-cell .btn { padding: 4px 10px; font-size: 0.72rem; }
+
+.table-wrap { overflow-x: auto; }
+
+/* Modal */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  z-index: 999; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card); border-radius: 16px; padding: 32px;
+  max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto;
+}
+.modal h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; color: var(--earth); margin-bottom: 20px; }
+.modal .form-group { margin-bottom: 14px; }
+.modal label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
+.modal input, .modal select, .modal textarea {
+  width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px;
+  font-family: 'Jost', sans-serif; font-size: 0.9rem;
+}
+.modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--gold); outline: none; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; padding: 14px 24px;
+  border-radius: 10px; font-size: 0.85rem; font-weight: 500;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12); z-index: 9999;
+  transform: translateY(100px); opacity: 0; transition: all 0.3s;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: var(--success); color: #fff; }
+.toast.error { background: var(--danger); color: #fff; }
+
+/* Loading */
+.loading { text-align: center; padding: 40px; color: var(--text-muted); }
+.spinner {
+  width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--gold);
+  border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .tabs { flex-wrap: wrap; }
+  .tab { flex: unset; min-width: 80px; }
+  .topbar { flex-direction: column; gap: 8px; }
+  .topbar-right { width: 100%; justify-content: flex-end; }
+  .guest-table { font-size: 0.75rem; }
+  .guest-table th, .guest-table td { padding: 8px 6px; }
+  .modal { padding: 24px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <img src="logo-rd-web.png" alt="R&D">
+    <h1>Hiraya Admin</h1>
+    <p class="sub">Wedding Management Dashboard</p>
+    <input type="password" id="adminKeyInput" placeholder="Admin Key" autofocus>
+    <div class="error" id="loginError">Invalid admin key. Try again.</div>
+    <button class="btn btn-gold" style="width:100%" onclick="login()">Sign In</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <img src="logo-rd-web.png" alt="R&D">
+      <div>
+        <h2>Hiraya Admin</h2>
+        <span>Wedding Dashboard</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-outline btn-sm" onclick="loadData()">↻ Refresh</button>
+      <button class="btn btn-outline btn-sm" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- Stats -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card"><div class="stat-num" id="statTotal">-</div><div class="stat-label">Total Guests</div></div>
+      <div class="stat-card confirmed"><div class="stat-num" id="statConfirmed">-</div><div class="stat-label">Confirmed</div></div>
+      <div class="stat-card declined"><div class="stat-num" id="statDeclined">-</div><div class="stat-label">Declined</div></div>
+      <div class="stat-card"><div class="stat-num" id="statProxy">-</div><div class="stat-label">Proxy</div></div>
+      <div class="stat-card pending"><div class="stat-num" id="statSent">-</div><div class="stat-label">Sent</div></div>
+      <div class="stat-card"><div class="stat-num" id="statPending">-</div><div class="stat-label">Pending</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" data-tab="guests" onclick="switchTab('guests')">Guest List</div>
+      <div class="tab" data-tab="tables" onclick="switchTab('tables')">Tables</div>
+      <div class="tab" data-tab="send" onclick="switchTab('send')">Send Invites</div>
+    </div>
+
+    <!-- GUEST LIST TAB -->
+    <div class="tab-content active" id="tab-guests">
+      <div class="card">
+        <div class="card-header">
+          <h3>Guest List</h3>
+          <button class="btn btn-gold btn-sm" onclick="openAddModal()">+ Add Guest</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="searchInput" placeholder="Search by name, email, group, or status..." oninput="filterGuests()">
+        </div>
+        <div class="table-wrap">
+          <table class="guest-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Group</th>
+                <th>Email</th>
+                <th>Table</th>
+                <th>Code</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="guestTableBody">
+              <tr><td colspan="7" class="loading"><div class="spinner"></div>Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLES TAB -->
+    <div class="tab-content" id="tab-tables">
+      <div class="card">
+        <div class="card-header">
+          <h3>Table Assignments</h3>
+        </div>
+        <div id="tableView">
+          <div class="loading"><div class="spinner"></div>Loading tables...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEND INVITES TAB -->
+    <div class="tab-content" id="tab-send">
+      <div class="card">
+        <div class="card-header">
+          <h3>Send Invitations</h3>
+        </div>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:16px;">
+          I-send ang invitation email sa mga guest na hindi pa naka-receive. Kasama sa email ang unique invite link at dress code.
+        </p>
+        <div id="unsent-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT GUEST MODAL -->
+<div class="modal-overlay" id="guestModal">
+  <div class="modal">
+    <h3 id="modalTitle">Add Guest</h3>
+    <input type="hidden" id="editGuestId">
+    <div class="form-group">
+      <label>Buong Pangalan *</label>
+      <input type="text" id="mFullName" placeholder="e.g. Juan Dela Cruz" required>
+    </div>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="mEmail" placeholder="e.g. juan@email.com">
+    </div>
+    <div class="form-group">
+      <label>Phone</label>
+      <input type="text" id="mPhone" placeholder="e.g. 09171234567">
+    </div>
+    <div class="form-group">
+      <label>Group</label>
+      <input type="text" id="mGroup" placeholder="e.g. Bride Family, Groom Friends, Ninong/Ninang" list="groupList">
+      <datalist id="groupList">
+        <option value="Bride Family">
+        <option value="Groom Family">
+        <option value="Bride Friends">
+        <option value="Groom Friends">
+        <option value="Ninong/Ninang">
+        <option value="Colleagues">
+        <option value="Church">
+      </datalist>
+    </div>
+    <div class="form-group">
+      <label>Table Number</label>
+      <input type="number" id="mTable" placeholder="e.g. 1" min="1">
+    </div>
+    <div class="form-group">
+      <label>Notes</label>
+      <textarea id="mNotes" rows="2" placeholder="Optional notes..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold" id="modalSaveBtn" onclick="saveGuest()">Add Guest</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbzTed1IVGpD7anZrIZqHC6-9mr0nH6fBxEjq6p_JKYX7HcGPweH5RthWSQ9NEwZ8MQewg/exec';
+const SITE_URL = 'https://baynisandy.github.io/hiraya-wedding/';
+let adminKey = '';
+let allGuests = [];
+
+// ===== AUTH =====
+document.getElementById('adminKeyInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') login();
+});
+
+function login() {
+  adminKey = document.getElementById('adminKeyInput').value.trim();
+  if (!adminKey) return;
+  document.getElementById('loginError').style.display = 'none';
+
+  // Test the key by fetching stats
+  apiGet('admin_stats', {})
+    .then(data => {
+      if (data.status === 200) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        loadData();
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+      }
+    })
+    .catch(() => {
+      document.getElementById('loginError').style.display = 'block';
+    });
+}
+
+function logout() {
+  adminKey = '';
+  allGuests = [];
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('adminKeyInput').value = '';
+}
+
+// ===== API =====
+function apiGet(action, params) {
+  const url = new URL(API_URL);
+  url.searchParams.set('action', action);
+  url.searchParams.set('admin_key', adminKey);
+  Object.keys(params).forEach(k => url.searchParams.set(k, params[k]));
+  return fetch(url).then(r => r.json());
+}
+
+function apiPost(action, payload) {
+  payload.action = action;
+  payload.admin_key = adminKey;
+  return fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
+  }).then(r => r.json());
+}
+
+// ===== DATA LOADING =====
+function loadData() {
+  loadStats();
+  loadGuests();
+}
+
+function loadStats() {
+  apiGet('admin_stats', {}).then(data => {
+    if (data.status === 200) {
+      const s = data.stats;
+      document.getElementById('statTotal').textContent = s.total;
+      document.getElementById('statConfirmed').textContent = s.confirmed;
+      document.getElementById('statDeclined').textContent = s.declined;
+      document.getElementById('statProxy').textContent = s.proxy || 0;
+      document.getElementById('statSent').textContent = s.sent;
+      document.getElementById('statPending').textContent = s.pending;
+    }
+  });
+}
+
+function loadGuests() {
+  document.getElementById('guestTableBody').innerHTML =
+    '<tr><td colspan="7" class="loading"><div class="spinner"></div>Loading...</td></tr>';
+
+  apiGet('admin_guests', {}).then(data => {
+    if (data.status === 200) {
+      allGuests = data.guests;
+      renderGuests(allGuests);
+      renderTables(allGuests);
+      renderUnsentList(allGuests);
+    }
+  });
+}
+
+function renderGuests(guests) {
+  const tbody = document.getElementById('guestTableBody');
+  if (!guests.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted);">Walang guests pa. Click "+ Add Guest" para magsimula.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = guests.map(g => {
+    const statusClass = 'status-' + (g.invite_status || 'pending');
+    const statusLabel = g.invite_status || 'pending';
+    return `<tr>
+      <td><strong>${esc(g.full_name)}</strong></td>
+      <td>${esc(g.group_label || '-')}</td>
+      <td style="font-size:0.78rem;">${esc(g.email || '-')}</td>
+      <td style="text-align:center;">${g.table_number || '-'}</td>
+      <td><code style="font-size:0.75rem;background:var(--cream);padding:2px 6px;border-radius:4px;">${esc(g.invite_code)}</code></td>
+      <td><span class="status ${statusClass}">${statusLabel}</span></td>
+      <td class="actions-cell">
+        <button class="btn btn-outline btn-sm" onclick="openEditModal('${g.guest_id}')">Edit</button>
+        ${g.invite_status === 'expired' || g.invite_status === 'confirmed' || g.invite_status === 'declined' ?
+          `<button class="btn btn-outline btn-sm" onclick="reopenInvite('${g.guest_id}')">Reopen</button>` : ''}
+        ${g.email && (g.invite_status === 'pending' || g.invite_status === 'sent') ?
+          `<button class="btn btn-outline btn-sm" onclick="sendInvite('${g.guest_id}')">Send</button>` : ''}
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterGuests() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  if (!q) return renderGuests(allGuests);
+  renderGuests(allGuests.filter(g =>
+    (g.full_name || '').toLowerCase().includes(q) ||
+    (g.email || '').toLowerCase().includes(q) ||
+    (g.group_label || '').toLowerCase().includes(q) ||
+    (g.invite_status || '').toLowerCase().includes(q) ||
+    (g.invite_code || '').toLowerCase().includes(q)
+  ));
+}
+
+// ===== TABLE VIEW =====
+function renderTables(guests) {
+  const byTable = {};
+  guests.forEach(g => {
+    const t = g.table_number || 'Unassigned';
+    if (!byTable[t]) byTable[t] = [];
+    byTable[t].push(g);
+  });
+
+  const container = document.getElementById('tableView');
+  const tables = Object.keys(byTable).sort((a, b) => {
+    if (a === 'Unassigned') return 1;
+    if (b === 'Unassigned') return -1;
+    return Number(a) - Number(b);
+  });
+
+  container.innerHTML = tables.map(t => {
+    const members = byTable[t];
+    const confirmed = members.filter(m => m.invite_status === 'confirmed').length;
+    return `
+      <div style="background:var(--cream);border-radius:10px;padding:16px;margin-bottom:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <strong style="color:var(--earth);">${t === 'Unassigned' ? '📋 Unassigned' : '🪑 Table ' + t}</strong>
+          <span style="font-size:0.8rem;color:var(--text-muted);">${confirmed}/${members.length} confirmed</span>
+        </div>
+        ${members.map(m => {
+          const sc = 'status-' + (m.invite_status || 'pending');
+          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
+            <span style="font-size:0.85rem;">${esc(m.full_name)}</span>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="status ${sc}" style="font-size:0.7rem;">${m.invite_status || 'pending'}</span>
+              <input type="number" value="${m.table_number || ''}" min="1" style="width:50px;padding:4px;border:1px solid var(--border);border-radius:6px;font-size:0.8rem;text-align:center;" onchange="assignTable('${m.guest_id}', this.value)">
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+  }).join('');
+}
+
+function assignTable(guestId, tableNum) {
+  apiPost('admin_assign_table', {
+    assignments: [{ guest_id: guestId, table_number: tableNum }]
+  }).then(data => {
+    if (data.status === 200) {
+      toast('Table assigned!', 'success');
+      loadData();
+    } else {
+      toast(data.error || 'Error assigning table', 'error');
+    }
+  });
+}
+
+// ===== SEND INVITES =====
+function renderUnsentList(guests) {
+  const unsent = guests.filter(g => g.email && g.invite_status === 'pending');
+  const container = document.getElementById('unsent-list');
+
+  if (!unsent.length) {
+    container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;">Lahat ng guests na may email ay na-send na ang invite, o walang pending.</p>';
+    return;
+  }
+
+  container.innerHTML = `
+    <div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:0.85rem;color:var(--text-muted);">${unsent.length} guest(s) na hindi pa na-send</span>
+      <button class="btn btn-gold btn-sm" onclick="sendAllInvites()">Send All (${unsent.length})</button>
+    </div>
+    ${unsent.map(g => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid var(--border);">
+        <div>
+          <strong style="font-size:0.85rem;">${esc(g.full_name)}</strong>
+          <span style="font-size:0.78rem;color:var(--text-muted);margin-left:8px;">${esc(g.email)}</span>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="sendInvite('${g.guest_id}')">Send</button>
+      </div>
+    `).join('')}
+  `;
+}
+
+function sendInvite(guestId) {
+  if (!confirm('I-send ang invitation email sa guest na ito?')) return;
+  apiPost('admin_send_invite', { guest_id: guestId, base_url: SITE_URL })
+    .then(data => {
+      if (data.status === 200) {
+        toast(data.message, 'success');
+        loadData();
+      } else {
+        toast(data.error || 'Failed to send', 'error');
+      }
+    });
+}
+
+function sendAllInvites() {
+  const unsent = allGuests.filter(g => g.email && g.invite_status === 'pending');
+  if (!confirm(`I-send ang invitation sa ${unsent.length} guests?`)) return;
+
+  let sent = 0;
+  const sendNext = (i) => {
+    if (i >= unsent.length) {
+      toast(`${sent} invitation(s) sent!`, 'success');
+      loadData();
+      return;
+    }
+    apiPost('admin_send_invite', { guest_id: unsent[i].guest_id, base_url: SITE_URL })
+      .then(data => {
+        if (data.status === 200) sent++;
+        // Small delay to avoid rate limiting
+        setTimeout(() => sendNext(i + 1), 1500);
+      })
+      .catch(() => setTimeout(() => sendNext(i + 1), 1500));
+  };
+  sendNext(0);
+  toast('Sending invitations...', 'success');
+}
+
+function reopenInvite(guestId) {
+  if (!confirm('I-reopen ang invite code para sa guest na ito? (+7 days)')) return;
+  apiPost('admin_reopen', { guest_id: guestId })
+    .then(data => {
+      if (data.status === 200) {
+        toast(data.message, 'success');
+        loadData();
+      } else {
+        toast(data.error || 'Error', 'error');
+      }
+    });
+}
+
+// ===== ADD/EDIT MODAL =====
+function openAddModal() {
+  document.getElementById('modalTitle').textContent = 'Add Guest';
+  document.getElementById('modalSaveBtn').textContent = 'Add Guest';
+  document.getElementById('editGuestId').value = '';
+  document.getElementById('mFullName').value = '';
+  document.getElementById('mEmail').value = '';
+  document.getElementById('mPhone').value = '';
+  document.getElementById('mGroup').value = '';
+  document.getElementById('mTable').value = '';
+  document.getElementById('mNotes').value = '';
+  document.getElementById('guestModal').classList.add('open');
+}
+
+function openEditModal(guestId) {
+  const g = allGuests.find(x => x.guest_id === guestId);
+  if (!g) return;
+  document.getElementById('modalTitle').textContent = 'Edit Guest';
+  document.getElementById('modalSaveBtn').textContent = 'Save Changes';
+  document.getElementById('editGuestId').value = guestId;
+  document.getElementById('mFullName').value = g.full_name || '';
+  document.getElementById('mEmail').value = g.email || '';
+  document.getElementById('mPhone').value = g.phone || '';
+  document.getElementById('mGroup').value = g.group_label || '';
+  document.getElementById('mTable').value = g.table_number || '';
+  document.getElementById('mNotes').value = g.notes || '';
+  document.getElementById('guestModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('guestModal').classList.remove('open');
+}
+
+function saveGuest() {
+  const guestId = document.getElementById('editGuestId').value;
+  const fullName = document.getElementById('mFullName').value.trim();
+  if (!fullName) { toast('Ilagay ang pangalan', 'error'); return; }
+
+  const btn = document.getElementById('modalSaveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  if (guestId) {
+    // Edit
+    apiPost('admin_update_guest', {
+      guest_id: guestId,
+      fields: {
+        full_name: fullName,
+        email: document.getElementById('mEmail').value.trim(),
+        phone: document.getElementById('mPhone').value.trim(),
+        group_label: document.getElementById('mGroup').value.trim(),
+        table_number: document.getElementById('mTable').value.trim(),
+        notes: document.getElementById('mNotes').value.trim()
+      }
+    }).then(data => {
+      btn.disabled = false;
+      if (data.status === 200) {
+        toast('Guest updated!', 'success');
+        closeModal();
+        loadData();
+      } else {
+        toast(data.error || 'Error', 'error');
+        btn.textContent = 'Save Changes';
+      }
+    });
+  } else {
+    // Add
+    apiPost('admin_add_guest', {
+      full_name: fullName,
+      email: document.getElementById('mEmail').value.trim(),
+      phone: document.getElementById('mPhone').value.trim(),
+      group_label: document.getElementById('mGroup').value.trim(),
+      table_number: document.getElementById('mTable').value.trim(),
+      notes: document.getElementById('mNotes').value.trim()
+    }).then(data => {
+      btn.disabled = false;
+      if (data.status === 200) {
+        toast(`Guest added! Code: ${data.invite_code}`, 'success');
+        closeModal();
+        loadData();
+      } else {
+        toast(data.error || 'Error', 'error');
+        btn.textContent = 'Add Guest';
+      }
+    });
+  }
+}
+
+// ===== TABS =====
+function switchTab(tabName) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tabName));
+}
+
+// ===== TOAST =====
+function toast(msg, type) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + type + ' show';
+  setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+// ===== UTIL =====
+function esc(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// Close modal on backdrop click
+document.getElementById('guestModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
