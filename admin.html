@@ -229,8 +229,8 @@ table.dt tr:hover td{background:var(--cream);}
     <div class="nav-item" data-page="checklist" onclick="navigate('checklist')"><span class="icon">✅</span><span>Checklist</span></div>
     <div class="nav-item" data-page="budget" onclick="navigate('budget')"><span class="icon">💰</span><span>Budget</span></div>
     <div class="nav-item" data-page="timeline" onclick="navigate('timeline')"><span class="icon">📅</span><span>Program</span></div>
-    <div class="nav-item" data-page="entourage" onclick="navigate('entourage')"><span class="icon">👥</span><span>Entourage</span></div>
     <div class="nav-item" data-page="suppliers" onclick="navigate('suppliers')"><span class="icon">🏪</span><span>Suppliers</span></div>
+    <div class="nav-item" data-page="documents" onclick="navigate('documents')"><span class="icon">📄</span><span>Documents</span></div>
     <div class="nav-section">Guest Mgmt</div>
     <div class="nav-item" data-page="guests" onclick="navigate('guests')"><span class="icon">📋</span><span>Guest List</span></div>
     <div class="nav-item" data-page="tables" onclick="navigate('tables')"><span class="icon">🪑</span><span>Tables</span></div>
@@ -336,19 +336,6 @@ table.dt tr:hover td{background:var(--cream);}
       </div>
     </div>
 
-    <!-- ========== ENTOURAGE ========== -->
-    <div class="page" id="pg-entourage">
-      <h1 class="page-title">Entourage</h1>
-      <p class="page-sub">Mga kasama sa wedding party</p>
-      <div class="card">
-        <div class="card-header">
-          <h3>Wedding Party</h3>
-          <button class="btn btn-gold btn-sm" onclick="openModal('entourage')">+ Add Member</button>
-        </div>
-        <div id="entourageBody"></div>
-      </div>
-    </div>
-
     <!-- ========== SUPPLIERS ========== -->
     <div class="page" id="pg-suppliers">
       <h1 class="page-title">Suppliers & Vendors</h1>
@@ -364,6 +351,49 @@ table.dt tr:hover td{background:var(--cream);}
             <tbody id="supplierBody"></tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+    <!-- ========== DOCUMENTS ========== -->
+    <div class="page" id="pg-documents">
+      <h1 class="page-title">Documents & Requirements</h1>
+      <p class="page-sub">I-track lahat ng legal documents na kailangan bago ang kasal</p>
+
+      <div class="stats-row" id="docStats"></div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Requirements Checklist</h3>
+          <button class="btn btn-gold btn-sm" onclick="openModal('document')">+ Add Document</button>
+        </div>
+        <div class="search-bar">
+          <select id="docFilter" onchange="renderDocuments()">
+            <option value="all">All</option>
+            <option value="todo">Not Started</option>
+            <option value="processing">Processing</option>
+            <option value="done">Secured</option>
+          </select>
+          <select id="docOwnerFilter" onchange="renderDocuments()">
+            <option value="all">Both</option>
+            <option value="Bride">Bride</option>
+            <option value="Groom">Groom</option>
+            <option value="Both">Joint</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table class="dt">
+            <thead><tr><th>Document</th><th>For</th><th>Where to Get</th><th>Cost</th><th>Status</th><th>Notes</th><th>Actions</th></tr></thead>
+            <tbody id="docBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header"><h3>💡 Common Filipino Wedding Requirements</h3></div>
+        <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.7;padding:4px 0;">
+          Click any item below to add it to your tracker:
+        </p>
+        <div id="docSuggestions" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;"></div>
       </div>
     </div>
 
@@ -475,8 +505,8 @@ function loadAll(){
   renderChecklist();
   renderBudget();
   renderTimeline();
-  renderEntourage();
   renderSuppliers();
+  renderDocuments();
 }
 
 // ============ COUNTDOWN ============
@@ -514,7 +544,8 @@ function renderOverview(){
     <div class="stat-card red"><div class="stat-num">${declined}</div><div class="stat-label">Declined</div></div>
     <div class="stat-card gold"><div class="stat-num">${pending}</div><div class="stat-label">Awaiting</div></div>
     <div class="stat-card blue"><div class="stat-num">${tasks.length?Math.round(doneTasks/tasks.length*100):0}%</div><div class="stat-label">Tasks Done</div></div>
-    <div class="stat-card"><div class="stat-num">₱${formatNum(totalSpent)}</div><div class="stat-label">Total Spent</div></div>`;
+    <div class="stat-card"><div class="stat-num">₱${formatNum(totalSpent)}</div><div class="stat-label">Total Spent</div></div>
+    <div class="stat-card green"><div class="stat-num">${lsGet('documents').filter(d=>d.status==='done').length}/${lsGet('documents').length}</div><div class="stat-label">Docs Secured</div></div>`;
 
   // RSVP donut
   drawDonut('rsvpChart',[
@@ -680,31 +711,92 @@ function renderTimeline(){
 
 function editTimelineItem(id){const items=lsGet('timeline');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('program',i);}}
 
-// ============ ENTOURAGE ============
-function renderEntourage(){
-  const items=lsGet('entourage');
-  const groups={};
-  items.forEach(m=>{const g=m.role_group||'Others';if(!groups[g])groups[g]=[];groups[g].push(m);});
-  const order=['Principal Sponsors','Secondary Sponsors','Best Man & Maid of Honor','Groomsmen & Bridesmaids','Flower Girls & Ring Bearers','Bible & Cord & Veil','Candle & Coin','Others'];
-  const sorted=order.filter(g=>groups[g]).concat(Object.keys(groups).filter(g=>!order.includes(g)));
+// ============ DOCUMENTS ============
+const DOC_SUGGESTIONS=[
+  {doc:'PSA Birth Certificate',who:'Bride',where:'PSA Office / Online (psahelpline.ph)',cost:365},
+  {doc:'PSA Birth Certificate',who:'Groom',where:'PSA Office / Online (psahelpline.ph)',cost:365},
+  {doc:'Certificate of No Marriage (CENOMAR)',who:'Bride',where:'PSA Office / Online',cost:420},
+  {doc:'Certificate of No Marriage (CENOMAR)',who:'Groom',where:'PSA Office / Online',cost:420},
+  {doc:'Marriage License',who:'Both',where:'Municipal/City Civil Registrar',cost:500},
+  {doc:'Pre-Marriage Counseling Certificate',who:'Both',where:'LGU / Church',cost:0},
+  {doc:'Community Tax Certificate (Cedula)',who:'Bride',where:'Municipal Hall',cost:50},
+  {doc:'Community Tax Certificate (Cedula)',who:'Groom',where:'Municipal Hall',cost:50},
+  {doc:'Barangay Clearance',who:'Bride',where:'Barangay Hall',cost:50},
+  {doc:'Barangay Clearance',who:'Groom',where:'Barangay Hall',cost:50},
+  {doc:'Certificate of Confirmation',who:'Bride',where:'Parish Church',cost:0},
+  {doc:'Certificate of Confirmation',who:'Groom',where:'Parish Church',cost:0},
+  {doc:'Baptismal Certificate (Church)',who:'Bride',where:'Parish where baptized',cost:100},
+  {doc:'Baptismal Certificate (Church)',who:'Groom',where:'Parish where baptized',cost:100},
+  {doc:'Marriage Banns',who:'Both',where:'Parish Church',cost:0},
+  {doc:'Canonical Interview',who:'Both',where:'Parish Church',cost:0},
+  {doc:'Wedding Permit (if different parish)',who:'Both',where:'Home Parish',cost:0},
+  {doc:'Valid ID (2 copies)',who:'Bride',where:'Already have',cost:0},
+  {doc:'Valid ID (2 copies)',who:'Groom',where:'Already have',cost:0},
+  {doc:'1x1 / 2x2 ID Photos',who:'Bride',where:'Photo studio',cost:100},
+  {doc:'1x1 / 2x2 ID Photos',who:'Groom',where:'Photo studio',cost:100},
+];
 
-  document.getElementById('entourageBody').innerHTML=sorted.length?sorted.map(g=>
-    `<div class="ent-group"><h4>${esc(g)}</h4>
-      ${groups[g].map(m=>
-        `<div class="ent-member">
-          <div><strong>${esc(m.name)}</strong> <span class="ent-role">${esc(m.specific_role||'')}</span></div>
-          <div>
-            ${m.contact?`<span style="font-size:0.75rem;color:var(--text-muted);margin-right:8px;">${esc(m.contact)}</span>`:''}
-            <button class="btn btn-outline btn-sm" onclick="editEntourage('${m.id}')">Edit</button>
-            <button class="btn btn-outline btn-sm" onclick="deleteItem('entourage','${m.id}')">×</button>
-          </div>
-        </div>`
-      ).join('')}
-    </div>`
-  ).join(''):'<p style="text-align:center;padding:30px;color:var(--text-muted);">Walang entourage members pa. Click "+ Add Member"!</p>';
+function renderDocuments(){
+  const items=lsGet('documents');
+  const filter=document.getElementById('docFilter')?.value||'all';
+  const ownerFilter=document.getElementById('docOwnerFilter')?.value||'all';
+
+  let filtered=items;
+  if(filter!=='all')filtered=filtered.filter(d=>d.status===filter);
+  if(ownerFilter!=='all')filtered=filtered.filter(d=>d.who===ownerFilter);
+
+  const total=items.length;
+  const done=items.filter(d=>d.status==='done').length;
+  const processing=items.filter(d=>d.status==='processing').length;
+  const todo=items.filter(d=>d.status==='todo'||!d.status).length;
+
+  document.getElementById('docStats').innerHTML=`
+    <div class="stat-card"><div class="stat-num" style="color:var(--earth);">${total}</div><div class="stat-label">Total Docs</div></div>
+    <div class="stat-card green"><div class="stat-num">${done}</div><div class="stat-label">Secured</div></div>
+    <div class="stat-card blue"><div class="stat-num">${processing}</div><div class="stat-label">Processing</div></div>
+    <div class="stat-card gold"><div class="stat-num">${todo}</div><div class="stat-label">Not Started</div></div>`;
+
+  document.getElementById('docBody').innerHTML=filtered.length?filtered.map(d=>{
+    const st=d.status||'todo';
+    const sc=st==='done'?'s-done':st==='processing'?'s-sent':'s-pending';
+    const label=st==='done'?'Secured':st==='processing'?'Processing':'Not Started';
+    return`<tr>
+      <td><strong>${esc(d.doc)}</strong></td>
+      <td>${esc(d.who||'-')}</td>
+      <td style="font-size:0.8rem;">${esc(d.where||'-')}</td>
+      <td style="text-align:right;">${d.cost?'₱'+formatNum(d.cost):'-'}</td>
+      <td><span class="status ${sc}">${label}</span></td>
+      <td style="font-size:0.78rem;color:var(--text-muted);max-width:150px;">${esc(d.notes||'')}</td>
+      <td class="actions-cell">
+        <button class="btn btn-outline btn-sm" onclick="cycleDocStatus('${d.id}')">${st==='todo'?'Start':st==='processing'?'✓ Done':'↺'}</button>
+        <button class="btn btn-outline btn-sm" onclick="editDocument('${d.id}')">Edit</button>
+        <button class="btn btn-outline btn-sm" onclick="deleteItem('documents','${d.id}')">×</button>
+      </td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">Walang documents pa. I-click ang suggestions sa baba o mag-Add!</td></tr>';
+
+  // Render suggestions
+  const existing=items.map(d=>d.doc+'|'+d.who);
+  const el=document.getElementById('docSuggestions');
+  if(el)el.innerHTML=DOC_SUGGESTIONS.filter(s=>!existing.includes(s.doc+'|'+s.who)).map(s=>
+    `<button class="btn btn-outline btn-sm" onclick="addDocSuggestion('${esc(s.doc)}','${s.who}','${esc(s.where)}',${s.cost})" style="font-size:0.72rem;">
+      ${esc(s.doc)} (${s.who})
+    </button>`
+  ).join('')||'<span style="font-size:0.82rem;color:var(--success);">✓ Lahat ng common requirements ay naka-add na!</span>';
 }
 
-function editEntourage(id){const items=lsGet('entourage');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('entourage',i);}}
+function addDocSuggestion(doc,who,where,cost){
+  const items=lsGet('documents');
+  items.push({id:genId(),doc,who,where,cost,status:'todo',notes:''});
+  lsSet('documents',items);renderDocuments();toast(`Added: ${doc}`,'success');
+}
+
+function cycleDocStatus(id){
+  const items=lsGet('documents');const d=items.find(x=>x.id===id);
+  if(d){d.status=d.status==='todo'?'processing':d.status==='processing'?'done':'todo';lsSet('documents',items);renderDocuments();renderOverview();}
+}
+
+function editDocument(id){const items=lsGet('documents');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('document',i);}}
 
 // ============ SUPPLIERS ============
 function renderSuppliers(){
@@ -854,25 +946,19 @@ function openModal(type,data){
         <div class="form-group"><label>Duration</label><input type="text" id="f_duration" value="${esc(d.duration||'')}" placeholder="e.g. 15 mins"></div>
       </div>
       <div class="form-group"><label>Details</label><textarea id="f_details" rows="2" placeholder="Notes about this event...">${esc(d.details||'')}</textarea></div>`;
-  } else if(type==='entourage'){
-    title=isEdit?'Edit Entourage Member':'Add Entourage Member';
+  } else if(type==='document'){
+    title=isEdit?'Edit Document':'Add Document';
     html=`
-      <div class="form-group"><label>Name *</label><input type="text" id="f_name" value="${esc(d.name||'')}"></div>
+      <div class="form-group"><label>Document Name *</label><input type="text" id="f_doc" value="${esc(d.doc||'')}" placeholder="e.g. PSA Birth Certificate"></div>
       <div class="form-row">
-        <div class="form-group"><label>Group</label><select id="f_role_group">
-          <option value="">Select...</option>
-          <option ${d.role_group==='Principal Sponsors'?'selected':''}>Principal Sponsors</option>
-          <option ${d.role_group==='Secondary Sponsors'?'selected':''}>Secondary Sponsors</option>
-          <option ${d.role_group==='Best Man & Maid of Honor'?'selected':''}>Best Man & Maid of Honor</option>
-          <option ${d.role_group==='Groomsmen & Bridesmaids'?'selected':''}>Groomsmen & Bridesmaids</option>
-          <option ${d.role_group==='Flower Girls & Ring Bearers'?'selected':''}>Flower Girls & Ring Bearers</option>
-          <option ${d.role_group==='Bible & Cord & Veil'?'selected':''}>Bible & Cord & Veil</option>
-          <option ${d.role_group==='Candle & Coin'?'selected':''}>Candle & Coin</option>
-          <option ${d.role_group==='Others'?'selected':''}>Others</option>
-        </select></div>
-        <div class="form-group"><label>Specific Role</label><input type="text" id="f_specific_role" value="${esc(d.specific_role||'')}" placeholder="e.g. Ninong, Bridesmaid"></div>
+        <div class="form-group"><label>For</label><select id="f_who"><option value="Bride" ${d.who==='Bride'?'selected':''}>Bride</option><option value="Groom" ${d.who==='Groom'?'selected':''}>Groom</option><option value="Both" ${d.who==='Both'?'selected':''}>Both</option></select></div>
+        <div class="form-group"><label>Status</label><select id="f_status"><option value="todo" ${(d.status||'todo')==='todo'?'selected':''}>Not Started</option><option value="processing" ${d.status==='processing'?'selected':''}>Processing</option><option value="done" ${d.status==='done'?'selected':''}>Secured</option></select></div>
       </div>
-      <div class="form-group"><label>Contact</label><input type="text" id="f_contact" value="${esc(d.contact||'')}" placeholder="Phone or email"></div>`;
+      <div class="form-row">
+        <div class="form-group"><label>Where to Get</label><input type="text" id="f_where" value="${esc(d.where||'')}" placeholder="e.g. PSA Office"></div>
+        <div class="form-group"><label>Cost (₱)</label><input type="number" id="f_cost" value="${d.cost||''}" placeholder="0"></div>
+      </div>
+      <div class="form-group"><label>Notes</label><textarea id="f_notes" rows="2" placeholder="Deadlines, requirements...">${esc(d.notes||'')}</textarea></div>`;
   } else if(type==='supplier'){
     title=isEdit?'Edit Supplier':'Add Supplier';
     html=`
@@ -935,13 +1021,13 @@ function saveModal(){
     if(editId){const i=items.find(x=>x.id===editId);if(i)Object.assign(i,obj);}
     else{obj.id=genId();items.push(obj);}
     lsSet('timeline',items);renderTimeline();toast('Event saved!','success');closeModal();btn.disabled=false;
-  } else if(currentModal==='entourage'){
-    const name=gv('f_name');if(!name){toast('Ilagay ang pangalan','error');btn.disabled=false;btn.textContent='Save';return;}
-    const items=lsGet('entourage');
-    const obj={name,role_group:gv('f_role_group'),specific_role:gv('f_specific_role'),contact:gv('f_contact')};
+  } else if(currentModal==='document'){
+    const doc=gv('f_doc');if(!doc){toast('Ilagay ang document name','error');btn.disabled=false;btn.textContent='Save';return;}
+    const items=lsGet('documents');
+    const obj={doc,who:gv('f_who'),where:gv('f_where'),cost:gv('f_cost'),status:gv('f_status'),notes:gv('f_notes')};
     if(editId){const i=items.find(x=>x.id===editId);if(i)Object.assign(i,obj);}
     else{obj.id=genId();items.push(obj);}
-    lsSet('entourage',items);renderEntourage();toast('Member saved!','success');closeModal();btn.disabled=false;
+    lsSet('documents',items);renderDocuments();toast('Document saved!','success');closeModal();btn.disabled=false;
   } else if(currentModal==='supplier'){
     const name=gv('f_name');if(!name){toast('Ilagay ang supplier name','error');btn.disabled=false;btn.textContent='Save';return;}
     const items=lsGet('suppliers');
@@ -962,7 +1048,7 @@ function saveModal(){
 }
 
 function deleteItem(store,id){if(!confirm('Are you sure you want to delete this?'))return;let items=lsGet(store);items=items.filter(x=>x.id!==id);lsSet(store,items);
-  if(store==='checklist')renderChecklist();else if(store==='budget')renderBudget();else if(store==='timeline')renderTimeline();else if(store==='entourage')renderEntourage();else if(store==='suppliers')renderSuppliers();renderOverview();toast('Deleted!','success');}
+  if(store==='checklist')renderChecklist();else if(store==='budget')renderBudget();else if(store==='timeline')renderTimeline();else if(store==='documents')renderDocuments();else if(store==='suppliers')renderSuppliers();renderOverview();toast('Deleted!','success');}
 
 // ============ UTILS ============
 function gv(id){const el=document.getElementById(id);return el?el.value.trim():'';}
