@@ -301,12 +301,45 @@ table.dt tr:hover td{background:var(--cream);}
       <h1 class="page-title">Budget Tracker</h1>
       <p class="page-sub">I-monitor ang gastos at payments para sa kasal</p>
 
+      <!-- TOTAL BUDGET SETTING -->
+      <div class="card" style="margin-bottom:16px;">
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:200px;">
+            <label style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Total Wedding Budget</label>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+              <span style="font-size:1.2rem;font-weight:600;color:var(--earth);">₱</span>
+              <input type="text" id="totalBudgetInput" style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Jost',sans-serif;font-size:1.1rem;font-weight:600;color:var(--earth);" placeholder="0" oninput="saveTotalBudget()" onblur="saveTotalBudget()">
+            </div>
+          </div>
+          <div id="budgetMeter" style="flex:2;min-width:260px;"></div>
+        </div>
+      </div>
+
       <div class="budget-summary" id="budgetSummary"></div>
+
+      <!-- CHARTS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <div class="card">
+          <div class="card-header"><h3>Gastos by Category</h3></div>
+          <canvas id="budgetPieChart" width="280" height="280" style="display:block;margin:0 auto;"></canvas>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Estimated vs Actual vs Paid</h3></div>
+          <canvas id="budgetBarChart" width="400" height="280" style="display:block;margin:0 auto;width:100%;"></canvas>
+        </div>
+      </div>
 
       <div class="card">
         <div class="card-header">
           <h3>Expenses</h3>
-          <button class="btn btn-gold btn-sm" onclick="openModal('expense')">+ Add Expense</button>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-outline btn-sm" onclick="showBudgetSuggestions()">💡 Suggestions</button>
+            <button class="btn btn-gold btn-sm" onclick="openModal('expense')">+ Add Expense</button>
+          </div>
+        </div>
+        <div id="budgetSuggestionBox" style="display:none;margin-bottom:16px;padding:14px;background:var(--cream);border-radius:10px;">
+          <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Click to add common Filipino wedding expenses:</p>
+          <div id="budgetSuggestionBtns" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
         </div>
         <div class="search-bar">
           <input type="text" id="budgetSearch" placeholder="Search expenses..." oninput="renderBudget()">
@@ -533,7 +566,9 @@ function renderOverview(){
   const proxy=guests.filter(g=>g.invite_status==='proxy').length;
   const pending=guests.filter(g=>!g.invite_status||g.invite_status==='pending'||g.invite_status==='sent').length;
   const budget=lsGet('budget');
-  const totalBudget=budget.reduce((s,b)=>s+Number(b.estimated||0),0);
+  const manualBudget=getTotalBudget();
+  const estBudget=budget.reduce((s,b)=>s+Number(b.estimated||0),0);
+  const totalBudget=manualBudget||estBudget;
   const totalSpent=budget.reduce((s,b)=>s+Number(b.actual||0),0);
   const tasks=lsGet('checklist');
   const doneTasks=tasks.filter(t=>t.done).length;
@@ -648,12 +683,62 @@ function toggleCheck(id){const items=lsGet('checklist');const i=items.find(x=>x.
 function editCheck(id){const items=lsGet('checklist');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('task',i);}}
 
 // ============ BUDGET ============
+const BUDGET_SUGGESTIONS=[
+  {item:'Venue Rental',category:'Venue'},
+  {item:'Catering (per head)',category:'Catering'},
+  {item:'Wedding Cake',category:'Cake'},
+  {item:'Photo & Video Package',category:'Photo/Video'},
+  {item:'Bridal Gown',category:'Attire'},
+  {item:'Groom Suit/Barong',category:'Attire'},
+  {item:'Hair & Makeup',category:'Hair & Makeup'},
+  {item:'Flowers & Bouquet',category:'Flowers & Decor'},
+  {item:'Church/Ceremony Venue',category:'Ceremony'},
+  {item:'Lights & Sounds',category:'Entertainment'},
+  {item:'DJ / Band',category:'Entertainment'},
+  {item:'Giveaways/Souvenirs',category:'Giveaways & Prizes'},
+  {item:'Prizes for Games',category:'Giveaways & Prizes'},
+  {item:'Biagya sa Ninong/Ninang',category:'Giveaways & Prizes'},
+  {item:'Invitation Printing',category:'Invitations'},
+  {item:'Wedding Rings',category:'Rings'},
+  {item:'Wedding Coordinator',category:'Coordinator'},
+  {item:'Transportation (Bridal Car)',category:'Transportation'},
+  {item:'Marriage License & Docs',category:'Legal'},
+  {item:'Pre-nup Photoshoot',category:'Photo/Video'},
+  {item:'Entourage Attire',category:'Attire'},
+  {item:'Hotel Accommodations',category:'Accommodation'},
+  {item:'Officiant/Priest Stipend',category:'Ceremony'},
+  {item:'Table Centerpieces',category:'Flowers & Decor'},
+  {item:'Photo Booth',category:'Entertainment'},
+  {item:'Wedding Veil & Accessories',category:'Attire'},
+  {item:'Cord, Veil, Coins (Arrhae)',category:'Ceremony'},
+  {item:'Guest Parking',category:'Miscellaneous'},
+  {item:'Lechon',category:'Catering'},
+  {item:'Drinks & Beverages',category:'Catering'},
+  {item:'Dessert Table/Candy Bar',category:'Catering'},
+  {item:'Emcee/Host',category:'Entertainment'},
+  {item:'Honeymoon Fund',category:'Honeymoon'},
+];
+
+const BUDGET_COLORS=['#c4a265','#5c4a3d','#8e6f5e','#A7A4D8','#C8B4E2','#A78BAA','#B8A6A0','#C9B99F','#8E887A','#2e7d32','#1565c0','#c62828','#e65100','#6a1b9a','#00695c'];
+
+function getTotalBudget(){return Number(localStorage.getItem(LS_KEY+'total_budget')||0);}
+function saveTotalBudget(){
+  const raw=document.getElementById('totalBudgetInput').value.replace(/[^0-9]/g,'');
+  localStorage.setItem(LS_KEY+'total_budget',raw);
+  renderBudget();
+}
+function loadTotalBudgetInput(){
+  const v=getTotalBudget();
+  const el=document.getElementById('totalBudgetInput');
+  if(el)el.value=v?Number(v).toLocaleString():'';
+}
+
 function renderBudget(){
   const items=lsGet('budget');
   const search=(document.getElementById('budgetSearch')?.value||'').toLowerCase();
   const cat=document.getElementById('budgetCatFilter')?.value||'all';
 
-  const cats=[...new Set(items.map(i=>i.category).filter(Boolean))];
+  const cats=[...new Set(items.map(i=>i.category).filter(Boolean))].sort();
   const catSel=document.getElementById('budgetCatFilter');
   if(catSel){const cv=catSel.value;catSel.innerHTML='<option value="all">All Categories</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');catSel.value=cv;}
 
@@ -661,19 +746,45 @@ function renderBudget(){
   if(search)filtered=filtered.filter(i=>i.item.toLowerCase().includes(search)||((i.category||'').toLowerCase().includes(search)));
   if(cat!=='all')filtered=filtered.filter(i=>i.category===cat);
 
+  const totalBudget=getTotalBudget();
   const totalEst=items.reduce((s,b)=>s+Number(b.estimated||0),0);
   const totalAct=items.reduce((s,b)=>s+Number(b.actual||0),0);
   const totalPaid=items.reduce((s,b)=>s+Number(b.paid||0),0);
-  const remaining=totalEst-totalAct;
   const unpaid=totalAct-totalPaid;
+  const budgetUsed=totalBudget?totalAct:0;
+  const budgetRemaining=totalBudget?totalBudget-totalAct:0;
+  const budgetPct=totalBudget?Math.round(totalAct/totalBudget*100):0;
 
+  // Budget meter
+  const meterEl=document.getElementById('budgetMeter');
+  if(meterEl){
+    if(totalBudget){
+      const barClass=budgetPct>100?'over':budgetPct>80?'warn':'ok';
+      meterEl.innerHTML=`
+        <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:4px;">
+          <span style="color:var(--text-muted);">Spent: <strong style="color:var(--earth);">₱${formatNum(totalAct)}</strong> of ₱${formatNum(totalBudget)}</span>
+          <span style="font-weight:600;color:${budgetPct>100?'var(--danger)':budgetPct>80?'var(--warn)':'var(--success)'};">${budgetPct}%</span>
+        </div>
+        <div class="budget-bar" style="height:12px;"><div class="budget-bar-fill ${barClass}" style="width:${Math.min(budgetPct,100)}%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--text-muted);margin-top:4px;">
+          <span>Remaining: <strong style="color:${budgetRemaining<0?'var(--danger)':'var(--success)'}">₱${formatNum(Math.abs(budgetRemaining))}</strong>${budgetRemaining<0?' OVER':''}</span>
+          <span>Unpaid: <strong style="color:${unpaid>0?'var(--warn)':'var(--success)'}">₱${formatNum(unpaid>0?unpaid:0)}</strong></span>
+        </div>`;
+    }else{meterEl.innerHTML=`<p style="font-size:0.82rem;color:var(--text-muted);margin-top:8px;">👈 Set your total wedding budget para makita ang progress bar!</p>`;}
+  }
+
+  // Load total budget input
+  loadTotalBudgetInput();
+
+  // Summary cards
   document.getElementById('budgetSummary').innerHTML=`
-    <div class="stat-card"><div class="stat-num" style="color:var(--earth);">₱${formatNum(totalEst)}</div><div class="stat-label">Total Budget</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--earth);">₱${formatNum(totalBudget||totalEst)}</div><div class="stat-label">${totalBudget?'Total Budget':'Est. Total'}</div></div>
     <div class="stat-card"><div class="stat-num" style="color:var(--warn);">₱${formatNum(totalAct)}</div><div class="stat-label">Actual Cost</div></div>
     <div class="stat-card green"><div class="stat-num">₱${formatNum(totalPaid)}</div><div class="stat-label">Paid</div></div>
     <div class="stat-card ${unpaid>0?'red':''}"><div class="stat-num">₱${formatNum(unpaid>0?unpaid:0)}</div><div class="stat-label">Unpaid</div></div>
-    <div class="stat-card ${remaining<0?'red':'blue'}"><div class="stat-num">₱${formatNum(Math.abs(remaining))}</div><div class="stat-label">${remaining<0?'Over Budget':'Remaining'}</div></div>`;
+    <div class="stat-card ${budgetRemaining<0?'red':'blue'}"><div class="stat-num">₱${formatNum(Math.abs(totalBudget?budgetRemaining:(totalEst-totalAct)))}</div><div class="stat-label">${(totalBudget?budgetRemaining:(totalEst-totalAct))<0?'Over Budget':'Remaining'}</div></div>`;
 
+  // Table
   document.getElementById('budgetBody').innerHTML=filtered.length?filtered.map(b=>{
     const payStatus=Number(b.paid||0)>=Number(b.actual||0)&&Number(b.actual)>0?'paid':Number(b.paid)>0?'partial':'unpaid';
     return`<tr>
@@ -688,9 +799,106 @@ function renderBudget(){
         <button class="btn btn-outline btn-sm" onclick="deleteItem('budget','${b.id}')">×</button>
       </td>
     </tr>`;
-  }).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">Walang expenses pa. Click "+ Add Expense"!</td></tr>';
+  }).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">Walang expenses pa. Click "+ Add Expense" or 💡 Suggestions!</td></tr>';
 
+  // Draw charts
+  drawBudgetPie(items);
+  drawBudgetBars(items);
   renderOverview();
+}
+
+function drawBudgetPie(items){
+  const canvas=document.getElementById('budgetPieChart');if(!canvas)return;
+  const ctx=canvas.getContext('2d');ctx.clearRect(0,0,280,280);
+  const byCat={};
+  items.forEach(b=>{const c=b.category||'Other';byCat[c]=(byCat[c]||0)+Number(b.actual||b.estimated||0);});
+  const entries=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  const total=entries.reduce((s,e)=>s+e[1],0);
+  if(!total){ctx.fillStyle='#e8e0d8';ctx.beginPath();ctx.arc(140,120,80,0,Math.PI*2);ctx.arc(140,120,50,0,Math.PI*2,true);ctx.fill();ctx.fillStyle='#a0917f';ctx.font='12px Jost';ctx.textAlign='center';ctx.fillText('No data yet',140,125);return;}
+  const cx=140,cy=110,r=85,r2=50;
+  let start=-Math.PI/2;
+  entries.forEach((e,i)=>{
+    const angle=(e[1]/total)*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx+r2*Math.cos(start),cy+r2*Math.sin(start));
+    ctx.arc(cx,cy,r,start,start+angle);ctx.arc(cx,cy,r2,start+angle,start,true);
+    ctx.fillStyle=BUDGET_COLORS[i%BUDGET_COLORS.length];ctx.fill();start+=angle;
+  });
+  // Legend
+  let ly=210;let lx=10;
+  ctx.font='10px Jost';ctx.textAlign='left';
+  entries.forEach((e,i)=>{
+    if(ly>275){lx=145;ly=210;}
+    const pct=Math.round(e[1]/total*100);
+    ctx.fillStyle=BUDGET_COLORS[i%BUDGET_COLORS.length];ctx.fillRect(lx,ly-8,8,8);
+    ctx.fillStyle='#3d3028';ctx.fillText(`${e[0]}: ${pct}%`,lx+12,ly);ly+=14;
+  });
+}
+
+function drawBudgetBars(items){
+  const canvas=document.getElementById('budgetBarChart');if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const w=canvas.width,h=canvas.height;ctx.clearRect(0,0,w,h);
+  const byCat={};
+  items.forEach(b=>{
+    const c=b.category||'Other';
+    if(!byCat[c])byCat[c]={est:0,act:0,paid:0};
+    byCat[c].est+=Number(b.estimated||0);
+    byCat[c].act+=Number(b.actual||0);
+    byCat[c].paid+=Number(b.paid||0);
+  });
+  const entries=Object.entries(byCat).sort((a,b)=>Math.max(b[1].est,b[1].act)-Math.max(a[1].est,a[1].act)).slice(0,8);
+  if(!entries.length){ctx.fillStyle='#a0917f';ctx.font='12px Jost';ctx.textAlign='center';ctx.fillText('No data yet',w/2,h/2);return;}
+  const maxVal=Math.max(...entries.map(e=>Math.max(e[1].est,e[1].act)));
+  if(!maxVal)return;
+  const left=60,right=w-10,top=20,bottom=h-50;
+  const barW=Math.min(((right-left)/entries.length-8)/3,18);
+  const groupW=barW*3+8;
+
+  // Y axis
+  ctx.strokeStyle='#e8e0d8';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=top+(bottom-top)*(1-i/4);
+    ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(right,y);ctx.stroke();
+    ctx.fillStyle='#a0917f';ctx.font='9px Jost';ctx.textAlign='right';
+    ctx.fillText('₱'+formatNum(Math.round(maxVal*i/4)),left-4,y+3);
+  }
+
+  entries.forEach((e,i)=>{
+    const x=left+((right-left)/entries.length)*i+((right-left)/entries.length-groupW)/2;
+    const hE=(e[1].est/maxVal)*(bottom-top);
+    const hA=(e[1].act/maxVal)*(bottom-top);
+    const hP=(e[1].paid/maxVal)*(bottom-top);
+    ctx.fillStyle='#c4a265';ctx.fillRect(x,bottom-hE,barW,hE);
+    ctx.fillStyle='#e65100';ctx.fillRect(x+barW+2,bottom-hA,barW,hA);
+    ctx.fillStyle='#2e7d32';ctx.fillRect(x+barW*2+4,bottom-hP,barW,hP);
+    // Label
+    ctx.save();ctx.translate(x+groupW/2,bottom+8);ctx.rotate(Math.PI/6);
+    ctx.fillStyle='#3d3028';ctx.font='8px Jost';ctx.textAlign='left';
+    const label=e[0].length>12?e[0].slice(0,11)+'…':e[0];
+    ctx.fillText(label,0,0);ctx.restore();
+  });
+
+  // Legend
+  const lx=left;const ly=10;
+  [{c:'#c4a265',l:'Estimated'},{c:'#e65100',l:'Actual'},{c:'#2e7d32',l:'Paid'}].forEach((leg,i)=>{
+    ctx.fillStyle=leg.c;ctx.fillRect(lx+i*80,ly,10,10);
+    ctx.fillStyle='#3d3028';ctx.font='10px Jost';ctx.textAlign='left';ctx.fillText(leg.l,lx+i*80+14,ly+9);
+  });
+}
+
+function showBudgetSuggestions(){
+  const box=document.getElementById('budgetSuggestionBox');
+  box.style.display=box.style.display==='none'?'block':'none';
+  const existing=lsGet('budget').map(b=>b.item);
+  document.getElementById('budgetSuggestionBtns').innerHTML=BUDGET_SUGGESTIONS.filter(s=>!existing.includes(s.item)).map(s=>
+    `<button class="btn btn-outline btn-sm" style="font-size:0.72rem;" onclick="addBudgetSuggestion('${esc(s.item)}','${esc(s.category)}')">${esc(s.item)}</button>`
+  ).join('')||'<span style="font-size:0.82rem;color:var(--success);">✓ Lahat ng suggestions ay naka-add na!</span>';
+}
+
+function addBudgetSuggestion(item,category){
+  const items=lsGet('budget');
+  items.push({id:genId(),item,category,estimated:'',actual:'',paid:'',notes:''});
+  lsSet('budget',items);renderBudget();showBudgetSuggestions();toast(`Added: ${item}`,'success');
 }
 
 function editBudgetItem(id){const items=lsGet('budget');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('expense',i);}}
@@ -930,7 +1138,7 @@ function openModal(type,data){
     html=`
       <div class="form-group"><label>Item *</label><input type="text" id="f_item" value="${esc(d.item||'')}" placeholder="e.g. Catering for 150 pax"></div>
       <div class="form-group"><label>Category</label><input type="text" id="f_category" value="${esc(d.category||'')}" placeholder="e.g. Venue, Catering" list="budgetCats">
-        <datalist id="budgetCats"><option value="Venue"><option value="Catering"><option value="Photo/Video"><option value="Attire"><option value="Flowers & Decor"><option value="Entertainment"><option value="Invitations"><option value="Transportation"><option value="Cake"><option value="Favors"><option value="Officiant"><option value="Rings"><option value="Hair & Makeup"><option value="Miscellaneous"></datalist></div>
+        <datalist id="budgetCats"><option value="Venue"><option value="Catering"><option value="Photo/Video"><option value="Attire"><option value="Flowers & Decor"><option value="Entertainment"><option value="Invitations"><option value="Transportation"><option value="Cake"><option value="Giveaways & Prizes"><option value="Ceremony"><option value="Coordinator"><option value="Rings"><option value="Hair & Makeup"><option value="Accommodation"><option value="Legal"><option value="Honeymoon"><option value="Miscellaneous"></datalist></div>
       <div class="form-row">
         <div class="form-group"><label>Estimated (₱)</label><input type="number" id="f_estimated" value="${d.estimated||''}" placeholder="0"></div>
         <div class="form-group"><label>Actual Cost (₱)</label><input type="number" id="f_actual" value="${d.actual||''}" placeholder="0"></div>
