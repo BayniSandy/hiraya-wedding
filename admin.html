@@ -517,9 +517,16 @@ table.dt tr:hover td{background:var(--cream);}
       <div class="card">
         <div class="card-header">
           <h3>Program Flow</h3>
-          <button class="btn btn-gold btn-sm" onclick="openModal('program')">+ Add Event</button>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span id="programTotal" style="font-size:0.85rem;color:var(--gold);font-weight:600;"></span>
+            <button class="btn btn-gold btn-sm" onclick="openModal('program')">+ Add Event</button>
+          </div>
         </div>
         <div id="timelineBody"></div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header"><h3>💡 Quick Add Suggestions</h3></div>
+        <div id="programQuickAdd" style="padding:16px;display:flex;flex-wrap:wrap;gap:6px;"></div>
       </div>
     </div>
 
@@ -598,6 +605,12 @@ table.dt tr:hover td{background:var(--cream);}
           <select id="guestTableFilter" onchange="filterGuests()">
             <option value="all">All Tables</option>
           </select>
+          <select id="guestSideFilter" onchange="filterGuests()">
+            <option value="all">All Sides</option>
+            <option value="Bride">Bride Side</option>
+            <option value="Groom">Groom Side</option>
+            <option value="Both">Both Sides</option>
+          </select>
           <select id="guestStatusFilter" onchange="filterGuests()">
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -611,7 +624,7 @@ table.dt tr:hover td{background:var(--cream);}
         </div>
         <div class="table-wrap">
           <table class="dt">
-            <thead><tr><th>Name</th><th>Group</th><th>Email</th><th>Table</th><th>Code</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Name / Side / Relasyon</th><th>Group</th><th>Email</th><th>Table</th><th>Code</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="guestBody"><tr><td colspan="7" class="loading"><div class="spinner"></div>Loading...</td></tr></tbody>
           </table>
         </div>
@@ -1000,8 +1013,11 @@ function renderOverview(){
   const tasks=lsGet('checklist');
   const doneTasks=tasks.filter(t=>t.done).length;
 
+  const memorialCount=guests.filter(g=>g.is_memorial==='TRUE').length;
+  const livingCount=guests.length-memorialCount;
   document.getElementById('overviewStats').innerHTML=`
-    <div class="stat-card"><div class="stat-num">${guests.length}</div><div class="stat-label">Total Guests</div></div>
+    <div class="stat-card"><div class="stat-num">${livingCount}</div><div class="stat-label">Living Guests</div></div>
+    ${memorialCount?`<div class="stat-card" style="border-left:3px solid #9e9e9e;"><div class="stat-num">🕊️ ${memorialCount}</div><div class="stat-label">Memorial Seats</div></div>`:''}
     <div class="stat-card green"><div class="stat-num">${confirmed+proxy}</div><div class="stat-label">Attending</div></div>
     <div class="stat-card red"><div class="stat-num">${declined}</div><div class="stat-label">Declined</div></div>
     <div class="stat-card gold"><div class="stat-num">${pending}</div><div class="stat-label">Awaiting</div></div>
@@ -1394,18 +1410,97 @@ function addBudgetSuggestion(item,category){
 function editBudgetItem(id){const items=lsGet('budget');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('expense',i);}}
 
 // ============ TIMELINE/PROGRAM ============
+const PROGRAM_SUGGESTIONS=[
+  {time:'08:00',event:'Guests Arrival & Registration',duration:'30 mins',details:'Ushers guide guests to seats'},
+  {time:'08:30',event:'Entourage Processional',duration:'10 mins',details:'Secondary sponsors, flower girls, ring bearer, etc.'},
+  {time:'08:40',event:'Bridal March',duration:'5 mins',details:'Bride walks down the aisle'},
+  {time:'08:45',event:'Opening Prayer',duration:'5 mins',details:'Officiant opens the ceremony'},
+  {time:'08:50',event:'Exchange of Vows',duration:'10 mins',details:'Couple reads vows'},
+  {time:'09:00',event:'Ring Ceremony',duration:'5 mins',details:'Exchange of rings'},
+  {time:'09:05',event:'Unity Ceremony — Cord, Veil & Coins',duration:'10 mins',details:'Sponsors place cord, veil; arrhae ceremony'},
+  {time:'09:15',event:'Candle Lighting Ceremony',duration:'5 mins',details:'Unity candle or sand ceremony'},
+  {time:'09:20',event:'Declaration & Pronouncement',duration:'3 mins',details:'Officiant pronounces couple'},
+  {time:'09:23',event:'First Kiss',duration:'2 mins',details:''},
+  {time:'09:25',event:'Signing of Marriage Certificate',duration:'5 mins',details:'Couple and witnesses sign'},
+  {time:'09:30',event:'Recessional',duration:'5 mins',details:'Newlyweds exit the aisle'},
+  {time:'09:35',event:'Photo Op & Receiving Line',duration:'25 mins',details:'Family and group photos'},
+  {time:'10:00',event:'Cocktail Hour / Photo Booth',duration:'30 mins',details:'Guests mingle while couple takes photos'},
+  {time:'10:30',event:'Grand Entrance of Couple',duration:'5 mins',details:'Emcee introduces Mr. & Mrs.'},
+  {time:'10:35',event:'First Dance',duration:'5 mins',details:'Couple\'s first dance'},
+  {time:'10:40',event:'Welcome Remarks',duration:'5 mins',details:'Host or parent welcome speech'},
+  {time:'10:45',event:'Opening Prayer & Dinner',duration:'45 mins',details:'Grace before meals, dinner service'},
+  {time:'11:30',event:'Toasts & Speeches',duration:'20 mins',details:'Best man, maid of honor, parents'},
+  {time:'11:50',event:'Cake Cutting',duration:'10 mins',details:''},
+  {time:'12:00',event:'Bouquet & Garter Toss',duration:'10 mins',details:''},
+  {time:'12:10',event:'Games & Prizes',duration:'30 mins',details:'Fun games for guests'},
+  {time:'12:40',event:'Money Dance',duration:'15 mins',details:'Dollar dance / sayaw ng bago kasal'},
+  {time:'12:55',event:'Message to Bride & Groom',duration:'10 mins',details:'Open mic, video messages'},
+  {time:'13:05',event:'Parent Dance',duration:'5 mins',details:'Father-daughter & mother-son dance'},
+  {time:'13:10',event:'Thank You Speech',duration:'5 mins',details:'Couple thanks guests and families'},
+  {time:'13:15',event:'Send Off',duration:'10 mins',details:'Sparklers, bubbles, or confetti exit'},
+];
+function addProgramSuggestion(time,event,duration,details){
+  const items=lsGet('timeline');
+  if(items.some(x=>x.event===event)){toast('Event already exists','error');return;}
+  items.push({id:genId(),time,event,duration,details});
+  lsSet('timeline',items);renderTimeline();toast('Event added!','success');
+}
+function addAllProgramSuggestions(){
+  const items=lsGet('timeline');let added=0;
+  PROGRAM_SUGGESTIONS.forEach(s=>{
+    if(!items.some(x=>x.event===s.event)){items.push({id:genId(),time:s.time,event:s.event,duration:s.duration,details:s.details});added++;}
+  });
+  lsSet('timeline',items);renderTimeline();toast(`${added} events added!`,'success');
+}
 function renderTimeline(){
-  const items=lsGet('timeline').sort((a,b)=>(a.time||'').localeCompare(b.time||''));
-  document.getElementById('timelineBody').innerHTML=items.length?items.map(t=>
-    `<div class="tl-item">
-      <div class="tl-time"><div class="time">${esc(t.time||'')}</div><div class="dur">${esc(t.duration||'')}</div></div>
+  const items=lsGet('timeline');
+  const sorted=[...items].sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
+  // Total hours
+  let totalMins=0;items.forEach(x=>totalMins+=parseDurationMins(x.duration));
+  const totalEl=document.getElementById('programTotal');
+  if(totalEl){
+    const hrs=Math.floor(totalMins/60);const mins=Math.round(totalMins%60);
+    totalEl.textContent=items.length?`⏱️ Total: ${hrs}h ${mins>0?mins+'m':''}  ·  ${items.length} events`:'';
+  }
+  // Quick-add
+  const qaEl=document.getElementById('programQuickAdd');
+  if(qaEl){
+    const existing=items.map(x=>x.event);
+    const avail=PROGRAM_SUGGESTIONS.filter(s=>!existing.includes(s.event));
+    qaEl.innerHTML=avail.length?
+      avail.map(s=>`<button class="btn btn-outline btn-sm" style="font-size:0.72rem;" onclick="addProgramSuggestion('${esc(s.time)}','${esc(s.event)}','${esc(s.duration)}','${esc(s.details)}')">${s.time} — ${s.event}</button>`).join('')+
+      `<button class="btn btn-gold btn-sm" style="font-size:0.72rem;margin-top:6px;" onclick="addAllProgramSuggestions()">➕ Add All Remaining</button>`:
+      '<span style="font-size:0.82rem;color:var(--success);">✓ Lahat ng suggested events ay naka-add na!</span>';
+  }
+  const el=document.getElementById('timelineBody');
+  if(!sorted.length){el.innerHTML='<p style="text-align:center;padding:30px;color:var(--text-muted);">Walang program events pa. Use Quick Add below or click "+ Add Event"!</p>';return;}
+  el.innerHTML=sorted.map((t,i)=>
+    `<div class="tl-item" draggable="true" data-id="${t.id}" ondragstart="tlDragStart(event)" ondragover="tlDragOver(event)" ondrop="tlDrop(event)" ondragend="tlDragEnd(event)">
+      <div class="tl-time"><span class="rs-drag-handle" title="Drag to reorder">⠿</span><div class="time">${esc(t.time||'TBD')}</div><div class="dur">${esc(t.duration||'')}</div></div>
       <div class="tl-dot"></div>
       <div class="tl-body"><h4>${esc(t.event)}</h4><p>${esc(t.details||'')}</p>
         <div style="margin-top:6px;"><button class="btn btn-outline btn-sm" onclick="editTimelineItem('${t.id}')">Edit</button> <button class="btn btn-outline btn-sm" onclick="deleteItem('timeline','${t.id}')">×</button></div>
       </div>
     </div>`
-  ).join(''):'<p style="text-align:center;padding:30px;color:var(--text-muted);">Walang program events pa. Click "+ Add Event"!</p>';
+  ).join('');
 }
+// Drag-to-reorder for program
+let tlDragId=null;
+function tlDragStart(e){tlDragId=e.currentTarget.dataset.id;e.currentTarget.style.opacity='0.4';e.dataTransfer.effectAllowed='move';}
+function tlDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';e.currentTarget.style.borderTop='2px solid var(--gold)';}
+function tlDrop(e){
+  e.preventDefault();e.currentTarget.style.borderTop='';
+  const targetId=e.currentTarget.dataset.id;
+  if(!tlDragId||tlDragId===targetId)return;
+  const items=lsGet('timeline');
+  const dragIdx=items.findIndex(x=>x.id===tlDragId);const targetIdx=items.findIndex(x=>x.id===targetId);
+  if(dragIdx<0||targetIdx<0)return;
+  const dragItem=items.splice(dragIdx,1)[0];
+  const newIdx=targetIdx>dragIdx?targetIdx-1:targetIdx;
+  items.splice(newIdx,0,dragItem);
+  lsSet('timeline',items);renderTimeline();toast('Event reordered!','success');
+}
+function tlDragEnd(e){e.currentTarget.style.opacity='1';document.querySelectorAll('.tl-item').forEach(el=>el.style.borderTop='');}
 
 function editTimelineItem(id){const items=lsGet('timeline');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('program',i);}}
 
@@ -1526,7 +1621,8 @@ function loadGuests(){
 }
 
 function renderGuestTable(guests){
-  document.getElementById('guestCount').textContent=`(${guests.length})`;
+  const memCount=guests.filter(g=>g.is_memorial==='TRUE').length;
+  document.getElementById('guestCount').textContent=memCount?`(${guests.length-memCount} living + ${memCount} 🕊️ memorial)`:`(${guests.length})`;
 
   // Populate table filter dropdown
   const tables=[...new Set(allGuests.map(g=>g.table_number).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
@@ -1553,13 +1649,17 @@ function renderGuestTable(guests){
 
 function guestRowHtml(g){
   const sc='s-'+(g.invite_status||'pending');
-  return`<tr>
-    <td><strong>${esc(g.full_name)}</strong></td>
+  const memorial=g.is_memorial==='TRUE';
+  const sideTag=g.side?`<span style="font-size:0.68rem;background:${g.side==='Bride'?'#e8d5e8':g.side==='Groom'?'#d5dce8':'#e0dce0'};color:var(--text);padding:1px 6px;border-radius:10px;margin-left:4px;">${g.side}</span>`:'';
+  const relTag=g.relation?`<div style="font-size:0.72rem;color:var(--text-muted);">${esc(g.relation)}</div>`:'';
+  const memBadge=memorial?'<span style="font-size:0.72rem;" title="Memorial / Reserved Seat"> 🕊️</span>':'';
+  return`<tr${memorial?' style="opacity:0.7;background:var(--cream);"':''}>
+    <td><strong>${esc(g.full_name)}</strong>${memBadge}${sideTag}${relTag}</td>
     <td>${esc(g.group_label||'-')}</td>
     <td style="font-size:0.78rem;">${esc(g.email||'-')}</td>
     <td style="text-align:center;">${g.table_number||'-'}</td>
     <td><code style="font-size:0.73rem;background:var(--cream);padding:2px 6px;border-radius:4px;">${esc(g.invite_code)}</code></td>
-    <td><span class="status ${sc}">${g.invite_status||'pending'}</span></td>
+    <td><span class="status ${sc}">${memorial?'🕊️ memorial':g.invite_status||'pending'}</span></td>
     <td class="actions-cell">
       <button class="btn btn-outline btn-sm" onclick="editGuest('${g.guest_id}')">Edit</button>
       ${['expired','confirmed','declined'].includes(g.invite_status)?`<button class="btn btn-outline btn-sm" onclick="reopenInvite('${g.guest_id}')">Reopen</button>`:''}
@@ -1572,10 +1672,12 @@ function filterGuests(){
   const q=(document.getElementById('guestSearch')?.value||'').toLowerCase();
   const tableF=document.getElementById('guestTableFilter')?.value||'all';
   const statusF=document.getElementById('guestStatusFilter')?.value||'all';
+  const sideF=document.getElementById('guestSideFilter')?.value||'all';
   let filtered=allGuests;
-  if(q)filtered=filtered.filter(g=>(g.full_name||'').toLowerCase().includes(q)||(g.email||'').toLowerCase().includes(q)||(g.group_label||'').toLowerCase().includes(q)||(g.invite_code||'').toLowerCase().includes(q));
+  if(q)filtered=filtered.filter(g=>(g.full_name||'').toLowerCase().includes(q)||(g.email||'').toLowerCase().includes(q)||(g.group_label||'').toLowerCase().includes(q)||(g.invite_code||'').toLowerCase().includes(q)||(g.relation||'').toLowerCase().includes(q));
   if(tableF!=='all')filtered=filtered.filter(g=>(g.table_number||'')==tableF);
   if(statusF!=='all')filtered=filtered.filter(g=>(g.invite_status||'pending')===statusF);
+  if(sideF!=='all')filtered=filtered.filter(g=>(g.side||'')===sideF);
   renderGuestTable(filtered);
 }
 
@@ -2256,10 +2358,23 @@ function openModal(type,data){
       <div class="form-group"><label>Email</label><input type="email" id="f_email" value="${esc(d.email||'')}"></div>
       <div class="form-row">
         <div class="form-group"><label>Phone</label><input type="text" id="f_phone" value="${esc(d.phone||'')}"></div>
+        <div class="form-group"><label>Side</label><select id="f_side">
+          <option value="">— Select Side —</option>
+          <option value="Bride" ${d.side==='Bride'?'selected':''}>Bride Side</option>
+          <option value="Groom" ${d.side==='Groom'?'selected':''}>Groom Side</option>
+          <option value="Both" ${d.side==='Both'?'selected':''}>Both Sides</option>
+        </select></div>
+      </div>
+      <div class="form-row">
         <div class="form-group"><label>Group</label><input type="text" id="f_group" value="${esc(d.group_label||'')}" list="grpList">
           <datalist id="grpList"><option value="Bride Family"><option value="Groom Family"><option value="Bride Friends"><option value="Groom Friends"><option value="Ninong/Ninang"><option value="Colleagues"><option value="Church"></datalist></div>
+        <div class="form-group"><label>Relasyon</label><select id="f_relation">
+          <option value="">— Select Relation —</option>
+          ${['Nanay','Tatay','Kapatid','Anak ng Kapatid','Lolo/Lola','Tito/Tita','Pinsan','Asawa ng Kapatid','Asawa ng Pinsan','BF/GF ng Kapatid','BF/GF ng Pinsan','Pamangkin','Inaanak','Ninong/Ninang','Barkada','Officemate/Katrabaho','Classmate','Churchmate','Kapitbahay','Boss','Iba Pa'].map(r=>`<option value="${r}" ${d.relation===r?'selected':''}>${r}</option>`).join('')}
+        </select></div>
       </div>
       <div class="form-group"><label>Table Number</label><input type="number" id="f_table" value="${d.table_number||''}" min="1"></div>
+      <div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" id="f_is_memorial" ${d.is_memorial==='TRUE'||d.is_memorial===true?'checked':''}> 🕊️ Memorial / Reserved Seat (para sa yumaong mahal sa buhay)</label></div>
       <div class="form-group"><label>Notes</label><textarea id="f_notes" rows="2">${esc(d.notes||'')}</textarea></div>`;
   } else if(type==='runsheet'){
     title=isEdit?'Edit Run Sheet Event':'Add Run Sheet Event';
@@ -2394,11 +2509,13 @@ function saveModal(){
     lsSet('suppliers',items);renderSuppliers();toast('Supplier saved!','success');closeModal();btn.disabled=false;
   } else if(currentModal==='guest'){
     const name=gv('f_full_name');if(!name){toast('Ilagay ang pangalan','error');btn.disabled=false;btn.textContent='Save';return;}
+    const memorialCb=document.getElementById('f_is_memorial');
+    const isMemorial=memorialCb&&memorialCb.checked?'TRUE':'FALSE';
     if(editId){
-      apiPost('admin_update_guest',{guest_id:editId,fields:{full_name:name,email:gv('f_email'),phone:gv('f_phone'),group_label:gv('f_group'),table_number:gv('f_table'),notes:gv('f_notes')}}).then(d=>{
+      apiPost('admin_update_guest',{guest_id:editId,fields:{full_name:name,email:gv('f_email'),phone:gv('f_phone'),group_label:gv('f_group'),table_number:gv('f_table'),notes:gv('f_notes'),side:gv('f_side'),relation:gv('f_relation'),is_memorial:isMemorial}}).then(d=>{
         btn.disabled=false;if(d.status===200){toast('Guest updated!','success');closeModal();loadGuests();}else{toast(d.error||'Error','error');btn.textContent='Save Changes';}});
     }else{
-      apiPost('admin_add_guest',{full_name:name,email:gv('f_email'),phone:gv('f_phone'),group_label:gv('f_group'),table_number:gv('f_table'),notes:gv('f_notes')}).then(d=>{
+      apiPost('admin_add_guest',{full_name:name,email:gv('f_email'),phone:gv('f_phone'),group_label:gv('f_group'),table_number:gv('f_table'),notes:gv('f_notes'),side:gv('f_side'),relation:gv('f_relation'),is_memorial:isMemorial}).then(d=>{
         btn.disabled=false;if(d.status===200){toast(`Guest added! Code: ${d.invite_code}`,'success');closeModal();loadGuests();}else{toast(d.error||'Error','error');btn.textContent='Add Guest';}});
     }
   } else if(currentModal==='runsheet'){

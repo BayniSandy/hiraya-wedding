@@ -601,6 +601,9 @@ function adminAddGuest(payload) {
       case 'invite_status': return 'pending';
       case 'table_number': return payload.table_number || '';
       case 'notes': return payload.notes || '';
+      case 'side': return payload.side || '';
+      case 'relation': return payload.relation || '';
+      case 'is_memorial': return payload.is_memorial || 'FALSE';
       case 'wedding_id': return guestId;
       case 'created_at': return now;
       case 'updated_at': return now;
