@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Hiraya — Coordinator Check-In</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#5c4a3d">
+<link rel="manifest" href="coordinator-manifest.json">
+<link rel="icon" href="logo-rd-web.png">
+<link rel="apple-touch-icon" href="logo-rd-web.png">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f0eb;--card:#ffffff;--earth:#5c4a3d;--earth-light:#8e6f5e;
+  --gold:#c4a265;--gold-light:#d4b87a;--cream:#faf8f5;--text:#3d3028;
+  --text-muted:#a0917f;--border:#e8e0d8;--success:#2e7d32;--danger:#c62828;
+  --info:#1565c0;--warn:#e65100;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Jost',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;}
+.header{background:linear-gradient(135deg,var(--earth),var(--earth-light));color:#fff;padding:16px 20px;text-align:center;position:sticky;top:0;z-index:100;}
+.header h1{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;margin-bottom:2px;}
+.header p{font-size:0.72rem;opacity:0.8;letter-spacing:1px;text-transform:uppercase;}
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--border);}
+.sb{text-align:center;}
+.sb .num{font-size:1.3rem;font-weight:700;}
+.sb .lbl{font-size:0.62rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;}
+.sb.green .num{color:var(--success);}
+.sb.gold .num{color:var(--gold);}
+.sb.blue .num{color:var(--info);}
+
+.tabs{display:flex;background:var(--card);border-bottom:2px solid var(--border);}
+.tab{flex:1;padding:12px;text-align:center;font-size:0.82rem;font-weight:500;cursor:pointer;border-bottom:3px solid transparent;transition:all 0.2s;color:var(--text-muted);}
+.tab.active{color:var(--earth);border-bottom-color:var(--gold);}
+
+.page{display:none;padding:16px;}
+.page.active{display:block;}
+
+/* Scanner */
+.scanner-area{background:#000;border-radius:12px;overflow:hidden;position:relative;width:100%;max-width:400px;margin:0 auto 16px;}
+.scanner-area video{width:100%;display:block;}
+.scanner-overlay{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:220px;height:220px;border:3px solid var(--gold);border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,0.4);}
+.scanner-line{position:absolute;left:4px;right:4px;height:2px;background:var(--gold);animation:scanline 2s ease-in-out infinite;}
+@keyframes scanline{0%,100%{top:4px;}50%{top:calc(100% - 6px);}}
+#scannerBtn{display:block;width:100%;max-width:400px;margin:0 auto 12px;padding:14px;font-size:1rem;font-weight:600;border:none;border-radius:10px;cursor:pointer;background:linear-gradient(135deg,var(--earth),var(--earth-light));color:#fff;transition:all 0.2s;}
+#scannerBtn.scanning{background:var(--danger);}
+.scan-result{max-width:400px;margin:0 auto;padding:16px;background:var(--card);border-radius:12px;border:1px solid var(--border);display:none;}
+.scan-result.show{display:block;}
+
+/* Search */
+.search-box{position:relative;margin-bottom:16px;}
+.search-box input{width:100%;padding:14px 14px 14px 44px;font-size:0.95rem;border:2px solid var(--border);border-radius:10px;background:var(--card);font-family:inherit;transition:border 0.2s;}
+.search-box input:focus{outline:none;border-color:var(--gold);}
+.search-box svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted);}
+
+/* Guest card */
+.guest-card{background:var(--card);border-radius:12px;padding:16px;margin-bottom:12px;border:1px solid var(--border);transition:all 0.2s;}
+.guest-card.checked{border-left:4px solid var(--success);background:#f0faf0;}
+.gc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.gc-name{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;}
+.gc-badge{font-size:0.68rem;padding:3px 10px;border-radius:20px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+.gc-badge.confirmed{background:#e8f5e9;color:var(--success);}
+.gc-badge.pending{background:#fff3e0;color:var(--warn);}
+.gc-badge.declined{background:#ffebee;color:var(--danger);}
+.gc-badge.proxy{background:#e3f2fd;color:var(--info);}
+.gc-badge.checked-in{background:var(--success);color:#fff;}
+.gc-meta{display:flex;flex-wrap:wrap;gap:12px;font-size:0.78rem;color:var(--text-muted);margin-bottom:12px;}
+.gc-meta span{display:flex;align-items:center;gap:4px;}
+.checkin-btn{width:100%;padding:12px;font-size:0.9rem;font-weight:600;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s;}
+.checkin-btn.check-in{background:linear-gradient(135deg,var(--success),#388e3c);color:#fff;}
+.checkin-btn.undo{background:var(--border);color:var(--text-muted);}
+.checkin-btn:active{transform:scale(0.97);}
+
+/* Toast */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);padding:14px 28px;border-radius:10px;color:#fff;font-weight:500;z-index:999;animation:toastin 0.3s ease;font-size:0.88rem;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
+.toast.success{background:var(--success);}
+.toast.error{background:var(--danger);}
+.toast.info{background:var(--info);}
+@keyframes toastin{from{opacity:0;transform:translateX(-50%) translateY(20px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+
+/* Login */
+.login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;background:linear-gradient(160deg,#f5f0eb,#e8ddd0);}
+.login-card{background:var(--card);padding:40px 30px;border-radius:16px;box-shadow:0 8px 40px rgba(0,0,0,0.08);text-align:center;width:100%;max-width:360px;}
+.login-card img{width:80px;margin-bottom:16px;border-radius:50%;border:3px solid var(--gold);}
+.login-card h2{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--earth);margin-bottom:4px;}
+.login-card p{font-size:0.8rem;color:var(--text-muted);margin-bottom:24px;}
+.login-card input{width:100%;padding:14px;border:2px solid var(--border);border-radius:10px;font-family:inherit;font-size:0.95rem;margin-bottom:12px;}
+.login-card button{width:100%;padding:14px;background:linear-gradient(135deg,var(--earth),var(--earth-light));color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;}
+
+/* Bottom nav */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--border);padding:8px 0 max(8px,env(safe-area-inset-bottom));z-index:100;}
+.bnav{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px;cursor:pointer;color:var(--text-muted);font-size:0.62rem;font-weight:500;transition:color 0.2s;}
+.bnav.active{color:var(--earth);}
+.bnav svg{width:22px;height:22px;}
+
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-muted);}
+.empty-state .emoji{font-size:2.5rem;margin-bottom:12px;}
+.empty-state p{font-size:0.88rem;}
+
+/* Guest list */
+.filter-chips{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;}
+.chip{padding:6px 14px;border-radius:20px;font-size:0.75rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--card);white-space:nowrap;transition:all 0.2s;}
+.chip.active{background:var(--earth);color:#fff;border-color:var(--earth);}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <img src="logo-rd-web.png" alt="R&D">
+    <h2>Coordinator Login</h2>
+    <p>Rodnel & Divine · October 15, 2027</p>
+    <input type="password" id="loginKey" placeholder="Enter coordinator key" onkeydown="if(event.key==='Enter')login()">
+    <button onclick="login()">Enter</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;">
+  <div class="header">
+    <h1>✨ Hiraya Check-In</h1>
+    <p>Rodnel & Divine · October 15, 2027</p>
+  </div>
+
+  <div class="stats-bar" id="statsBar">
+    <div class="sb"><div class="num" id="stTotal">-</div><div class="lbl">Total</div></div>
+    <div class="sb green"><div class="num" id="stChecked">-</div><div class="lbl">Checked In</div></div>
+    <div class="sb gold"><div class="num" id="stPending">-</div><div class="lbl">Awaiting</div></div>
+    <div class="sb blue"><div class="num" id="stTables">-</div><div class="lbl">Tables</div></div>
+  </div>
+
+  <!-- TABS -->
+  <div class="bottom-nav">
+    <div class="bnav active" onclick="switchTab('scan')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Scan
+    </div>
+    <div class="bnav" onclick="switchTab('search')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Search
+    </div>
+    <div class="bnav" onclick="switchTab('guests')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Guests
+    </div>
+  </div>
+
+  <!-- SCAN PAGE -->
+  <div class="page active" id="pageScan">
+    <div class="scanner-area" id="scannerArea" style="display:none;">
+      <video id="scanVideo" playsinline></video>
+      <div class="scanner-overlay"><div class="scanner-line"></div></div>
+    </div>
+    <button id="scannerBtn" onclick="toggleScanner()">📷 Start QR Scanner</button>
+
+    <div style="text-align:center;margin:12px 0;font-size:0.78rem;color:var(--text-muted);">— or enter code manually —</div>
+    <div class="search-box">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="scanInput" placeholder="Type invite code or guest name..." onkeydown="if(event.key==='Enter')scanLookup()">
+    </div>
+
+    <div class="scan-result" id="scanResult"></div>
+  </div>
+
+  <!-- SEARCH PAGE -->
+  <div class="page" id="pageSearch">
+    <div class="search-box">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Search by name..." oninput="searchGuests()">
+    </div>
+    <div id="searchResults"></div>
+  </div>
+
+  <!-- GUESTS PAGE -->
+  <div class="page" id="pageGuests">
+    <div class="filter-chips" id="filterChips">
+      <div class="chip active" onclick="filterGuests('all')">All</div>
+      <div class="chip" onclick="filterGuests('checked')">✅ Checked In</div>
+      <div class="chip" onclick="filterGuests('not-checked')">⏳ Not Yet</div>
+      <div class="chip" onclick="filterGuests('confirmed')">Confirmed</div>
+      <div class="chip" onclick="filterGuests('proxy')">Proxy</div>
+    </div>
+    <div id="guestList"></div>
+  </div>
+</div>
+
+<!-- QR Scanner Library -->
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<script>
+const API='https://script.google.com/macros/s/AKfycbzTed1IVGpD7anZrIZqHC6-9mr0nH6fBxEjq6p_JKYX7HcGPweH5RthWSQ9NEwZ8MQewg/exec';
+let KEY='';
+let allGuests=[];
+let scanning=false;
+let html5QrCode=null;
+let currentFilter='all';
+
+function login(){
+  const k=document.getElementById('loginKey').value.trim();
+  if(!k){toast('Enter the coordinator key','error');return;}
+  KEY=k;
+  // Test the key
+  fetch(`${API}?action=admin_guests&key=${encodeURIComponent(k)}`)
+    .then(r=>r.json())
+    .then(d=>{
+      if(d.error){toast('Invalid key!','error');return;}
+      allGuests=d.guests||[];
+      document.getElementById('loginScreen').style.display='none';
+      document.getElementById('app').style.display='block';
+      sessionStorage.setItem('hiraya_coord_key',k);
+      updateStats();
+      renderGuestList();
+    })
+    .catch(()=>toast('Connection error','error'));
+}
+
+// Auto-login
+(function(){
+  const k=sessionStorage.getItem('hiraya_coord_key');
+  if(k){document.getElementById('loginKey').value=k;login();}
+})();
+
+function switchTab(tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bnav').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page'+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add('active');
+  document.querySelectorAll('.bnav')[['scan','search','guests'].indexOf(tab)].classList.add('active');
+  if(tab!=='scan'&&scanning)toggleScanner();
+}
+
+function updateStats(){
+  const total=allGuests.filter(g=>g.invite_status==='confirmed'||g.invite_status==='proxy').length;
+  const checked=allGuests.filter(g=>g.checked_in==='TRUE'||g.checked_in===true).length;
+  const tables=[...new Set(allGuests.filter(g=>g.table_number).map(g=>g.table_number))].length;
+  document.getElementById('stTotal').textContent=total;
+  document.getElementById('stChecked').textContent=checked;
+  document.getElementById('stPending').textContent=total-checked;
+  document.getElementById('stTables').textContent=tables;
+}
+
+function refreshGuests(){
+  fetch(`${API}?action=admin_guests&key=${encodeURIComponent(KEY)}`)
+    .then(r=>r.json())
+    .then(d=>{if(!d.error){allGuests=d.guests||[];updateStats();renderGuestList();}});
+}
+
+// ============ QR SCANNER ============
+function toggleScanner(){
+  if(scanning){stopScanner();return;}
+  const area=document.getElementById('scannerArea');
+  area.style.display='block';
+  document.getElementById('scannerBtn').textContent='⏹ Stop Scanner';
+  document.getElementById('scannerBtn').classList.add('scanning');
+  scanning=true;
+
+  if(!html5QrCode){
+    html5QrCode=new Html5Qrcode("scannerArea");
+  }
+
+  html5QrCode.start(
+    {facingMode:"environment"},
+    {fps:10,qrbox:{width:220,height:220},aspectRatio:1.0},
+    (decoded)=>{onQrScanned(decoded);},
+    ()=>{}
+  ).catch(err=>{
+    toast('Camera error: '+err,'error');
+    stopScanner();
+  });
+}
+
+function stopScanner(){
+  scanning=false;
+  document.getElementById('scannerBtn').textContent='📷 Start QR Scanner';
+  document.getElementById('scannerBtn').classList.remove('scanning');
+  if(html5QrCode){
+    html5QrCode.stop().then(()=>{
+      document.getElementById('scannerArea').style.display='none';
+    }).catch(()=>{
+      document.getElementById('scannerArea').style.display='none';
+    });
+  }
+}
+
+function onQrScanned(data){
+  stopScanner();
+  // QR data might be invite code or guest_id or a URL with code param
+  let code=data;
+  try{
+    const url=new URL(data);
+    code=url.searchParams.get('code')||url.searchParams.get('c')||data;
+  }catch(e){}
+  document.getElementById('scanInput').value=code;
+  scanLookup();
+}
+
+function scanLookup(){
+  const q=document.getElementById('scanInput').value.trim();
+  if(!q)return;
+  const resultDiv=document.getElementById('scanResult');
+  resultDiv.classList.add('show');
+  resultDiv.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);">Searching...</div>';
+
+  fetch(`${API}?action=admin_checkin_lookup&key=${encodeURIComponent(KEY)}&q=${encodeURIComponent(q)}`)
+    .then(r=>r.json())
+    .then(d=>{
+      if(d.error||!d.guests||d.guests.length===0){
+        resultDiv.innerHTML='<div class="empty-state"><div class="emoji">🔍</div><p>Hindi mahanap. Check the code or name.</p></div>';
+        return;
+      }
+      resultDiv.innerHTML=d.guests.map(g=>guestCardHtml(g)).join('');
+    })
+    .catch(()=>{resultDiv.innerHTML='<div class="empty-state"><div class="emoji">⚠️</div><p>Connection error</p></div>';});
+}
+
+// ============ SEARCH ============
+function searchGuests(){
+  const q=document.getElementById('searchInput').value.trim().toLowerCase();
+  const div=document.getElementById('searchResults');
+  if(!q){div.innerHTML='<div class="empty-state"><div class="emoji">🔍</div><p>Type a name para mag-search</p></div>';return;}
+  const matches=allGuests.filter(g=>(g.full_name||'').toLowerCase().includes(q)||(g.invite_code||'').toLowerCase().includes(q)||(g.table_number||'').toString()===q);
+  if(!matches.length){div.innerHTML='<div class="empty-state"><div class="emoji">🤷</div><p>Walang match for "'+esc(q)+'"</p></div>';return;}
+  div.innerHTML=matches.map(g=>guestCardHtml(g)).join('');
+}
+
+// ============ GUEST LIST ============
+function filterGuests(filter){
+  currentFilter=filter;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  event.target.classList.add('active');
+  renderGuestList();
+}
+
+function renderGuestList(){
+  let list=allGuests;
+  switch(currentFilter){
+    case 'checked':list=list.filter(g=>g.checked_in==='TRUE'||g.checked_in===true);break;
+    case 'not-checked':list=list.filter(g=>(g.invite_status==='confirmed'||g.invite_status==='proxy')&&g.checked_in!=='TRUE'&&g.checked_in!==true);break;
+    case 'confirmed':list=list.filter(g=>g.invite_status==='confirmed');break;
+    case 'proxy':list=list.filter(g=>g.invite_status==='proxy');break;
+  }
+  const div=document.getElementById('guestList');
+  if(!list.length){div.innerHTML='<div class="empty-state"><div class="emoji">📋</div><p>Walang guests sa filter na ito</p></div>';return;}
+  list.sort((a,b)=>(a.full_name||'').localeCompare(b.full_name||''));
+  div.innerHTML=list.map(g=>guestCardHtml(g)).join('');
+}
+
+// ============ GUEST CARD ============
+function guestCardHtml(g){
+  const isChecked=g.checked_in==='TRUE'||g.checked_in===true;
+  const status=isChecked?'checked-in':(g.invite_status||'pending');
+  const statusLabel=isChecked?'Checked In':status.charAt(0).toUpperCase()+status.slice(1);
+  return`<div class="guest-card ${isChecked?'checked':''}">
+    <div class="gc-top">
+      <div class="gc-name">${esc(g.full_name)}</div>
+      <span class="gc-badge ${status}">${statusLabel}</span>
+    </div>
+    <div class="gc-meta">
+      ${g.table_number?`<span>🪑 Table ${esc(String(g.table_number))}</span>`:''}
+      ${g.group_label?`<span>👥 ${esc(g.group_label)}</span>`:''}
+      ${g.invite_code?`<span>🔑 ${esc(g.invite_code)}</span>`:''}
+      ${g.checkin_time?`<span>🕐 ${new Date(g.checkin_time).toLocaleTimeString('en-PH',{hour:'numeric',minute:'2-digit'})}</span>`:''}
+    </div>
+    ${(g.invite_status==='confirmed'||g.invite_status==='proxy'||isChecked)?`
+      <button class="checkin-btn ${isChecked?'undo':'check-in'}" onclick="doCheckin('${g.guest_id}',${isChecked})">
+        ${isChecked?'↩ Undo Check-in':'✅ Check In Guest'}
+      </button>
+    `:`<div style="font-size:0.78rem;color:var(--text-muted);text-align:center;padding:8px;">Status: ${statusLabel} — hindi pa pwede i-check in</div>`}
+  </div>`;
+}
+
+// ============ CHECK-IN ACTION ============
+function doCheckin(guestId,isUndo){
+  const btn=event.target;
+  btn.disabled=true;btn.textContent='Processing...';
+
+  fetch(API,{
+    method:'POST',
+    headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({action:'admin_checkin',key:KEY,guest_id:guestId,undo:isUndo})
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    if(d.error){toast(d.error,'error');btn.disabled=false;return;}
+    toast(d.message,'success');
+    // Update local data
+    const g=allGuests.find(x=>x.guest_id===guestId);
+    if(g){g.checked_in=isUndo?'':'TRUE';g.checkin_time=isUndo?'':d.checkin_time;}
+    updateStats();
+    renderGuestList();
+    // Re-render scan result and search if visible
+    if(document.getElementById('scanResult').classList.contains('show'))scanLookup();
+    if(document.getElementById('searchInput').value)searchGuests();
+
+    // Show table number for check-in
+    if(!isUndo&&d.table_number){
+      setTimeout(()=>toast(`🪑 Table ${d.table_number}`,'info'),1500);
+    }
+  })
+  .catch(()=>{toast('Connection error','error');btn.disabled=false;});
+}
+
+// ============ UTILS ============
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+function toast(msg,type='info'){
+  const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
+}
+
+// Auto-refresh every 30 seconds
+setInterval(()=>{if(KEY)refreshGuests();},30000);
+</script>
+</body>
+</html>
