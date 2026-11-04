@@ -239,15 +239,80 @@ table.dt tr:hover td{background:var(--cream);}
 .ty-sent-btn.pending{background:var(--warn-bg);color:var(--warn);}
 .ty-sent-btn.sent{background:var(--success-bg);color:var(--success);}
 
+/* CONFIRM OVERLAY */
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9998;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.2s;}
+.confirm-overlay.open{display:flex;}
+.confirm-box{background:var(--card);border-radius:16px;padding:32px;max-width:400px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(92,74,61,0.15);animation:slideUp 0.25s;}
+.confirm-box .confirm-icon{font-size:2.2rem;margin-bottom:12px;}
+.confirm-box .confirm-msg{font-size:0.95rem;color:var(--text);line-height:1.6;margin-bottom:24px;}
+.confirm-box .confirm-actions{display:flex;gap:10px;justify-content:center;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* PWA INSTALL */
+.pwa-install-btn{display:none;align-items:center;gap:6px;background:transparent;border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.7);padding:5px 12px;border-radius:8px;font-family:'Jost',sans-serif;font-size:0.72rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.pwa-install-btn:hover{color:#fff;border-color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.08);}
+
+/* USER AVATAR */
+.user-badge{display:flex;align-items:center;gap:8px;padding:10px 16px;margin:0 10px 8px;border-radius:10px;background:rgba(255,255,255,0.08);}
+.user-badge .avatar{width:32px;height:32px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:0.82rem;font-weight:700;color:#fff;}
+.user-badge .uname{font-size:0.78rem;color:rgba(255,255,255,0.85);font-weight:500;}
+.user-badge .urole{font-size:0.62rem;color:rgba(255,255,255,0.4);}
+
+/* PAYMENT TRACKER */
+.payment-timeline{border-left:2px solid var(--border);margin-left:12px;padding-left:16px;}
+.payment-item{position:relative;margin-bottom:14px;}
+.payment-item::before{content:'';position:absolute;left:-21px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--gold);border:2px solid var(--card);}
+.payment-item.paid::before{background:var(--success);}
+.payment-item.overdue::before{background:var(--danger);}
+
+/* ENTOURAGE MANAGER */
+.ent-role-card{background:var(--cream);border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid var(--border);}
+.ent-role-card h4{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--earth);margin-bottom:8px;}
+.ent-member-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.85rem;}
+.ent-member-row:last-child{border-bottom:none;}
+
+/* DRESS CODE */
+.dresscolor{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:10px;border:1.5px solid var(--border);margin:4px;background:var(--card);font-size:0.82rem;}
+.dresscolor .swatch{width:28px;height:28px;border-radius:8px;border:1px solid rgba(0,0,0,0.08);flex-shrink:0;}
+
+/* NOTES / JOURNAL */
+.journal-entry{background:var(--cream);border-radius:10px;padding:14px 16px;margin-bottom:10px;border:1px solid var(--border);}
+.journal-entry .je-date{font-size:0.72rem;color:var(--text-muted);margin-bottom:4px;}
+.journal-entry .je-title{font-weight:600;font-size:0.95rem;margin-bottom:4px;}
+.journal-entry .je-body{font-size:0.85rem;color:var(--text);line-height:1.6;white-space:pre-wrap;}
+
+/* MOOD BOARD */
+.mood-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+.mood-card{background:var(--card);border-radius:12px;overflow:hidden;border:1.5px solid var(--border);transition:transform 0.2s;}
+.mood-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(92,74,61,0.1);}
+.mood-card img{width:100%;height:160px;object-fit:cover;display:block;}
+.mood-card .mc-body{padding:10px 12px;}
+.mood-card .mc-title{font-weight:600;font-size:0.85rem;}
+.mood-card .mc-cat{font-size:0.72rem;color:var(--gold);margin-top:2px;}
+.mood-card .mc-notes{font-size:0.78rem;color:var(--text-muted);margin-top:4px;}
+
+/* RSVP ANALYTICS */
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:768px){.analytics-grid{grid-template-columns:1fr;}}
+
+/* GUEST COMPANION */
+.companion-card{background:var(--cream);border-radius:10px;padding:14px;margin-bottom:10px;border:1px solid var(--border);}
+
 /* PRINT STYLES */
 @media print{
-  .sidebar,.login-screen,.btn,.modal-overlay,.toast{display:none!important;}
+  .sidebar,.login-screen,.btn,.modal-overlay,.toast,.confirm-overlay{display:none!important;}
   .app{display:block!important;}
   .content{margin-left:0!important;padding:0!important;}
   .page{display:block!important;}
   .runsheet-content{break-inside:avoid;}
 }
 </style>
+<link rel="manifest" href="admin-manifest.json">
+<meta name="theme-color" content="#5c4a3d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="brown-translucent">
+<link rel="apple-touch-icon" href="logo-rd-web.png">
 </head>
 <body>
 
@@ -257,9 +322,18 @@ table.dt tr:hover td{background:var(--cream);}
     <img src="logo-rd-web.png" alt="R&D">
     <h1>Hiraya Portal</h1>
     <p class="sub">Wedding Management System</p>
-    <input type="password" id="adminKeyInput" placeholder="Admin Key" autofocus>
-    <div class="error" id="loginError">Invalid admin key. Try again.</div>
-    <button class="btn btn-gold" style="width:100%" onclick="login()">Sign In</button>
+    <div id="loginStep1">
+      <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:16px;">Sino ka?</p>
+      <button class="btn btn-gold" style="width:100%;margin-bottom:10px;" onclick="selectAccount('divine')">💐 Divine</button>
+      <button class="btn btn-outline" style="width:100%;" onclick="selectAccount('rodnel')">🤵 Rodnel</button>
+    </div>
+    <div id="loginStep2" style="display:none;">
+      <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:12px;">Welcome, <strong id="loginWho"></strong>!</p>
+      <input type="password" id="adminKeyInput" placeholder="Admin Key" autofocus>
+      <div class="error" id="loginError">Invalid admin key. Try again.</div>
+      <button class="btn btn-gold" style="width:100%;margin-bottom:8px;" onclick="login()">Sign In</button>
+      <button class="btn btn-outline" style="width:100%;font-size:0.78rem;" onclick="backToStep1()">← Back</button>
+    </div>
   </div>
 </div>
 
@@ -271,6 +345,11 @@ table.dt tr:hover td{background:var(--cream);}
       <img src="logo-rd-web.png" alt="R&D">
       <h2>Hiraya</h2>
       <span>Wedding Portal</span>
+      <button class="pwa-install-btn" id="pwaInstallBtn" onclick="installPWA()">📲 <span>Install App</span></button>
+    </div>
+    <div class="user-badge" id="userBadge" style="display:none;">
+      <div class="avatar" id="userAvatar">D</div>
+      <div><div class="uname" id="userName">Divine</div><div class="urole">Admin</div></div>
     </div>
     <div class="nav-section">Overview</div>
     <div class="nav-item active" data-page="overview" onclick="navigate('overview')"><span class="icon">📊</span><span>Dashboard</span></div>
@@ -287,6 +366,16 @@ table.dt tr:hover td{background:var(--cream);}
     <div class="nav-item" data-page="invites" onclick="navigate('invites')"><span class="icon">💌</span><span>Send Invites</span></div>
     <div class="nav-section">Wedding Day</div>
     <div class="nav-item" data-page="runsheet" onclick="navigate('runsheet')"><span class="icon">⏱️</span><span>Run Sheet</span></div>
+    <div class="nav-item" data-page="entourage" onclick="navigate('entourage')"><span class="icon">👰</span><span>Entourage</span></div>
+    <div class="nav-item" data-page="dresscode" onclick="navigate('dresscode')"><span class="icon">👗</span><span>Dress Code</span></div>
+    <div class="nav-section">Finances</div>
+    <div class="nav-item" data-page="payments" onclick="navigate('payments')"><span class="icon">💳</span><span>Payments</span></div>
+    <div class="nav-section">Tools</div>
+    <div class="nav-item" data-page="reminders" onclick="navigate('reminders')"><span class="icon">🔔</span><span>Reminders</span></div>
+    <div class="nav-item" data-page="analytics" onclick="navigate('analytics')"><span class="icon">📈</span><span>RSVP Analytics</span></div>
+    <div class="nav-item" data-page="companions" onclick="navigate('companions')"><span class="icon">👥</span><span>Companions</span></div>
+    <div class="nav-item" data-page="journal" onclick="navigate('journal')"><span class="icon">📝</span><span>Journal</span></div>
+    <div class="nav-item" data-page="moodboard" onclick="navigate('moodboard')"><span class="icon">🎨</span><span>Mood Board</span></div>
     <div class="nav-section">Post-Wedding</div>
     <div class="nav-item" data-page="thankyou" onclick="navigate('thankyou')"><span class="icon">💝</span><span>Thank You</span></div>
     <div class="sidebar-footer">
@@ -601,8 +690,124 @@ table.dt tr:hover td{background:var(--cream);}
       <div id="thankYouList"></div>
     </div>
 
+    <!-- ========== ENTOURAGE MANAGER ========== -->
+    <div class="page" id="pg-entourage">
+      <h1 class="page-title">Entourage Manager</h1>
+      <p class="page-sub">Organize ang wedding entourage — sponsors, bridesmaids, groomsmen, at iba pa</p>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header"><h3>Wedding Entourage</h3><button class="btn btn-gold btn-sm" onclick="openModal('entourage')">+ Add Member</button></div>
+      </div>
+      <div id="entourageList"></div>
+    </div>
+
+    <!-- ========== DRESS CODE VISUALIZER ========== -->
+    <div class="page" id="pg-dresscode">
+      <h1 class="page-title">Dress Code Visualizer</h1>
+      <p class="page-sub">Color palette at dress code guide para sa lahat ng guests</p>
+      <div class="card">
+        <div class="card-header"><h3>Wedding Color Palette</h3></div>
+        <div id="dressCodePalette" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;"></div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header"><h3>Dress Code Notes</h3><button class="btn btn-gold btn-sm" onclick="openModal('dressnote')">+ Add Note</button></div>
+        <div id="dressNotesList"></div>
+      </div>
+    </div>
+
+    <!-- ========== PAYMENT TRACKER ========== -->
+    <div class="page" id="pg-payments">
+      <h1 class="page-title">Payment Tracker</h1>
+      <p class="page-sub">I-track ang installments at payments sa lahat ng suppliers</p>
+      <div class="stats-row" id="paymentStats"></div>
+      <div class="card">
+        <div class="card-header"><h3>Payment Schedule</h3><button class="btn btn-gold btn-sm" onclick="openModal('payment')">+ Add Payment</button></div>
+        <div class="search-bar">
+          <input type="text" id="paymentSearch" placeholder="Search payments..." oninput="renderPayments()">
+          <select id="paymentFilter" onchange="renderPayments()">
+            <option value="all">All</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="paid">Paid</option>
+            <option value="overdue">Overdue</option>
+          </select>
+        </div>
+        <div id="paymentList"></div>
+      </div>
+    </div>
+
+    <!-- ========== AUTO-REMINDER DASHBOARD ========== -->
+    <div class="page" id="pg-reminders">
+      <h1 class="page-title">Reminders Dashboard</h1>
+      <p class="page-sub">Quick view ng upcoming tasks, payments, at deadlines</p>
+      <div id="reminderContent"></div>
+    </div>
+
+    <!-- ========== RSVP ANALYTICS ========== -->
+    <div class="page" id="pg-analytics">
+      <h1 class="page-title">RSVP Analytics</h1>
+      <p class="page-sub">Detailed breakdown ng RSVP responses at guest data</p>
+      <div class="stats-row" id="analyticsStats"></div>
+      <div class="analytics-grid">
+        <div class="card"><div class="card-header"><h3>RSVP Status</h3></div><canvas id="analyticsDonut" width="250" height="250" style="display:block;margin:0 auto;"></canvas></div>
+        <div class="card"><div class="card-header"><h3>Group Breakdown</h3></div><canvas id="analyticsGroups" width="400" height="250" style="display:block;margin:0 auto;width:100%;"></canvas></div>
+      </div>
+      <div class="card" style="margin-top:16px;"><div class="card-header"><h3>Table Fill Rate</h3></div><div id="tableFillRate"></div></div>
+      <div class="card" style="margin-top:16px;"><div class="card-header"><h3>Response Timeline</h3></div><div id="responseTimeline" style="font-size:0.85rem;color:var(--text-muted);padding:12px;">Data will show once guests start responding.</div></div>
+    </div>
+
+    <!-- ========== GUEST COMPANIONS ========== -->
+    <div class="page" id="pg-companions">
+      <h1 class="page-title">Guest Companions</h1>
+      <p class="page-sub">View ng companions na dala ng bawat confirmed guest</p>
+      <div class="stats-row" id="companionStats"></div>
+      <div class="card">
+        <div class="card-header"><h3>Companion List</h3></div>
+        <div id="companionList"></div>
+      </div>
+    </div>
+
+    <!-- ========== JOURNAL / NOTES ========== -->
+    <div class="page" id="pg-journal">
+      <h1 class="page-title">Wedding Journal</h1>
+      <p class="page-sub">I-save ang mga notes, ideas, at memories habang nagpa-plan</p>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header"><h3>Entries</h3><button class="btn btn-gold btn-sm" onclick="openModal('journal')">+ New Entry</button></div>
+      </div>
+      <div id="journalList"></div>
+    </div>
+
+    <!-- ========== MOOD BOARD ========== -->
+    <div class="page" id="pg-moodboard">
+      <h1 class="page-title">Mood Board</h1>
+      <p class="page-sub">Inspiration board para sa wedding theme, decor, at styling</p>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header"><h3>Inspirations</h3><button class="btn btn-gold btn-sm" onclick="openModal('moodboard')">+ Add Inspiration</button></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+          <button class="btn btn-outline btn-sm mood-filter active" data-cat="all" onclick="filterMoodBoard('all',this)">All</button>
+          <button class="btn btn-outline btn-sm mood-filter" data-cat="Venue" onclick="filterMoodBoard('Venue',this)">Venue</button>
+          <button class="btn btn-outline btn-sm mood-filter" data-cat="Flowers" onclick="filterMoodBoard('Flowers',this)">Flowers</button>
+          <button class="btn btn-outline btn-sm mood-filter" data-cat="Attire" onclick="filterMoodBoard('Attire',this)">Attire</button>
+          <button class="btn btn-outline btn-sm mood-filter" data-cat="Decor" onclick="filterMoodBoard('Decor',this)">Decor</button>
+          <button class="btn btn-outline btn-sm mood-filter" data-cat="Food" onclick="filterMoodBoard('Food',this)">Food</button>
+          <button class="btn btn-outline btn-sm mood-filter" data-cat="Other" onclick="filterMoodBoard('Other',this)">Other</button>
+        </div>
+      </div>
+      <div id="moodGrid" class="mood-grid"></div>
+    </div>
+
   </div><!-- /content -->
 </div><!-- /app -->
+
+<!-- CONFIRM OVERLAY -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon" id="confirmIcon">⚠️</div>
+    <div class="confirm-msg" id="confirmMsg">Are you sure?</div>
+    <div class="confirm-actions">
+      <button class="btn btn-outline" id="confirmNo" onclick="resolveConfirm(false)">Hindi</button>
+      <button class="btn btn-gold" id="confirmYes" onclick="resolveConfirm(true)">Oo, Go!</button>
+    </div>
+  </div>
+</div>
 
 <!-- UNIVERSAL MODAL -->
 <div class="modal-overlay" id="modal">
@@ -627,6 +832,22 @@ let adminKey='';
 let allGuests=[];
 let currentModal='';
 let editId=null;
+let currentUser=''; // 'divine' or 'rodnel'
+let confirmResolve=null;
+let moodFilter='all';
+
+// ============ DRESS CODE PALETTE ============
+const DRESS_PALETTE=[
+  {name:'Periwinkle',hex:'#A7A4D8'},
+  {name:'Soft Lavender',hex:'#C8B4E2'},
+  {name:'Dusty Mauve',hex:'#A78BAA'},
+  {name:'Warm Taupe',hex:'#B8A6A0'},
+  {name:'Champagne Beige',hex:'#C9B99F'},
+  {name:'Muted Olive',hex:'#8E887A'}
+];
+
+// ============ ENTOURAGE ROLES ============
+const ENTOURAGE_ROLES=['Principal Sponsors (Ninong)','Principal Sponsors (Ninang)','Best Man','Maid of Honor','Groomsmen','Bridesmaids','Flower Girls','Ring Bearer','Bible Bearer','Cord Sponsors','Veil Sponsors','Candle Sponsors','Coin Bearer','Guest Book Attendant','Ushers'];
 
 // ============ LOCAL DATA (localStorage) ============
 const LS_KEY='hiraya_portal_';
@@ -634,7 +855,34 @@ function lsGet(key){try{return JSON.parse(localStorage.getItem(LS_KEY+key))||[];
 function lsSet(key,data){try{localStorage.setItem(LS_KEY+key,JSON.stringify(data));}catch(e){}}
 function genId(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
 
-// ============ AUTH ============
+// ============ CONFIRM OVERLAY (replaces native confirm) ============
+function showConfirm(msg,icon){
+  return new Promise(resolve=>{
+    confirmResolve=resolve;
+    document.getElementById('confirmIcon').textContent=icon||'⚠️';
+    document.getElementById('confirmMsg').textContent=msg;
+    document.getElementById('confirmOverlay').classList.add('open');
+  });
+}
+function resolveConfirm(val){
+  document.getElementById('confirmOverlay').classList.remove('open');
+  if(confirmResolve)confirmResolve(val);
+  confirmResolve=null;
+}
+
+// ============ AUTH (Two accounts) ============
+function selectAccount(who){
+  currentUser=who;
+  document.getElementById('loginStep1').style.display='none';
+  document.getElementById('loginStep2').style.display='block';
+  document.getElementById('loginWho').textContent=who==='divine'?'Divine':'Rodnel';
+  document.getElementById('adminKeyInput').focus();
+}
+function backToStep1(){
+  document.getElementById('loginStep1').style.display='block';
+  document.getElementById('loginStep2').style.display='none';
+  currentUser='';
+}
 document.getElementById('adminKeyInput').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
 function login(){
   adminKey=document.getElementById('adminKeyInput').value.trim();
@@ -644,11 +892,35 @@ function login(){
     if(d.status===200){
       document.getElementById('loginScreen').style.display='none';
       document.getElementById('app').style.display='block';
+      // Show user badge
+      const badge=document.getElementById('userBadge');
+      badge.style.display='flex';
+      const initial=currentUser==='divine'?'D':'R';
+      document.getElementById('userAvatar').textContent=initial;
+      document.getElementById('userName').textContent=currentUser==='divine'?'Divine':'Rodnel';
+      localStorage.setItem('hiraya_lastUser',currentUser);
       loadAll();
     }else{document.getElementById('loginError').style.display='block';}
   }).catch(()=>{document.getElementById('loginError').style.display='block';});
 }
-function logout(){adminKey='';allGuests=[];document.getElementById('app').style.display='none';document.getElementById('loginScreen').style.display='flex';document.getElementById('adminKeyInput').value='';}
+function logout(){adminKey='';allGuests=[];currentUser='';document.getElementById('app').style.display='none';document.getElementById('loginScreen').style.display='flex';document.getElementById('adminKeyInput').value='';document.getElementById('loginStep1').style.display='block';document.getElementById('loginStep2').style.display='none';document.getElementById('userBadge').style.display='none';}
+
+// ============ PWA INSTALL ============
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;
+  document.getElementById('pwaInstallBtn').style.display='inline-flex';
+});
+function installPWA(){
+  if(!deferredPrompt)return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(r=>{
+    if(r.outcome==='accepted')toast('App installed!','success');
+    deferredPrompt=null;
+    document.getElementById('pwaInstallBtn').style.display='none';
+  });
+}
+window.addEventListener('appinstalled',()=>{document.getElementById('pwaInstallBtn').style.display='none';});
 
 // ============ API ============
 function apiGet(action,params){const u=new URL(API_URL);u.searchParams.set('action',action);u.searchParams.set('admin_key',adminKey);Object.keys(params).forEach(k=>u.searchParams.set(k,params[k]));return fetch(u).then(r=>r.json());}
@@ -658,6 +930,10 @@ function apiPost(action,payload){payload.action=action;payload.admin_key=adminKe
 function navigate(page){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===page));
   document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='pg-'+page));
+  // Lazy-render for guest-dependent and aggregated views
+  if(page==='analytics')renderAnalytics();
+  if(page==='companions')renderCompanions();
+  if(page==='reminders')renderReminders();
 }
 
 // ============ LOAD ALL ============
@@ -671,6 +947,11 @@ function loadAll(){
   renderDocuments();
   renderRunsheet();
   renderThankYou();
+  renderEntourage();
+  renderDressCode();
+  renderPayments();
+  renderJournal();
+  renderMoodBoard();
 }
 
 // ============ COUNTDOWN ============
@@ -1232,9 +1513,9 @@ function filterGuests(){
 
 function editGuest(id){const g=allGuests.find(x=>x.guest_id===id);if(g){editId=id;openModal('guest',g);}}
 
-function reopenInvite(id){if(!confirm('I-reopen ang invite code para sa guest na ito?'))return;apiPost('admin_reopen',{guest_id:id}).then(d=>{if(d.status===200){toast(d.message,'success');loadGuests();}else toast(d.error||'Error','error');});}
+async function reopenInvite(id){if(!await showConfirm('I-reopen ang invite code para sa guest na ito?','🔓'))return;apiPost('admin_reopen',{guest_id:id}).then(d=>{if(d.status===200){toast(d.message,'success');loadGuests();}else toast(d.error||'Error','error');});}
 
-function sendInvite(id){if(!confirm('I-send ang invitation email?'))return;apiPost('admin_send_invite',{guest_id:id,base_url:SITE_URL}).then(d=>{if(d.status===200){toast(d.message,'success');loadGuests();}else toast(d.error||'Error','error');});}
+async function sendInvite(id){if(!await showConfirm('I-send ang invitation email?','💌'))return;apiPost('admin_send_invite',{guest_id:id,base_url:SITE_URL}).then(d=>{if(d.status===200){toast(d.message,'success');loadGuests();}else toast(d.error||'Error','error');});}
 
 // ============ TABLES ============
 function renderTables(guests){
@@ -1276,9 +1557,9 @@ function renderUnsentList(guests){
   :'<p style="text-align:center;padding:20px;color:var(--text-muted);">Lahat ng guests na may email ay na-send na, o walang pending.</p>';
 }
 
-function sendAll(){
+async function sendAll(){
   const unsent=allGuests.filter(g=>g.email&&(!g.invite_status||g.invite_status==='pending'));
-  if(!confirm(`I-send sa ${unsent.length} guests?`))return;
+  if(!await showConfirm(`I-send sa ${unsent.length} guests?`,'📨'))return;
   let sent=0;
   const go=(i)=>{if(i>=unsent.length){toast(`${sent} invitation(s) sent!`,'success');loadGuests();return;}
     apiPost('admin_send_invite',{guest_id:unsent[i].guest_id,base_url:SITE_URL}).then(d=>{if(d.status===200)sent++;setTimeout(()=>go(i+1),1500);}).catch(()=>setTimeout(()=>go(i+1),1500));};
@@ -1485,6 +1766,303 @@ function importGuestsToThankYou(){
   toast(added?`${added} guests imported!`:'Lahat ng confirmed guests ay naka-import na','success');
 }
 
+// ============ ENTOURAGE MANAGER ============
+function renderEntourage(){
+  const items=lsGet('entourage');
+  if(!items.length){document.getElementById('entourageList').innerHTML='<div class="card" style="text-align:center;color:var(--text-muted);padding:32px;">Walang entourage members pa. Click "+ Add Member" para magsimula!</div>';return;}
+  const grouped={};
+  items.forEach(m=>{const r=m.role||'Other';if(!grouped[r])grouped[r]=[];grouped[r].push(m);});
+  let html='';
+  ENTOURAGE_ROLES.forEach(role=>{
+    if(grouped[role]&&grouped[role].length){
+      html+=`<div class="ent-role-card"><h4>${esc(role)} <span style="font-size:0.75rem;color:var(--text-muted);">(${grouped[role].length})</span></h4>`;
+      grouped[role].forEach(m=>{
+        html+=`<div class="ent-member-row"><div><strong>${esc(m.name)}</strong>${m.notes?` <span style="font-size:0.75rem;color:var(--text-muted);">— ${esc(m.notes)}</span>`:''}</div><div class="actions-cell"><button class="btn btn-outline btn-sm" onclick="editEntourage('${m.id}')">Edit</button><button class="btn btn-outline btn-sm" style="color:var(--danger);" onclick="deleteItem('entourage','${m.id}')">×</button></div></div>`;
+      });
+      html+=`</div>`;
+    }
+  });
+  // any remaining roles not in standard list
+  Object.keys(grouped).forEach(role=>{
+    if(!ENTOURAGE_ROLES.includes(role)){
+      html+=`<div class="ent-role-card"><h4>${esc(role)}</h4>`;
+      grouped[role].forEach(m=>{
+        html+=`<div class="ent-member-row"><div><strong>${esc(m.name)}</strong></div><div class="actions-cell"><button class="btn btn-outline btn-sm" onclick="editEntourage('${m.id}')">Edit</button><button class="btn btn-outline btn-sm" style="color:var(--danger);" onclick="deleteItem('entourage','${m.id}')">×</button></div></div>`;
+      });
+      html+=`</div>`;
+    }
+  });
+  document.getElementById('entourageList').innerHTML=html;
+}
+function editEntourage(id){const items=lsGet('entourage');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('entourage',i);}}
+
+// ============ DRESS CODE VISUALIZER ============
+function renderDressCode(){
+  document.getElementById('dressCodePalette').innerHTML=DRESS_PALETTE.map(c=>
+    `<div class="dresscolor"><div class="swatch" style="background:${c.hex};"></div><div><strong>${c.name}</strong><br><span style="font-size:0.72rem;color:var(--text-muted);">${c.hex}</span></div></div>`
+  ).join('');
+  const notes=lsGet('dressnotes');
+  document.getElementById('dressNotesList').innerHTML=notes.length?notes.map(n=>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
+      <div><strong style="font-size:0.85rem;">${esc(n.group||'All Guests')}</strong><br><span style="font-size:0.82rem;color:var(--text-muted);">${esc(n.note)}</span></div>
+      <div class="actions-cell"><button class="btn btn-outline btn-sm" onclick="editDressNote('${n.id}')">Edit</button><button class="btn btn-outline btn-sm" style="color:var(--danger);" onclick="deleteItem('dressnotes','${n.id}')">×</button></div>
+    </div>`
+  ).join(''):'<p style="padding:12px 0;color:var(--text-muted);font-size:0.85rem;">Walang dress code notes pa.</p>';
+}
+function editDressNote(id){const items=lsGet('dressnotes');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('dressnote',i);}}
+
+// ============ PAYMENT TRACKER ============
+function renderPayments(){
+  const items=lsGet('payments');
+  const today=new Date().toISOString().slice(0,10);
+  const totalDue=items.reduce((s,x)=>s+Number(x.amount||0),0);
+  const totalPaid=items.filter(x=>x.status==='paid').reduce((s,x)=>s+Number(x.amount||0),0);
+  const upcoming=items.filter(x=>x.status!=='paid'&&x.due>=today).length;
+  const overdue=items.filter(x=>x.status!=='paid'&&x.due&&x.due<today).length;
+
+  document.getElementById('paymentStats').innerHTML=`
+    <div class="stat-card"><div class="stat-num">₱${formatNum(totalDue)}</div><div class="stat-label">Total Payments</div></div>
+    <div class="stat-card green"><div class="stat-num">₱${formatNum(totalPaid)}</div><div class="stat-label">Paid</div></div>
+    <div class="stat-card gold"><div class="stat-num">₱${formatNum(totalDue-totalPaid)}</div><div class="stat-label">Remaining</div></div>
+    <div class="stat-card blue"><div class="stat-num">${upcoming}</div><div class="stat-label">Upcoming</div></div>
+    <div class="stat-card red"><div class="stat-num">${overdue}</div><div class="stat-label">Overdue</div></div>`;
+
+  const q=(document.getElementById('paymentSearch')?.value||'').toLowerCase();
+  const filter=document.getElementById('paymentFilter')?.value||'all';
+  let filtered=[...items].sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));
+  if(q)filtered=filtered.filter(x=>(x.supplier||'').toLowerCase().includes(q)||(x.description||'').toLowerCase().includes(q));
+  if(filter==='paid')filtered=filtered.filter(x=>x.status==='paid');
+  else if(filter==='overdue')filtered=filtered.filter(x=>x.status!=='paid'&&x.due&&x.due<today);
+  else if(filter==='upcoming')filtered=filtered.filter(x=>x.status!=='paid'&&(!x.due||x.due>=today));
+
+  if(!filtered.length){document.getElementById('paymentList').innerHTML='<p style="padding:20px;text-align:center;color:var(--text-muted);">Walang payments pa.</p>';return;}
+  document.getElementById('paymentList').innerHTML='<div class="payment-timeline">'+filtered.map(p=>{
+    const isOverdue=p.status!=='paid'&&p.due&&p.due<today;
+    const cls=p.status==='paid'?'paid':isOverdue?'overdue':'';
+    return`<div class="payment-item ${cls}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+        <div>
+          <strong style="font-size:0.9rem;">${esc(p.supplier||'Payment')}</strong>
+          ${p.description?`<div style="font-size:0.82rem;color:var(--text-muted);">${esc(p.description)}</div>`:''}
+          <div style="font-size:0.78rem;color:${isOverdue?'var(--danger)':'var(--text-muted)'};">${p.due?'Due: '+p.due:'No due date'} ${isOverdue?'⚠️ OVERDUE':''}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:1rem;font-weight:600;color:var(--earth);">₱${formatNum(p.amount||0)}</div>
+          <span class="status s-${p.status||'unpaid'}">${p.status||'unpaid'}</span>
+        </div>
+      </div>
+      <div class="actions-cell" style="margin-top:8px;">
+        ${p.status!=='paid'?`<button class="btn btn-outline btn-sm" onclick="markPaymentPaid('${p.id}')">✓ Mark Paid</button>`:`<button class="btn btn-outline btn-sm" onclick="markPaymentUnpaid('${p.id}')">↩ Unpaid</button>`}
+        <button class="btn btn-outline btn-sm" onclick="editPayment('${p.id}')">Edit</button>
+        <button class="btn btn-outline btn-sm" style="color:var(--danger);" onclick="deleteItem('payments','${p.id}')">🗑️</button>
+      </div>
+    </div>`;
+  }).join('')+'</div>';
+}
+function markPaymentPaid(id){const items=lsGet('payments');const i=items.find(x=>x.id===id);if(i){i.status='paid';i.paid_date=new Date().toISOString().slice(0,10);lsSet('payments',items);renderPayments();toast('Marked as paid!','success');}}
+function markPaymentUnpaid(id){const items=lsGet('payments');const i=items.find(x=>x.id===id);if(i){i.status='unpaid';delete i.paid_date;lsSet('payments',items);renderPayments();toast('Marked as unpaid','success');}}
+function editPayment(id){const items=lsGet('payments');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('payment',i);}}
+
+// ============ AUTO-REMINDER DASHBOARD ============
+function renderReminders(){
+  const today=new Date().toISOString().slice(0,10);
+  const in7=new Date(Date.now()+7*86400000).toISOString().slice(0,10);
+  const in30=new Date(Date.now()+30*86400000).toISOString().slice(0,10);
+
+  // Upcoming tasks
+  const tasks=lsGet('checklist').filter(t=>!t.done&&t.due);
+  const overdueTasks=tasks.filter(t=>t.due<today);
+  const thisWeekTasks=tasks.filter(t=>t.due>=today&&t.due<=in7);
+  const thisMonthTasks=tasks.filter(t=>t.due>in7&&t.due<=in30);
+
+  // Upcoming payments
+  const payments=lsGet('payments').filter(p=>p.status!=='paid');
+  const overduePay=payments.filter(p=>p.due&&p.due<today);
+  const upcomingPay=payments.filter(p=>p.due&&p.due>=today&&p.due<=in30);
+
+  // Pending documents
+  const docs=lsGet('documents').filter(d=>d.status!=='done');
+
+  let html='';
+  if(overdueTasks.length){
+    html+=`<div class="card" style="border-left:4px solid var(--danger);"><h3 style="font-family:'Cormorant Garamond',serif;color:var(--danger);margin-bottom:10px;">🚨 Overdue Tasks (${overdueTasks.length})</h3>`;
+    overdueTasks.forEach(t=>{html+=`<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">• ${esc(t.text)} <span style="color:var(--danger);font-size:0.78rem;">— due ${t.due}</span></div>`;});
+    html+=`</div>`;
+  }
+  if(overduePay.length){
+    html+=`<div class="card" style="border-left:4px solid var(--danger);"><h3 style="font-family:'Cormorant Garamond',serif;color:var(--danger);margin-bottom:10px;">💸 Overdue Payments (${overduePay.length})</h3>`;
+    overduePay.forEach(p=>{html+=`<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">• ${esc(p.supplier||'Payment')} — ₱${formatNum(p.amount)} <span style="color:var(--danger);font-size:0.78rem;">due ${p.due}</span></div>`;});
+    html+=`</div>`;
+  }
+  if(thisWeekTasks.length){
+    html+=`<div class="card" style="border-left:4px solid var(--warn);"><h3 style="font-family:'Cormorant Garamond',serif;color:var(--warn);margin-bottom:10px;">📋 This Week's Tasks (${thisWeekTasks.length})</h3>`;
+    thisWeekTasks.forEach(t=>{html+=`<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">• ${esc(t.text)} — ${t.due}</div>`;});
+    html+=`</div>`;
+  }
+  if(upcomingPay.length){
+    html+=`<div class="card" style="border-left:4px solid var(--info);"><h3 style="font-family:'Cormorant Garamond',serif;color:var(--info);margin-bottom:10px;">💳 Upcoming Payments (${upcomingPay.length})</h3>`;
+    upcomingPay.forEach(p=>{html+=`<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">• ${esc(p.supplier||'Payment')} — ₱${formatNum(p.amount)} — due ${p.due}</div>`;});
+    html+=`</div>`;
+  }
+  if(thisMonthTasks.length){
+    html+=`<div class="card" style="border-left:4px solid var(--gold);"><h3 style="font-family:'Cormorant Garamond',serif;color:var(--gold);margin-bottom:10px;">📅 This Month's Tasks (${thisMonthTasks.length})</h3>`;
+    thisMonthTasks.forEach(t=>{html+=`<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">• ${esc(t.text)} — ${t.due}</div>`;});
+    html+=`</div>`;
+  }
+  if(docs.length){
+    html+=`<div class="card" style="border-left:4px solid var(--earth-light);"><h3 style="font-family:'Cormorant Garamond',serif;color:var(--earth-light);margin-bottom:10px;">📄 Pending Documents (${docs.length})</h3>`;
+    docs.forEach(d=>{html+=`<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">• ${esc(d.doc)} (${d.who}) — <span class="status s-${d.status||'todo'}">${d.status==='processing'?'Processing':'Not Started'}</span></div>`;});
+    html+=`</div>`;
+  }
+  if(!html) html='<div class="card" style="text-align:center;padding:40px;color:var(--text-muted);">🎉 Walang urgent reminders ngayon! Mag-enjoy ka muna!</div>';
+  document.getElementById('reminderContent').innerHTML=html;
+}
+
+// ============ RSVP ANALYTICS ============
+function renderAnalytics(){
+  const guests=allGuests;
+  if(!guests.length){document.getElementById('analyticsStats').innerHTML='<div class="stat-card"><div class="stat-num">0</div><div class="stat-label">Total Guests</div></div>';return;}
+  const confirmed=guests.filter(g=>g.invite_status==='confirmed').length;
+  const declined=guests.filter(g=>g.invite_status==='declined').length;
+  const pending=guests.filter(g=>!g.invite_status||g.invite_status==='pending').length;
+  const sent=guests.filter(g=>g.invite_status==='sent').length;
+  const proxy=guests.filter(g=>g.invite_status==='proxy').length;
+
+  document.getElementById('analyticsStats').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${guests.length}</div><div class="stat-label">Total Guests</div></div>
+    <div class="stat-card green"><div class="stat-num">${confirmed}</div><div class="stat-label">Confirmed</div></div>
+    <div class="stat-card red"><div class="stat-num">${declined}</div><div class="stat-label">Declined</div></div>
+    <div class="stat-card blue"><div class="stat-num">${sent}</div><div class="stat-label">Sent</div></div>
+    <div class="stat-card gold"><div class="stat-num">${pending}</div><div class="stat-label">Pending</div></div>
+    <div class="stat-card"><div class="stat-num">${proxy}</div><div class="stat-label">Proxy</div></div>`;
+
+  // Donut chart
+  const segments=[
+    {value:confirmed,color:'#2e7d32',label:'Confirmed'},
+    {value:declined,color:'#c62828',label:'Declined'},
+    {value:sent,color:'#1565c0',label:'Sent'},
+    {value:pending,color:'#e65100',label:'Pending'},
+    {value:proxy,color:'#283593',label:'Proxy'}
+  ].filter(s=>s.value>0);
+  drawDonut('analyticsDonut',segments);
+
+  // Group breakdown bar chart
+  const groups={};
+  guests.forEach(g=>{const gl=g.group_label||'Ungrouped';if(!groups[gl])groups[gl]=0;groups[gl]++;});
+  const gLabels=Object.keys(groups).sort((a,b)=>groups[b]-groups[a]);
+  const canvas=document.getElementById('analyticsGroups');
+  if(canvas&&gLabels.length){
+    const ctx=canvas.getContext('2d');
+    const w=canvas.width,h=canvas.height;
+    ctx.clearRect(0,0,w,h);
+    const barW=Math.min(40,w/(gLabels.length*1.5));
+    const maxV=Math.max(...gLabels.map(l=>groups[l]));
+    const chartH=h-40;
+    const startX=(w-gLabels.length*(barW+8))/2;
+    const colors=['#c4a265','#5c4a3d','#8e6f5e','#A7A4D8','#C8B4E2','#A78BAA','#B8A6A0','#C9B99F','#8E887A'];
+    gLabels.forEach((l,i)=>{
+      const bh=(groups[l]/maxV)*chartH;
+      ctx.fillStyle=colors[i%colors.length];
+      ctx.fillRect(startX+i*(barW+8),chartH-bh+10,barW,bh);
+      ctx.fillStyle='#3d3028';
+      ctx.font='9px Jost';
+      ctx.textAlign='center';
+      ctx.fillText(groups[l],startX+i*(barW+8)+barW/2,chartH-bh+6);
+      ctx.save();
+      ctx.translate(startX+i*(barW+8)+barW/2,chartH+22);
+      ctx.rotate(-0.4);
+      ctx.font='8px Jost';
+      ctx.fillStyle='#a0917f';
+      ctx.textAlign='right';
+      ctx.fillText(l.substring(0,12),0,0);
+      ctx.restore();
+    });
+  }
+
+  // Table fill rate
+  const byTable={};
+  guests.forEach(g=>{const t=g.table_number;if(t){if(!byTable[t])byTable[t]={total:0,conf:0};byTable[t].total++;if(g.invite_status==='confirmed'||g.invite_status==='proxy')byTable[t].conf++;}});
+  const tableNums=Object.keys(byTable).sort((a,b)=>Number(a)-Number(b));
+  document.getElementById('tableFillRate').innerHTML=tableNums.length?tableNums.map(t=>{
+    const pct=Math.round(byTable[t].conf/byTable[t].total*100);
+    return`<div style="display:flex;align-items:center;gap:12px;padding:6px 0;border-bottom:1px solid var(--border);">
+      <span style="font-weight:600;min-width:70px;">Table ${t}</span>
+      <div style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:var(--success);border-radius:4px;"></div></div>
+      <span style="font-size:0.78rem;min-width:80px;text-align:right;">${byTable[t].conf}/${byTable[t].total} (${pct}%)</span>
+    </div>`;
+  }).join(''):'<p style="padding:12px;color:var(--text-muted);">Assign guests to tables para makita ang fill rates.</p>';
+}
+
+// ============ GUEST COMPANIONS ============
+function renderCompanions(){
+  const guests=allGuests;
+  const withCompanions=guests.filter(g=>g.companions&&g.companions.length);
+  const totalCompanions=withCompanions.reduce((s,g)=>s+(g.companions?g.companions.length:0),0);
+
+  document.getElementById('companionStats').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${guests.length}</div><div class="stat-label">Total Invited</div></div>
+    <div class="stat-card blue"><div class="stat-num">${withCompanions.length}</div><div class="stat-label">With Companions</div></div>
+    <div class="stat-card gold"><div class="stat-num">${totalCompanions}</div><div class="stat-label">Total Companions</div></div>
+    <div class="stat-card green"><div class="stat-num">${guests.length+totalCompanions}</div><div class="stat-label">Total Headcount</div></div>`;
+
+  if(!withCompanions.length){
+    document.getElementById('companionList').innerHTML='<p style="padding:20px;text-align:center;color:var(--text-muted);">Walang companions pa. Makikita dito ang companions pag nag-RSVP na ang guests.</p>';
+    return;
+  }
+  document.getElementById('companionList').innerHTML=withCompanions.map(g=>
+    `<div class="companion-card"><strong>${esc(g.full_name)}</strong> <span style="font-size:0.78rem;color:var(--text-muted);">(${g.group_label||''})</span>
+      <div style="margin-top:6px;">${g.companions.map(c=>`<span style="display:inline-block;background:var(--card);border:1px solid var(--border);padding:4px 10px;border-radius:6px;font-size:0.82rem;margin:2px;">${esc(c.name||c)}</span>`).join('')}</div>
+    </div>`
+  ).join('');
+}
+
+// ============ JOURNAL / NOTES ============
+function renderJournal(){
+  const items=lsGet('journal');
+  if(!items.length){document.getElementById('journalList').innerHTML='<div class="card" style="text-align:center;color:var(--text-muted);padding:32px;">Walang journal entries pa. Click "+ New Entry" para magsulat!</div>';return;}
+  const sorted=[...items].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  document.getElementById('journalList').innerHTML=sorted.map(e=>
+    `<div class="journal-entry">
+      <div class="je-date">${e.date||'No date'} ${e.by?'· by '+esc(e.by):''}</div>
+      <div class="je-title">${esc(e.title||'Untitled')}</div>
+      <div class="je-body">${esc(e.body||'')}</div>
+      <div class="actions-cell" style="margin-top:8px;">
+        <button class="btn btn-outline btn-sm" onclick="editJournal('${e.id}')">Edit</button>
+        <button class="btn btn-outline btn-sm" style="color:var(--danger);" onclick="deleteItem('journal','${e.id}')">🗑️</button>
+      </div>
+    </div>`
+  ).join('');
+}
+function editJournal(id){const items=lsGet('journal');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('journal',i);}}
+
+// ============ MOOD BOARD ============
+function renderMoodBoard(){
+  const items=lsGet('moodboard');
+  const filtered=moodFilter==='all'?items:items.filter(x=>x.category===moodFilter);
+  if(!filtered.length){document.getElementById('moodGrid').innerHTML='<div class="card" style="text-align:center;color:var(--text-muted);padding:32px;grid-column:1/-1;">Walang inspirations pa. Click "+ Add Inspiration" para mag-add!</div>';return;}
+  document.getElementById('moodGrid').innerHTML=filtered.map(m=>
+    `<div class="mood-card">
+      ${m.image_url?`<img src="${esc(m.image_url)}" alt="${esc(m.title)}" onerror="this.style.display='none'">`:'<div style="height:100px;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:2rem;">🎨</div>'}
+      <div class="mc-body">
+        <div class="mc-title">${esc(m.title||'Untitled')}</div>
+        <div class="mc-cat">${esc(m.category||'Other')}</div>
+        ${m.notes?`<div class="mc-notes">${esc(m.notes)}</div>`:''}
+        ${m.url?`<a href="${esc(m.url)}" target="_blank" style="font-size:0.72rem;color:var(--info);">🔗 View Source</a>`:''}
+        <div class="actions-cell" style="margin-top:6px;">
+          <button class="btn btn-outline btn-sm" onclick="editMoodItem('${m.id}')">Edit</button>
+          <button class="btn btn-outline btn-sm" style="color:var(--danger);" onclick="deleteItem('moodboard','${m.id}')">×</button>
+        </div>
+      </div>
+    </div>`
+  ).join('');
+}
+function filterMoodBoard(cat,btn){
+  moodFilter=cat;
+  document.querySelectorAll('.mood-filter').forEach(b=>b.classList.toggle('active',b.dataset.cat===cat));
+  renderMoodBoard();
+}
+function editMoodItem(id){const items=lsGet('moodboard');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('moodboard',i);}}
+
 // ============ MODAL SYSTEM ============
 function openModal(type,data){
   currentModal=type;editId=data?editId:null;
@@ -1600,6 +2178,54 @@ function openModal(type,data){
       <div class="form-group"><label>Notes</label><textarea id="f_notes" rows="2" placeholder="How to thank, address...">${esc(d.notes||'')}</textarea></div>`;
   }
 
+  if(type==='entourage'){
+    title=isEdit?'Edit Member':'Add Entourage Member';
+    html=`
+      <div class="form-group"><label>Name *</label><input type="text" id="f_name" value="${esc(d.name||'')}" placeholder="e.g. Juan Dela Cruz"></div>
+      <div class="form-group"><label>Role *</label><select id="f_role">
+        ${ENTOURAGE_ROLES.map(r=>`<option value="${r}" ${d.role===r?'selected':''}>${r}</option>`).join('')}
+        <option value="Other" ${d.role==='Other'?'selected':''}>Other</option>
+      </select></div>
+      <div class="form-group"><label>Contact</label><input type="text" id="f_contact" value="${esc(d.contact||'')}" placeholder="Phone or email"></div>
+      <div class="form-group"><label>Notes</label><textarea id="f_notes" rows="2" placeholder="Special notes...">${esc(d.notes||'')}</textarea></div>`;
+  } else if(type==='dressnote'){
+    title=isEdit?'Edit Dress Code Note':'Add Dress Code Note';
+    html=`
+      <div class="form-group"><label>Group</label><input type="text" id="f_group" value="${esc(d.group||'')}" placeholder="e.g. Bridesmaids, Male Guests, All" list="dressGroups">
+        <datalist id="dressGroups"><option value="All Guests"><option value="Bridesmaids"><option value="Groomsmen"><option value="Principal Sponsors"><option value="Male Guests"><option value="Female Guests"><option value="Bride Family"><option value="Groom Family"></datalist></div>
+      <div class="form-group"><label>Note / Instruction *</label><textarea id="f_note" rows="3" placeholder="e.g. Semi-formal attire in pastel colors...">${esc(d.note||'')}</textarea></div>`;
+  } else if(type==='payment'){
+    title=isEdit?'Edit Payment':'Add Payment';
+    html=`
+      <div class="form-group"><label>Supplier / Payee *</label><input type="text" id="f_supplier" value="${esc(d.supplier||'')}" placeholder="e.g. Caterer, Venue"></div>
+      <div class="form-group"><label>Description</label><input type="text" id="f_description" value="${esc(d.description||'')}" placeholder="e.g. 2nd installment"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Amount (₱) *</label><input type="number" id="f_amount" value="${d.amount||''}" placeholder="0"></div>
+        <div class="form-group"><label>Due Date</label><input type="date" id="f_due" value="${d.due||''}"></div>
+      </div>
+      <div class="form-group"><label>Status</label><select id="f_status">
+        <option value="unpaid" ${(d.status||'unpaid')==='unpaid'?'selected':''}>Unpaid</option>
+        <option value="paid" ${d.status==='paid'?'selected':''}>Paid</option>
+      </select></div>
+      <div class="form-group"><label>Notes</label><textarea id="f_notes" rows="2">${esc(d.notes||'')}</textarea></div>`;
+  } else if(type==='journal'){
+    title=isEdit?'Edit Entry':'New Journal Entry';
+    html=`
+      <div class="form-group"><label>Title *</label><input type="text" id="f_title" value="${esc(d.title||'')}" placeholder="e.g. Venue Visit Notes"></div>
+      <div class="form-group"><label>Date</label><input type="date" id="f_date" value="${d.date||new Date().toISOString().slice(0,10)}"></div>
+      <div class="form-group"><label>Entry *</label><textarea id="f_body" rows="6" placeholder="Write your thoughts, notes, ideas...">${esc(d.body||'')}</textarea></div>`;
+  } else if(type==='moodboard'){
+    title=isEdit?'Edit Inspiration':'Add Inspiration';
+    html=`
+      <div class="form-group"><label>Title *</label><input type="text" id="f_title" value="${esc(d.title||'')}" placeholder="e.g. Rustic centerpiece idea"></div>
+      <div class="form-group"><label>Category</label><select id="f_category">
+        ${['Venue','Flowers','Attire','Decor','Food','Other'].map(c=>`<option value="${c}" ${d.category===c?'selected':''}>${c}</option>`).join('')}
+      </select></div>
+      <div class="form-group"><label>Image URL</label><input type="url" id="f_image_url" value="${esc(d.image_url||'')}" placeholder="https://..."></div>
+      <div class="form-group"><label>Source URL</label><input type="url" id="f_url" value="${esc(d.url||'')}" placeholder="https://pinterest.com/..."></div>
+      <div class="form-group"><label>Notes</label><textarea id="f_notes" rows="2">${esc(d.notes||'')}</textarea></div>`;
+  }
+
   document.getElementById('modalTitle').textContent=title;
   document.getElementById('modalBody').innerHTML=html;
   document.getElementById('modalSave').textContent=isEdit?'Save Changes':title.replace('Add','Add');
@@ -1669,11 +2295,46 @@ function saveModal(){
     if(editId){const i=items.find(x=>x.id===editId);if(i)Object.assign(i,obj);}
     else{obj.id=genId();items.push(obj);}
     lsSet('thankyou',items);renderThankYou();toast('Gift saved!','success');closeModal();btn.disabled=false;
+  } else if(currentModal==='entourage'){
+    const name=gv('f_name');if(!name){toast('Ilagay ang name','error');btn.disabled=false;btn.textContent='Save';return;}
+    const items=lsGet('entourage');
+    const obj={name,role:gv('f_role'),contact:gv('f_contact'),notes:gv('f_notes')};
+    if(editId){const i=items.find(x=>x.id===editId);if(i)Object.assign(i,obj);}
+    else{obj.id=genId();items.push(obj);}
+    lsSet('entourage',items);renderEntourage();toast('Member saved!','success');closeModal();btn.disabled=false;
+  } else if(currentModal==='dressnote'){
+    const note=gv('f_note');if(!note){toast('Ilagay ang note','error');btn.disabled=false;btn.textContent='Save';return;}
+    const items=lsGet('dressnotes');
+    const obj={group:gv('f_group'),note};
+    if(editId){const i=items.find(x=>x.id===editId);if(i)Object.assign(i,obj);}
+    else{obj.id=genId();items.push(obj);}
+    lsSet('dressnotes',items);renderDressCode();toast('Note saved!','success');closeModal();btn.disabled=false;
+  } else if(currentModal==='payment'){
+    const supplier=gv('f_supplier');if(!supplier){toast('Ilagay ang supplier','error');btn.disabled=false;btn.textContent='Save';return;}
+    const items=lsGet('payments');
+    const obj={supplier,description:gv('f_description'),amount:gv('f_amount'),due:gv('f_due'),status:gv('f_status'),notes:gv('f_notes')};
+    if(editId){const i=items.find(x=>x.id===editId);if(i)Object.assign(i,obj);}
+    else{obj.id=genId();items.push(obj);}
+    lsSet('payments',items);renderPayments();toast('Payment saved!','success');closeModal();btn.disabled=false;
+  } else if(currentModal==='journal'){
+    const title=gv('f_title');if(!title){toast('Ilagay ang title','error');btn.disabled=false;btn.textContent='Save';return;}
+    const items=lsGet('journal');
+    const obj={title,date:gv('f_date'),body:gv('f_body'),by:currentUser==='divine'?'Divine':'Rodnel'};
+    if(editId){const i=items.find(x=>x.id===editId);if(i)Object.assign(i,obj);}
+    else{obj.id=genId();items.push(obj);}
+    lsSet('journal',items);renderJournal();toast('Entry saved!','success');closeModal();btn.disabled=false;
+  } else if(currentModal==='moodboard'){
+    const mtitle=gv('f_title');if(!mtitle){toast('Ilagay ang title','error');btn.disabled=false;btn.textContent='Save';return;}
+    const items=lsGet('moodboard');
+    const obj={title:mtitle,category:gv('f_category'),image_url:gv('f_image_url'),url:gv('f_url'),notes:gv('f_notes'),by:currentUser==='divine'?'Divine':'Rodnel'};
+    if(editId){const i=items.find(x=>x.id===editId);if(i)Object.assign(i,obj);}
+    else{obj.id=genId();items.push(obj);}
+    lsSet('moodboard',items);renderMoodBoard();toast('Inspiration saved!','success');closeModal();btn.disabled=false;
   }
 }
 
-function deleteItem(store,id){if(!confirm('Are you sure you want to delete this?'))return;let items=lsGet(store);items=items.filter(x=>x.id!==id);lsSet(store,items);
-  if(store==='checklist')renderChecklist();else if(store==='budget')renderBudget();else if(store==='timeline')renderTimeline();else if(store==='documents')renderDocuments();else if(store==='suppliers')renderSuppliers();else if(store==='runsheet')renderRunsheet();else if(store==='thankyou')renderThankYou();renderOverview();toast('Deleted!','success');}
+async function deleteItem(store,id){if(!await showConfirm('I-delete ba talaga ito?','🗑️'))return;let items=lsGet(store);items=items.filter(x=>x.id!==id);lsSet(store,items);
+  if(store==='checklist')renderChecklist();else if(store==='budget')renderBudget();else if(store==='timeline')renderTimeline();else if(store==='documents')renderDocuments();else if(store==='suppliers')renderSuppliers();else if(store==='runsheet')renderRunsheet();else if(store==='thankyou')renderThankYou();else if(store==='entourage')renderEntourage();else if(store==='payments')renderPayments();else if(store==='journal')renderJournal();else if(store==='moodboard')renderMoodBoard();else if(store==='dressnotes')renderDressCode();renderOverview();toast('Deleted!','success');}
 
 // ============ UTILS ============
 function gv(id){const el=document.getElementById(id);return el?el.value.trim():'';}
@@ -1683,6 +2344,11 @@ function toast(msg,type){const el=document.getElementById('toast');el.textConten
 
 // Close modal on backdrop click
 document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+// Close confirm on backdrop click
+document.getElementById('confirmOverlay').addEventListener('click',function(e){if(e.target===this)resolveConfirm(false);});
+
+// ============ SERVICE WORKER ============
+if('serviceWorker' in navigator){navigator.serviceWorker.register('admin-sw.js').catch(()=>{});}
 </script>
 </body>
 </html>
