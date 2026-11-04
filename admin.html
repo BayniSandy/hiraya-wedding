@@ -214,8 +214,11 @@ table.dt tr:hover td{background:var(--cream);}
 .seat.confirmed{background:var(--success-bg);border-color:#a5d6a7;color:var(--success);}
 
 /* RUN SHEET */
-.runsheet-event{display:flex;gap:16px;margin-bottom:2px;position:relative;}
+.runsheet-event{display:flex;gap:16px;margin-bottom:2px;position:relative;cursor:grab;transition:opacity 0.2s,border-top 0.15s;}
+.runsheet-event:active{cursor:grabbing;}
 .runsheet-time{min-width:80px;text-align:right;font-weight:600;font-size:0.85rem;color:var(--earth);padding-top:14px;}
+.rs-drag-handle{color:var(--text-muted);font-size:1rem;margin-right:4px;cursor:grab;opacity:0.4;user-select:none;}
+.runsheet-event:hover .rs-drag-handle{opacity:1;}
 .runsheet-line{display:flex;flex-direction:column;align-items:center;min-width:20px;}
 .runsheet-dot{width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--card);box-shadow:0 0 0 2px var(--gold);margin-top:16px;z-index:1;}
 .runsheet-dot.done{background:var(--success);}
@@ -440,6 +443,11 @@ table.dt tr:hover td{background:var(--cream);}
         </div>
         <div id="checklistBody"></div>
       </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header"><h3>💡 Common Filipino Wedding Tasks</h3></div>
+        <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.7;padding:4px 0;">Click any task to add it to your checklist:</p>
+        <div id="checkSuggestions" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;"></div>
+      </div>
     </div>
 
     <!-- ========== BUDGET ========== -->
@@ -661,15 +669,19 @@ table.dt tr:hover td{background:var(--cream);}
       <p class="page-sub">Minute-by-minute timeline para sa coordinator at wedding party</p>
       <div class="card" style="margin-bottom:16px;">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn btn-outline" onclick="showRunsheetSuggestions()" style="font-size:0.8rem;">💡 Suggested Events</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
             <button class="btn btn-outline" onclick="printRunsheet()" style="font-size:0.8rem;">🖨️ Print</button>
+            <span id="runsheetTotal" style="font-size:0.82rem;color:var(--text-muted);font-weight:500;"></span>
           </div>
           <button class="btn btn-gold" onclick="openModal('runsheet')">+ Add Event</button>
         </div>
       </div>
-      <div id="runsheetSuggestions" style="display:none;margin-bottom:16px;"></div>
       <div id="runsheetList"></div>
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header"><h3>💡 Quick Add — Filipino Wedding Events</h3></div>
+        <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.7;padding:4px 0;">Click any event below to add it to your run sheet:</p>
+        <div id="runsheetQuickAdd" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;"></div>
+      </div>
     </div>
 
     <!-- THANK YOU TRACKER -->
@@ -1054,6 +1066,49 @@ function drawDonut(id,segments){
 }
 
 // ============ CHECKLIST ============
+const CHECKLIST_SUGGESTIONS=[
+  {text:'Book wedding venue',category:'Venue'},
+  {text:'Book ceremony officiant',category:'Ceremony'},
+  {text:'Order wedding cake',category:'Catering'},
+  {text:'Book caterer / food tasting',category:'Catering'},
+  {text:'Book photographer',category:'Photo/Video'},
+  {text:'Book videographer',category:'Photo/Video'},
+  {text:'Book wedding coordinator',category:'Coordinator'},
+  {text:'Book HMUA (Hair & Makeup)',category:'Hair & Makeup'},
+  {text:'Book host / emcee',category:'Entertainment'},
+  {text:'Book live band / DJ',category:'Entertainment'},
+  {text:'Book florist & decor',category:'Flowers & Decor'},
+  {text:'Order bridal gown / dress',category:'Attire'},
+  {text:'Order groom suit / barong',category:'Attire'},
+  {text:'Order entourage attire',category:'Attire'},
+  {text:'Buy wedding rings',category:'Rings'},
+  {text:'Design & print invitations',category:'Invitations'},
+  {text:'Send out invitations',category:'Invitations'},
+  {text:'Prepare prosperity/money envelope',category:'Ceremony'},
+  {text:'Buy arrhae (wedding coins)',category:'Ceremony'},
+  {text:'Buy unity candle set',category:'Ceremony'},
+  {text:'Buy cord & veil for sponsors',category:'Ceremony'},
+  {text:'Confirm list of sponsors (ninong/ninang)',category:'Ceremony'},
+  {text:'Buy giveaways / souvenirs',category:'Reception'},
+  {text:'Prepare games & prizes',category:'Reception'},
+  {text:'Book bridal car / transportation',category:'Transportation'},
+  {text:'Reserve hotel for wedding night',category:'Accommodation'},
+  {text:'Prenup photoshoot',category:'Photo/Video'},
+  {text:'Final fitting — bride',category:'Attire'},
+  {text:'Final fitting — groom',category:'Attire'},
+  {text:'Wedding rehearsal',category:'Ceremony'},
+  {text:'Prepare emergency kit',category:'Miscellaneous'},
+  {text:'Confirm all vendors (1 week before)',category:'Coordinator'},
+  {text:'Prepare seating arrangement',category:'Reception'},
+  {text:'Prepare playlist / song requests',category:'Entertainment'},
+  {text:'Secure marriage license',category:'Legal'},
+];
+function addCheckSuggestion(text,category){
+  const items=lsGet('checklist');
+  if(items.some(x=>x.text===text)){toast('Task already exists','error');return;}
+  items.push({id:genId(),text,category,due:'',notes:'',done:false});
+  lsSet('checklist',items);renderChecklist();renderOverview();toast('Task added!','success');
+}
 function renderChecklist(){
   const items=lsGet('checklist');
   const search=(document.getElementById('checkSearch')?.value||'').toLowerCase();
@@ -1091,7 +1146,17 @@ function renderChecklist(){
       <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();editCheck('${i.id}')">Edit</button>
       <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();deleteItem('checklist','${i.id}')">×</button>
     </div>`;
-  }).join(''):'<p style="text-align:center;padding:30px;color:var(--text-muted);">Walang tasks pa. Click "+ Add Task" para magsimula!</p>';
+  }).join(''):'<p style="text-align:center;padding:30px;color:var(--text-muted);">Walang tasks pa. Use suggested tasks below or click "+ Add Task"!</p>';
+
+  // Render checklist suggestions
+  const csEl=document.getElementById('checkSuggestions');
+  if(csEl){
+    const existing=items.map(x=>x.text);
+    const avail=CHECKLIST_SUGGESTIONS.filter(s=>!existing.includes(s.text));
+    csEl.innerHTML=avail.length?
+      avail.map(s=>`<button class="btn btn-outline btn-sm" style="font-size:0.72rem;" onclick="addCheckSuggestion('${esc(s.text)}','${esc(s.category)}')">${s.text}</button>`).join(''):
+      '<span style="font-size:0.82rem;color:var(--success);">✓ Lahat ng common wedding tasks ay naka-add na!</span>';
+  }
 }
 
 function toggleCheck(id){const items=lsGet('checklist');const i=items.find(x=>x.id===id);if(i){i.done=!i.done;lsSet('checklist',items);renderChecklist();renderOverview();}}
@@ -1637,10 +1702,36 @@ const RUNSHEET_SUGGESTIONS=[
   {time:'14:30',event:'Vendor breakdown & settle balances',person:'Coordinator',category:'Wrap Up',duration:'1 hr'},
 ];
 
+function parseDurationMins(d){
+  if(!d)return 0;
+  let mins=0;
+  const hm=d.match(/([\d.]+)\s*h/i);if(hm)mins+=parseFloat(hm[1])*60;
+  const mm=d.match(/([\d.]+)\s*m/i);if(mm)mins+=parseFloat(mm[1]);
+  if(!hm&&!mm){const n=parseFloat(d);if(!isNaN(n))mins=n;}
+  return mins;
+}
 function renderRunsheet(){
   const items=lsGet('runsheet');
   const el=document.getElementById('runsheetList');
-  if(!items.length){el.innerHTML='<div class="card" style="text-align:center;color:var(--text-muted);padding:32px;">Walang event pa. Click "+ Add Event" or "💡 Suggested Events" para magsimula.</div>';return;}
+  // Total hours
+  let totalMins=0;
+  items.forEach(x=>totalMins+=parseDurationMins(x.duration));
+  const totalEl=document.getElementById('runsheetTotal');
+  if(totalEl){
+    const hrs=Math.floor(totalMins/60);const mins=Math.round(totalMins%60);
+    totalEl.textContent=items.length?`⏱️ Total: ${hrs}h ${mins>0?mins+'m':''}  ·  ${items.length} events`:'';
+  }
+  // Quick-add suggestions
+  const qaEl=document.getElementById('runsheetQuickAdd');
+  if(qaEl){
+    const existing=items.map(x=>x.event);
+    const avail=RUNSHEET_SUGGESTIONS.filter(s=>!existing.includes(s.event));
+    qaEl.innerHTML=avail.length?
+      avail.map(s=>`<button class="btn btn-outline btn-sm" style="font-size:0.72rem;" onclick="addRunsheetSuggestion('${esc(s.time)}','${esc(s.event)}','${esc(s.person)}','${esc(s.category)}','${esc(s.duration)}')">${s.time} — ${s.event}</button>`).join('')+
+      `<button class="btn btn-gold btn-sm" style="font-size:0.72rem;margin-top:6px;" onclick="addAllRunsheetSuggestions()">➕ Add All Remaining</button>`:
+      '<span style="font-size:0.82rem;color:var(--success);">✓ Lahat ng suggested events ay naka-add na!</span>';
+  }
+  if(!items.length){el.innerHTML='<div class="card" style="text-align:center;color:var(--text-muted);padding:32px;">Walang event pa. Click "+ Add Event" or use Quick Add below!</div>';return;}
   const sorted=[...items].sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
   let html='';
   let lastCat='';
@@ -1651,8 +1742,8 @@ function renderRunsheet(){
     }
     const statusCls=item.status==='done'?'done':item.status==='ready'?'ready':'pending';
     const statusLbl=item.status==='done'?'Done':item.status==='ready'?'Ready':'Pending';
-    html+=`<div class="runsheet-event">
-      <div class="runsheet-time">${esc(item.time||'TBD')}</div>
+    html+=`<div class="runsheet-event" draggable="true" data-id="${item.id}" ondragstart="rsDragStart(event)" ondragover="rsDragOver(event)" ondrop="rsDrop(event)" ondragend="rsDragEnd(event)">
+      <div class="runsheet-time"><span class="rs-drag-handle" title="Drag to reorder">⠿</span>${esc(item.time||'TBD')}</div>
       <div class="runsheet-line"><div class="runsheet-dot ${item.status==='done'?'done':''}"></div>${i<sorted.length-1?'<div class="runsheet-connector"></div>':''}</div>
       <div class="runsheet-content">
         <h4>${esc(item.event)} <span class="rs-status ${statusCls}">${statusLbl}</span></h4>
@@ -1669,17 +1760,28 @@ function renderRunsheet(){
   });
   el.innerHTML=html;
 }
-
-function showRunsheetSuggestions(){
-  const el=document.getElementById('runsheetSuggestions');
-  if(el.style.display!=='none'){el.style.display='none';return;}
-  let html='<div class="card"><h3 style="font-family:\'Cormorant Garamond\',serif;margin-bottom:12px;">Filipino Wedding Day Suggested Timeline</h3><p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">Click to add events to your run sheet</p><div style="display:flex;flex-wrap:wrap;gap:6px;">';
-  RUNSHEET_SUGGESTIONS.forEach(s=>{
-    html+=`<button class="btn btn-outline" style="font-size:0.75rem;" onclick="addRunsheetSuggestion('${esc(s.time)}','${esc(s.event)}','${esc(s.person)}','${esc(s.category)}','${esc(s.duration)}')">${s.time} - ${s.event}</button>`;
-  });
-  html+='</div><button class="btn btn-gold" style="margin-top:12px;" onclick="addAllRunsheetSuggestions()">➕ Add All Suggested Events</button></div>';
-  el.innerHTML=html;el.style.display='block';
+// Drag-to-reorder for run sheet
+let rsDragId=null;
+function rsDragStart(e){rsDragId=e.currentTarget.dataset.id;e.currentTarget.style.opacity='0.4';e.dataTransfer.effectAllowed='move';}
+function rsDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';const t=e.currentTarget;t.style.borderTop='2px solid var(--gold)';}
+function rsDrop(e){
+  e.preventDefault();e.currentTarget.style.borderTop='';
+  const targetId=e.currentTarget.dataset.id;
+  if(!rsDragId||rsDragId===targetId)return;
+  const items=lsGet('runsheet');
+  const dragIdx=items.findIndex(x=>x.id===rsDragId);
+  const targetIdx=items.findIndex(x=>x.id===targetId);
+  if(dragIdx<0||targetIdx<0)return;
+  // Move dragged item's time to target's time and vice-adjust
+  const dragItem=items.splice(dragIdx,1)[0];
+  const newIdx=targetIdx>dragIdx?targetIdx-1:targetIdx;
+  items.splice(newIdx,0,dragItem);
+  // Swap times so order makes sense
+  const targetTime=items[newIdx===0?1:newIdx-1]?.time;
+  if(targetTime&&!dragItem.time)dragItem.time=targetTime;
+  lsSet('runsheet',items);renderRunsheet();toast('Event reordered!','success');
 }
+function rsDragEnd(e){e.currentTarget.style.opacity='1';document.querySelectorAll('.runsheet-event').forEach(el=>el.style.borderTop='');}
 
 function addRunsheetSuggestion(time,event,person,category,duration){
   const items=lsGet('runsheet');
@@ -1698,7 +1800,6 @@ function addAllRunsheetSuggestions(){
     }
   });
   lsSet('runsheet',items);renderRunsheet();toast(`${added} events added!`,'success');
-  document.getElementById('runsheetSuggestions').style.display='none';
 }
 
 function cycleRunsheetStatus(id){
@@ -2065,6 +2166,18 @@ function filterMoodBoard(cat,btn){
   renderMoodBoard();
 }
 function editMoodItem(id){const items=lsGet('moodboard');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('moodboard',i);}}
+function handleMoodPhoto(input){
+  const file=input.files[0];if(!file)return;
+  if(file.size>2*1024*1024){toast('Max 2MB lang ang photo!','error');input.value='';return;}
+  const reader=new FileReader();
+  reader.onload=function(e){
+    document.getElementById('f_image_url').value=e.target.result;
+    const prev=document.getElementById('f_photo_preview');
+    prev.style.display='block';
+    prev.innerHTML=`<img src="${e.target.result}" style="max-width:100%;max-height:160px;border-radius:8px;object-fit:cover;">`;
+  };
+  reader.readAsDataURL(file);
+}
 
 // ============ MODAL SYSTEM ============
 function openModal(type,data){
@@ -2224,7 +2337,12 @@ function openModal(type,data){
       <div class="form-group"><label>Category</label><select id="f_category">
         ${['Venue','Flowers','Attire','Decor','Food','Other'].map(c=>`<option value="${c}" ${d.category===c?'selected':''}>${c}</option>`).join('')}
       </select></div>
-      <div class="form-group"><label>Image URL</label><input type="url" id="f_image_url" value="${esc(d.image_url||'')}" placeholder="https://..."></div>
+      <div class="form-group"><label>📷 Photo</label>
+        <div id="f_photo_preview" style="margin-bottom:8px;${d.image_url?'':'display:none'}"><img src="${esc(d.image_url||'')}" style="max-width:100%;max-height:160px;border-radius:8px;object-fit:cover;"></div>
+        <input type="file" id="f_photo_file" accept="image/*" onchange="handleMoodPhoto(this)" style="font-size:0.82rem;">
+        <input type="hidden" id="f_image_url" value="${esc(d.image_url||'')}">
+        <p style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">Or paste URL: <input type="url" id="f_image_url_text" value="${d.image_url&&!d.image_url.startsWith('data:')?esc(d.image_url):''}" placeholder="https://..." style="width:55%;padding:4px 8px;font-size:0.72rem;border:1px solid var(--border);border-radius:6px;" onchange="document.getElementById('f_image_url').value=this.value"></p>
+      </div>
       <div class="form-group"><label>Source URL</label><input type="url" id="f_url" value="${esc(d.url||'')}" placeholder="https://pinterest.com/..."></div>
       <div class="form-group"><label>Notes</label><textarea id="f_notes" rows="2">${esc(d.notes||'')}</textarea></div>`;
   }
