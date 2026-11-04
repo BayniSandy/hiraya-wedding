@@ -199,6 +199,53 @@ table.dt tr:hover td{background:var(--cream);}
   .countdown-nums{gap:12px;}
   .countdown-unit .num{font-size:1.4rem;}
   .modal{padding:24px 16px;}
+  .seating-grid{grid-template-columns:repeat(2,1fr);}
+}
+
+/* SEATING CHART */
+.seating-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;}
+.table-circle{background:var(--card);border-radius:16px;padding:20px;text-align:center;box-shadow:0 2px 12px rgba(92,74,61,0.06);border:1.5px solid var(--border);position:relative;}
+.table-circle .table-num{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--earth);margin-bottom:4px;}
+.table-circle .table-count{font-size:0.7rem;color:var(--text-muted);margin-bottom:10px;}
+.table-seats{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;}
+.seat{background:var(--cream);border:1px solid var(--border);border-radius:6px;padding:3px 7px;font-size:0.68rem;color:var(--text);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.seat.empty{background:var(--bg);color:var(--text-muted);border-style:dashed;}
+.seat.confirmed{background:var(--success-bg);border-color:#a5d6a7;color:var(--success);}
+
+/* RUN SHEET */
+.runsheet-event{display:flex;gap:16px;margin-bottom:2px;position:relative;}
+.runsheet-time{min-width:80px;text-align:right;font-weight:600;font-size:0.85rem;color:var(--earth);padding-top:14px;}
+.runsheet-line{display:flex;flex-direction:column;align-items:center;min-width:20px;}
+.runsheet-dot{width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--card);box-shadow:0 0 0 2px var(--gold);margin-top:16px;z-index:1;}
+.runsheet-dot.done{background:var(--success);}
+.runsheet-connector{flex:1;width:2px;background:var(--border);}
+.runsheet-content{flex:1;background:var(--card);border-radius:10px;padding:12px 16px;border:1px solid var(--border);margin-bottom:8px;}
+.runsheet-content h4{font-size:0.95rem;margin-bottom:2px;}
+.runsheet-content .rs-person{font-size:0.78rem;color:var(--gold);font-weight:500;}
+.runsheet-content .rs-notes{font-size:0.8rem;color:var(--text-muted);margin-top:4px;}
+.runsheet-content .rs-actions{display:flex;gap:6px;margin-top:8px;}
+.rs-status{display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.7rem;font-weight:600;margin-left:6px;}
+.rs-status.pending{background:var(--warn-bg);color:var(--warn);}
+.rs-status.ready{background:var(--info-bg);color:var(--info);}
+.rs-status.done{background:var(--success-bg);color:var(--success);}
+
+/* THANK YOU TRACKER */
+.ty-card{background:var(--card);border-radius:10px;padding:14px 18px;border:1px solid var(--border);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;}
+.ty-card .ty-main{flex:1;min-width:180px;}
+.ty-card .ty-name{font-weight:600;font-size:0.95rem;}
+.ty-card .ty-gift{font-size:0.82rem;color:var(--text-muted);margin-top:2px;}
+.ty-card .ty-amount{font-size:0.82rem;color:var(--earth);font-weight:500;}
+.ty-sent-btn{padding:6px 14px;border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;border:none;font-family:'Jost',sans-serif;transition:all 0.2s;}
+.ty-sent-btn.pending{background:var(--warn-bg);color:var(--warn);}
+.ty-sent-btn.sent{background:var(--success-bg);color:var(--success);}
+
+/* PRINT STYLES */
+@media print{
+  .sidebar,.login-screen,.btn,.modal-overlay,.toast{display:none!important;}
+  .app{display:block!important;}
+  .content{margin-left:0!important;padding:0!important;}
+  .page{display:block!important;}
+  .runsheet-content{break-inside:avoid;}
 }
 </style>
 </head>
@@ -236,7 +283,12 @@ table.dt tr:hover td{background:var(--cream);}
     <div class="nav-section">Guest Mgmt</div>
     <div class="nav-item" data-page="guests" onclick="navigate('guests')"><span class="icon">📋</span><span>Guest List</span></div>
     <div class="nav-item" data-page="tables" onclick="navigate('tables')"><span class="icon">🪑</span><span>Tables</span></div>
+    <div class="nav-item" data-page="seating" onclick="navigate('seating')"><span class="icon">🗺️</span><span>Seating Chart</span></div>
     <div class="nav-item" data-page="invites" onclick="navigate('invites')"><span class="icon">💌</span><span>Send Invites</span></div>
+    <div class="nav-section">Wedding Day</div>
+    <div class="nav-item" data-page="runsheet" onclick="navigate('runsheet')"><span class="icon">⏱️</span><span>Run Sheet</span></div>
+    <div class="nav-section">Post-Wedding</div>
+    <div class="nav-item" data-page="thankyou" onclick="navigate('thankyou')"><span class="icon">💝</span><span>Thank You</span></div>
     <div class="sidebar-footer">
       <button onclick="logout()">Sign Out</button>
     </div>
@@ -487,6 +539,68 @@ table.dt tr:hover td{background:var(--cream);}
       </div>
     </div>
 
+    <!-- SEATING CHART -->
+    <div class="page" id="pg-seating">
+      <h1 class="page-title">Seating Chart</h1>
+      <p class="page-sub">Visual na layout ng table arrangement para sa reception</p>
+      <div class="card" style="margin-bottom:16px;">
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+          <div class="form-group" style="flex:1;min-width:120px;margin:0;">
+            <label style="font-size:0.75rem;">Tables to show</label>
+            <input type="number" id="seatingTableCount" min="1" max="50" value="10" onchange="renderSeating()" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Jost',sans-serif;width:100%;">
+          </div>
+          <div class="form-group" style="flex:1;min-width:120px;margin:0;">
+            <label style="font-size:0.75rem;">Guests per table</label>
+            <input type="number" id="seatingPerTable" min="4" max="20" value="10" onchange="renderSeating()" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Jost',sans-serif;width:100%;">
+          </div>
+          <button class="btn btn-gold" onclick="renderSeating()" style="margin-top:auto;">🔄 Refresh</button>
+        </div>
+      </div>
+      <div id="seatingChart" class="seating-grid"></div>
+      <div class="card" style="margin-top:16px;">
+        <h3 style="font-family:'Cormorant Garamond',serif;margin-bottom:8px;">Unassigned Guests</h3>
+        <div id="unassignedGuests" style="font-size:0.85rem;color:var(--text-muted);"></div>
+      </div>
+    </div>
+
+    <!-- DAY-OF RUN SHEET -->
+    <div class="page" id="pg-runsheet">
+      <h1 class="page-title">Day-of Run Sheet</h1>
+      <p class="page-sub">Minute-by-minute timeline para sa coordinator at wedding party</p>
+      <div class="card" style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-outline" onclick="showRunsheetSuggestions()" style="font-size:0.8rem;">💡 Suggested Events</button>
+            <button class="btn btn-outline" onclick="printRunsheet()" style="font-size:0.8rem;">🖨️ Print</button>
+          </div>
+          <button class="btn btn-gold" onclick="openModal('runsheet')">+ Add Event</button>
+        </div>
+      </div>
+      <div id="runsheetSuggestions" style="display:none;margin-bottom:16px;"></div>
+      <div id="runsheetList"></div>
+    </div>
+
+    <!-- THANK YOU TRACKER -->
+    <div class="page" id="pg-thankyou">
+      <h1 class="page-title">Thank You Tracker</h1>
+      <p class="page-sub">I-track ang gifts at thank you notes pagkatapos ng kasal</p>
+      <div class="card" style="margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+            <select id="tyFilter" onchange="renderThankYou()" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Jost',sans-serif;font-size:0.85rem;">
+              <option value="all">All Gifts</option>
+              <option value="pending">Pending Thank You</option>
+              <option value="sent">Thank You Sent</option>
+            </select>
+            <button class="btn btn-outline" onclick="importGuestsToThankYou()" style="font-size:0.8rem;">📥 Import from Guest List</button>
+          </div>
+          <button class="btn btn-gold" onclick="openModal('thankyou')">+ Add Gift</button>
+        </div>
+      </div>
+      <div id="thankYouStats" class="stat-row" style="margin-bottom:16px;"></div>
+      <div id="thankYouList"></div>
+    </div>
+
   </div><!-- /content -->
 </div><!-- /app -->
 
@@ -555,6 +669,8 @@ function loadAll(){
   renderTimeline();
   renderSuppliers();
   renderDocuments();
+  renderRunsheet();
+  renderThankYou();
 }
 
 // ============ COUNTDOWN ============
@@ -1056,7 +1172,7 @@ function editSupplier(id){const items=lsGet('suppliers');const i=items.find(x=>x
 // ============ GUESTS (API-backed) ============
 function loadGuests(){
   apiGet('admin_guests',{}).then(d=>{
-    if(d.status===200){allGuests=d.guests;renderGuestTable(allGuests);renderTables(allGuests);renderUnsentList(allGuests);renderOverview();}
+    if(d.status===200){allGuests=d.guests;renderGuestTable(allGuests);renderTables(allGuests);renderUnsentList(allGuests);renderSeating();renderOverview();}
   });
 }
 
@@ -1169,6 +1285,206 @@ function sendAll(){
   go(0);toast('Sending invitations...','success');
 }
 
+// ============ SEATING CHART ============
+function renderSeating(){
+  const guests=allGuests;
+  const numTables=parseInt(document.getElementById('seatingTableCount')?.value)||10;
+  const perTable=parseInt(document.getElementById('seatingPerTable')?.value)||10;
+  const byTable={};
+  const unassigned=[];
+  guests.forEach(g=>{
+    const t=parseInt(g.table_number);
+    if(t>0){if(!byTable[t])byTable[t]=[];byTable[t].push(g);}
+    else unassigned.push(g);
+  });
+  let html='';
+  for(let t=1;t<=numTables;t++){
+    const seated=byTable[t]||[];
+    const slots=[];
+    seated.forEach(g=>{
+      const cls=g.invite_status==='confirmed'?'seat confirmed':'seat';
+      slots.push(`<span class="${cls}" title="${esc(g.full_name)}">${esc(g.full_name?.split(' ')[0]||'?')}</span>`);
+    });
+    for(let e=seated.length;e<perTable;e++) slots.push('<span class="seat empty">—</span>');
+    html+=`<div class="table-circle">
+      <div class="table-num">Table ${t}</div>
+      <div class="table-count">${seated.length}/${perTable} seated</div>
+      <div class="table-seats">${slots.join('')}</div>
+    </div>`;
+  }
+  document.getElementById('seatingChart').innerHTML=html;
+  // Unassigned
+  if(unassigned.length===0){
+    document.getElementById('unassignedGuests').innerHTML='<p>Lahat ng guests ay may table na! 🎉</p>';
+  } else {
+    document.getElementById('unassignedGuests').innerHTML=`<p style="margin-bottom:8px;">${unassigned.length} guest(s) walang table pa:</p>`+
+      unassigned.map(g=>`<span style="display:inline-block;background:var(--warn-bg);color:var(--warn);padding:3px 10px;border-radius:6px;font-size:0.78rem;margin:2px 4px;">${esc(g.full_name)}</span>`).join('');
+  }
+}
+
+// ============ DAY-OF RUN SHEET ============
+const RUNSHEET_SUGGESTIONS=[
+  {time:'05:00',event:'Bride Hair & Makeup starts',person:'HMUA Team',category:'Prep',duration:'2 hrs'},
+  {time:'05:30',event:'Groom preparation',person:'Best Man',category:'Prep',duration:'1.5 hrs'},
+  {time:'06:30',event:'Photographer arrives at bride venue',person:'Photographer',category:'Prep',duration:''},
+  {time:'07:00',event:'Bride dressing & first look photos',person:'Photographer, MOH',category:'Prep',duration:'30 mins'},
+  {time:'07:30',event:'Travel to ceremony venue',person:'Driver/Coordinator',category:'Travel',duration:'30 mins'},
+  {time:'08:00',event:'Guests arrive at ceremony venue',person:'Ushers',category:'Ceremony',duration:'30 mins'},
+  {time:'08:15',event:'Coordinate entourage lineup',person:'Coordinator',category:'Ceremony',duration:'15 mins'},
+  {time:'08:30',event:'Ceremony starts — Processional',person:'Officiant',category:'Ceremony',duration:'5 mins'},
+  {time:'08:35',event:'Bridal march',person:'Bride & Father',category:'Ceremony',duration:'3 mins'},
+  {time:'08:40',event:'Ceremony proper — vows & rings',person:'Officiant',category:'Ceremony',duration:'30 mins'},
+  {time:'09:10',event:'Unity ceremony (candle/cord/veil/coins)',person:'Sponsors',category:'Ceremony',duration:'10 mins'},
+  {time:'09:20',event:'Pronouncement & Kiss',person:'Officiant',category:'Ceremony',duration:'2 mins'},
+  {time:'09:25',event:'Recessional & receiving line',person:'Couple & Family',category:'Ceremony',duration:'20 mins'},
+  {time:'09:50',event:'Travel to reception venue',person:'Driver',category:'Travel',duration:'30 mins'},
+  {time:'10:30',event:'Cocktail hour & photo booth open',person:'Caterer/Photo Booth',category:'Reception',duration:'1 hr'},
+  {time:'11:30',event:'Grand entrance of couple',person:'Host/Emcee',category:'Reception',duration:'5 mins'},
+  {time:'11:35',event:'First dance',person:'Couple',category:'Reception',duration:'5 mins'},
+  {time:'11:45',event:'Opening prayer & welcome',person:'Officiant/Host',category:'Reception',duration:'5 mins'},
+  {time:'11:50',event:'Dinner service begins',person:'Caterer',category:'Reception',duration:'45 mins'},
+  {time:'12:35',event:'Toasts & speeches',person:'Best Man, MOH, Parents',category:'Reception',duration:'20 mins'},
+  {time:'12:55',event:'Cake cutting',person:'Couple',category:'Reception',duration:'10 mins'},
+  {time:'13:05',event:'Bouquet & garter toss',person:'Host',category:'Reception',duration:'10 mins'},
+  {time:'13:15',event:'Games & prizes',person:'Host/Coordinator',category:'Reception',duration:'30 mins'},
+  {time:'13:45',event:'Money dance / Dollar dance',person:'Couple',category:'Reception',duration:'15 mins'},
+  {time:'14:00',event:'Final song & thank you',person:'Couple',category:'Reception',duration:'5 mins'},
+  {time:'14:05',event:'Send off / Bubble/sparkler exit',person:'Coordinator',category:'Reception',duration:'10 mins'},
+  {time:'14:30',event:'Vendor breakdown & settle balances',person:'Coordinator',category:'Wrap Up',duration:'1 hr'},
+];
+
+function renderRunsheet(){
+  const items=lsGet('runsheet');
+  const el=document.getElementById('runsheetList');
+  if(!items.length){el.innerHTML='<div class="card" style="text-align:center;color:var(--text-muted);padding:32px;">Walang event pa. Click "+ Add Event" or "💡 Suggested Events" para magsimula.</div>';return;}
+  const sorted=[...items].sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
+  let html='';
+  let lastCat='';
+  sorted.forEach((item,i)=>{
+    if(item.category && item.category!==lastCat){
+      lastCat=item.category;
+      html+=`<div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--earth);margin:16px 0 8px;padding-left:96px;">${esc(item.category)}</div>`;
+    }
+    const statusCls=item.status==='done'?'done':item.status==='ready'?'ready':'pending';
+    const statusLbl=item.status==='done'?'Done':item.status==='ready'?'Ready':'Pending';
+    html+=`<div class="runsheet-event">
+      <div class="runsheet-time">${esc(item.time||'TBD')}</div>
+      <div class="runsheet-line"><div class="runsheet-dot ${item.status==='done'?'done':''}"></div>${i<sorted.length-1?'<div class="runsheet-connector"></div>':''}</div>
+      <div class="runsheet-content">
+        <h4>${esc(item.event)} <span class="rs-status ${statusCls}">${statusLbl}</span></h4>
+        ${item.person?`<div class="rs-person">👤 ${esc(item.person)}</div>`:''}
+        ${item.duration?`<div class="rs-notes">⏱️ ${esc(item.duration)}</div>`:''}
+        ${item.notes?`<div class="rs-notes">${esc(item.notes)}</div>`:''}
+        <div class="rs-actions">
+          <button class="btn btn-outline btn-sm" onclick="cycleRunsheetStatus('${item.id}')">${statusLbl==='Done'?'↩ Undo':'✓ '+{Pending:'Mark Ready',Ready:'Mark Done'}[statusLbl]}</button>
+          <button class="btn btn-outline btn-sm" onclick="editRunsheetItem('${item.id}')">Edit</button>
+          <button class="btn btn-outline btn-sm" style="color:var(--danger);" onclick="deleteItem('runsheet','${item.id}')">🗑️</button>
+        </div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+function showRunsheetSuggestions(){
+  const el=document.getElementById('runsheetSuggestions');
+  if(el.style.display!=='none'){el.style.display='none';return;}
+  let html='<div class="card"><h3 style="font-family:\'Cormorant Garamond\',serif;margin-bottom:12px;">Filipino Wedding Day Suggested Timeline</h3><p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px;">Click to add events to your run sheet</p><div style="display:flex;flex-wrap:wrap;gap:6px;">';
+  RUNSHEET_SUGGESTIONS.forEach(s=>{
+    html+=`<button class="btn btn-outline" style="font-size:0.75rem;" onclick="addRunsheetSuggestion('${esc(s.time)}','${esc(s.event)}','${esc(s.person)}','${esc(s.category)}','${esc(s.duration)}')">${s.time} - ${s.event}</button>`;
+  });
+  html+='</div><button class="btn btn-gold" style="margin-top:12px;" onclick="addAllRunsheetSuggestions()">➕ Add All Suggested Events</button></div>';
+  el.innerHTML=html;el.style.display='block';
+}
+
+function addRunsheetSuggestion(time,event,person,category,duration){
+  const items=lsGet('runsheet');
+  if(items.some(x=>x.event===event)){toast('Event already exists','error');return;}
+  items.push({id:genId(),time,event,person,category,duration,status:'pending',notes:''});
+  lsSet('runsheet',items);renderRunsheet();toast('Event added!','success');
+}
+
+function addAllRunsheetSuggestions(){
+  const items=lsGet('runsheet');
+  let added=0;
+  RUNSHEET_SUGGESTIONS.forEach(s=>{
+    if(!items.some(x=>x.event===s.event)){
+      items.push({id:genId(),time:s.time,event:s.event,person:s.person,category:s.category,duration:s.duration,status:'pending',notes:''});
+      added++;
+    }
+  });
+  lsSet('runsheet',items);renderRunsheet();toast(`${added} events added!`,'success');
+  document.getElementById('runsheetSuggestions').style.display='none';
+}
+
+function cycleRunsheetStatus(id){
+  const items=lsGet('runsheet');const i=items.find(x=>x.id===id);
+  if(i){i.status=i.status==='pending'?'ready':i.status==='ready'?'done':'pending';lsSet('runsheet',items);renderRunsheet();}
+}
+
+function editRunsheetItem(id){const items=lsGet('runsheet');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('runsheet',i);}}
+
+function printRunsheet(){window.print();}
+
+// ============ THANK YOU TRACKER ============
+function renderThankYou(){
+  const items=lsGet('thankyou');
+  const filter=document.getElementById('tyFilter')?.value||'all';
+  const filtered=filter==='all'?items:items.filter(x=>filter==='sent'?x.thanked:!x.thanked);
+  const totalGifts=items.length;
+  const thanked=items.filter(x=>x.thanked).length;
+  const totalAmt=items.reduce((s,x)=>s+Number(x.amount||0),0);
+
+  document.getElementById('thankYouStats').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${totalGifts}</div><div class="stat-label">Total Gifts</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--success);">${thanked}</div><div class="stat-label">Thank You Sent</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--warn);">${totalGifts-thanked}</div><div class="stat-label">Pending</div></div>
+    <div class="stat-card"><div class="stat-num">₱${formatNum(totalAmt)}</div><div class="stat-label">Total Value</div></div>`;
+
+  if(!filtered.length){
+    document.getElementById('thankYouList').innerHTML='<div class="card" style="text-align:center;color:var(--text-muted);padding:32px;">Walang gift pa. Click "+ Add Gift" or "📥 Import from Guest List" para magsimula.</div>';return;
+  }
+  let html='';
+  filtered.forEach(item=>{
+    html+=`<div class="ty-card">
+      <div class="ty-main">
+        <div class="ty-name">${esc(item.guest_name)}</div>
+        <div class="ty-gift">${esc(item.gift||'No gift description')}</div>
+        ${item.amount?`<div class="ty-amount">₱${formatNum(item.amount)}</div>`:''}
+        ${item.notes?`<div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">${esc(item.notes)}</div>`:''}
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <button class="ty-sent-btn ${item.thanked?'sent':'pending'}" onclick="toggleThankYou('${item.id}')">${item.thanked?'✓ Sent':'Send TY'}</button>
+        <button class="btn btn-outline btn-sm" onclick="editThankYouItem('${item.id}')">Edit</button>
+        <button class="btn btn-outline btn-sm" style="color:var(--danger);" onclick="deleteItem('thankyou','${item.id}')">🗑️</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('thankYouList').innerHTML=html;
+}
+
+function toggleThankYou(id){
+  const items=lsGet('thankyou');const i=items.find(x=>x.id===id);
+  if(i){i.thanked=!i.thanked;if(i.thanked)i.thanked_date=new Date().toISOString().slice(0,10);else delete i.thanked_date;lsSet('thankyou',items);renderThankYou();toast(i.thanked?'Marked as sent!':'Unmarked','success');}
+}
+
+function editThankYouItem(id){const items=lsGet('thankyou');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('thankyou',i);}}
+
+function importGuestsToThankYou(){
+  const existing=lsGet('thankyou');
+  const existingNames=new Set(existing.map(x=>x.guest_name?.toLowerCase()));
+  const confirmed=allGuests.filter(g=>g.invite_status==='confirmed'||g.invite_status==='proxy');
+  let added=0;
+  confirmed.forEach(g=>{
+    if(!existingNames.has(g.full_name?.toLowerCase())){
+      existing.push({id:genId(),guest_name:g.full_name,gift:'',amount:'',notes:'',thanked:false});
+      added++;
+    }
+  });
+  lsSet('thankyou',existing);renderThankYou();
+  toast(added?`${added} guests imported!`:'Lahat ng confirmed guests ay naka-import na','success');
+}
+
 // ============ MODAL SYSTEM ============
 function openModal(type,data){
   currentModal=type;editId=data?editId:null;
@@ -1251,6 +1567,37 @@ function openModal(type,data){
       </div>
       <div class="form-group"><label>Table Number</label><input type="number" id="f_table" value="${d.table_number||''}" min="1"></div>
       <div class="form-group"><label>Notes</label><textarea id="f_notes" rows="2">${esc(d.notes||'')}</textarea></div>`;
+  } else if(type==='runsheet'){
+    title=isEdit?'Edit Run Sheet Event':'Add Run Sheet Event';
+    html=`
+      <div class="form-group"><label>Event Name *</label><input type="text" id="f_event" value="${esc(d.event||'')}" placeholder="e.g. Bridal March"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Time</label><input type="time" id="f_time" value="${d.time||''}"></div>
+        <div class="form-group"><label>Duration</label><input type="text" id="f_duration" value="${esc(d.duration||'')}" placeholder="e.g. 15 mins"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Person-in-Charge</label><input type="text" id="f_person" value="${esc(d.person||'')}" placeholder="e.g. Coordinator, Bride"></div>
+        <div class="form-group"><label>Category</label><select id="f_category">
+          ${['Prep','Travel','Ceremony','Reception','Wrap Up','Other'].map(c=>`<option value="${c}" ${d.category===c?'selected':''}>${c}</option>`).join('')}
+        </select></div>
+      </div>
+      <div class="form-group"><label>Status</label><select id="f_status">
+        <option value="pending" ${(d.status||'pending')==='pending'?'selected':''}>Pending</option>
+        <option value="ready" ${d.status==='ready'?'selected':''}>Ready</option>
+        <option value="done" ${d.status==='done'?'selected':''}>Done</option>
+      </select></div>
+      <div class="form-group"><label>Notes</label><textarea id="f_notes" rows="2" placeholder="Special instructions...">${esc(d.notes||'')}</textarea></div>`;
+  } else if(type==='thankyou'){
+    title=isEdit?'Edit Gift':'Add Gift';
+    html=`
+      <div class="form-group"><label>Guest Name *</label><input type="text" id="f_guest_name" value="${esc(d.guest_name||'')}" placeholder="e.g. Juan Dela Cruz"></div>
+      <div class="form-group"><label>Gift Description</label><input type="text" id="f_gift" value="${esc(d.gift||'')}" placeholder="e.g. Cash, Appliance, Kitchenware"></div>
+      <div class="form-group"><label>Amount / Value (₱)</label><input type="number" id="f_amount" value="${d.amount||''}" placeholder="0"></div>
+      <div class="form-group"><label>Thank You Sent?</label><select id="f_thanked">
+        <option value="no" ${!d.thanked?'selected':''}>Not Yet</option>
+        <option value="yes" ${d.thanked?'selected':''}>Yes, Sent</option>
+      </select></div>
+      <div class="form-group"><label>Notes</label><textarea id="f_notes" rows="2" placeholder="How to thank, address...">${esc(d.notes||'')}</textarea></div>`;
   }
 
   document.getElementById('modalTitle').textContent=title;
@@ -1307,11 +1654,26 @@ function saveModal(){
       apiPost('admin_add_guest',{full_name:name,email:gv('f_email'),phone:gv('f_phone'),group_label:gv('f_group'),table_number:gv('f_table'),notes:gv('f_notes')}).then(d=>{
         btn.disabled=false;if(d.status===200){toast(`Guest added! Code: ${d.invite_code}`,'success');closeModal();loadGuests();}else{toast(d.error||'Error','error');btn.textContent='Add Guest';}});
     }
+  } else if(currentModal==='runsheet'){
+    const event=gv('f_event');if(!event){toast('Ilagay ang event name','error');btn.disabled=false;btn.textContent='Save';return;}
+    const items=lsGet('runsheet');
+    const obj={event,time:gv('f_time'),duration:gv('f_duration'),person:gv('f_person'),category:gv('f_category'),status:gv('f_status'),notes:gv('f_notes')};
+    if(editId){const i=items.find(x=>x.id===editId);if(i)Object.assign(i,obj);}
+    else{obj.id=genId();items.push(obj);}
+    lsSet('runsheet',items);renderRunsheet();toast('Event saved!','success');closeModal();btn.disabled=false;
+  } else if(currentModal==='thankyou'){
+    const guest_name=gv('f_guest_name');if(!guest_name){toast('Ilagay ang guest name','error');btn.disabled=false;btn.textContent='Save';return;}
+    const items=lsGet('thankyou');
+    const obj={guest_name,gift:gv('f_gift'),amount:gv('f_amount'),thanked:gv('f_thanked')==='yes',notes:gv('f_notes')};
+    if(obj.thanked)obj.thanked_date=new Date().toISOString().slice(0,10);
+    if(editId){const i=items.find(x=>x.id===editId);if(i)Object.assign(i,obj);}
+    else{obj.id=genId();items.push(obj);}
+    lsSet('thankyou',items);renderThankYou();toast('Gift saved!','success');closeModal();btn.disabled=false;
   }
 }
 
 function deleteItem(store,id){if(!confirm('Are you sure you want to delete this?'))return;let items=lsGet(store);items=items.filter(x=>x.id!==id);lsSet(store,items);
-  if(store==='checklist')renderChecklist();else if(store==='budget')renderBudget();else if(store==='timeline')renderTimeline();else if(store==='documents')renderDocuments();else if(store==='suppliers')renderSuppliers();renderOverview();toast('Deleted!','success');}
+  if(store==='checklist')renderChecklist();else if(store==='budget')renderBudget();else if(store==='timeline')renderTimeline();else if(store==='documents')renderDocuments();else if(store==='suppliers')renderSuppliers();else if(store==='runsheet')renderRunsheet();else if(store==='thankyou')renderThankYou();renderOverview();toast('Deleted!','success');}
 
 // ============ UTILS ============
 function gv(id){const el=document.getElementById(id);return el?el.value.trim():'';}
