@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <title>HIRAYA Portal — Rodnel & Divine</title>
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -441,6 +443,19 @@ table.dt tr:hover td{background:var(--cream);}
         </div>
         <div class="search-bar">
           <input type="text" id="guestSearch" placeholder="Search by name, email, group, or status..." oninput="filterGuests()">
+          <select id="guestTableFilter" onchange="filterGuests()">
+            <option value="all">All Tables</option>
+          </select>
+          <select id="guestStatusFilter" onchange="filterGuests()">
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="sent">Sent</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="declined">Declined</option>
+            <option value="proxy">Proxy</option>
+            <option value="expired">Expired</option>
+          </select>
+          <label style="display:flex;align-items:center;gap:4px;font-size:0.78rem;cursor:pointer;white-space:nowrap;"><input type="checkbox" id="guestGroupByTable" onchange="filterGuests()"> Group by Table</label>
         </div>
         <div class="table-wrap">
           <table class="dt">
@@ -723,14 +738,57 @@ const BUDGET_COLORS=['#c4a265','#5c4a3d','#8e6f5e','#A7A4D8','#C8B4E2','#A78BAA'
 
 function getTotalBudget(){return Number(localStorage.getItem(LS_KEY+'total_budget')||0);}
 function saveTotalBudget(){
-  const raw=document.getElementById('totalBudgetInput').value.replace(/[^0-9]/g,'');
+  const el=document.getElementById('totalBudgetInput');
+  const raw=el.value.replace(/[^0-9]/g,'');
   localStorage.setItem(LS_KEY+'total_budget',raw);
-  renderBudget();
+  // Format with commas but keep cursor position
+  const pos=el.selectionStart;
+  const oldLen=el.value.length;
+  el.value=raw?Number(raw).toLocaleString():'';
+  const newLen=el.value.length;
+  const newPos=pos+(newLen-oldLen);
+  el.setSelectionRange(newPos,newPos);
+  // Update meter and charts without re-setting input
+  updateBudgetDisplay();
 }
 function loadTotalBudgetInput(){
   const v=getTotalBudget();
   const el=document.getElementById('totalBudgetInput');
   if(el)el.value=v?Number(v).toLocaleString():'';
+}
+function updateBudgetDisplay(){
+  const items=lsGet('budget');
+  const totalBudget=getTotalBudget();
+  const totalEst=items.reduce((s,b)=>s+Number(b.estimated||0),0);
+  const totalAct=items.reduce((s,b)=>s+Number(b.actual||0),0);
+  const totalPaid=items.reduce((s,b)=>s+Number(b.paid||0),0);
+  const unpaid=totalAct-totalPaid;
+  const budgetPct=totalBudget?Math.round(totalAct/totalBudget*100):0;
+  const budgetRemaining=totalBudget?totalBudget-totalAct:0;
+  // Update meter
+  const meterEl=document.getElementById('budgetMeter');
+  if(meterEl&&totalBudget){
+    const barClass=budgetPct>100?'over':budgetPct>80?'warn':'ok';
+    meterEl.innerHTML=`
+      <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:4px;">
+        <span style="color:var(--text-muted);">Spent: <strong style="color:var(--earth);">₱${formatNum(totalAct)}</strong> of ₱${formatNum(totalBudget)}</span>
+        <span style="font-weight:600;color:${budgetPct>100?'var(--danger)':budgetPct>80?'var(--warn)':'var(--success)'};">${budgetPct}%</span>
+      </div>
+      <div class="budget-bar" style="height:12px;"><div class="budget-bar-fill ${barClass}" style="width:${Math.min(budgetPct,100)}%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--text-muted);margin-top:4px;">
+        <span>Remaining: <strong style="color:${budgetRemaining<0?'var(--danger)':'var(--success)'}">₱${formatNum(Math.abs(budgetRemaining))}</strong>${budgetRemaining<0?' OVER':''}</span>
+        <span>Unpaid: <strong style="color:${unpaid>0?'var(--warn)':'var(--success)'}">₱${formatNum(unpaid>0?unpaid:0)}</strong></span>
+      </div>`;
+  }else if(meterEl&&!totalBudget){
+    meterEl.innerHTML=`<p style="font-size:0.82rem;color:var(--text-muted);margin-top:8px;">👈 Set your total wedding budget para makita ang progress bar!</p>`;
+  }
+  // Update summary cards
+  document.getElementById('budgetSummary').innerHTML=`
+    <div class="stat-card"><div class="stat-num" style="color:var(--earth);">₱${formatNum(totalBudget||totalEst)}</div><div class="stat-label">${totalBudget?'Total Budget':'Est. Total'}</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--warn);">₱${formatNum(totalAct)}</div><div class="stat-label">Actual Cost</div></div>
+    <div class="stat-card green"><div class="stat-num">₱${formatNum(totalPaid)}</div><div class="stat-label">Paid</div></div>
+    <div class="stat-card ${unpaid>0?'red':''}"><div class="stat-num">₱${formatNum(unpaid>0?unpaid:0)}</div><div class="stat-label">Unpaid</div></div>
+    <div class="stat-card ${budgetRemaining<0?'red':'blue'}"><div class="stat-num">₱${formatNum(Math.abs(totalBudget?budgetRemaining:(totalEst-totalAct)))}</div><div class="stat-label">${(totalBudget?budgetRemaining:(totalEst-totalAct))<0?'Over Budget':'Remaining'}</div></div>`;
 }
 
 function renderBudget(){
@@ -746,43 +804,10 @@ function renderBudget(){
   if(search)filtered=filtered.filter(i=>i.item.toLowerCase().includes(search)||((i.category||'').toLowerCase().includes(search)));
   if(cat!=='all')filtered=filtered.filter(i=>i.category===cat);
 
-  const totalBudget=getTotalBudget();
-  const totalEst=items.reduce((s,b)=>s+Number(b.estimated||0),0);
-  const totalAct=items.reduce((s,b)=>s+Number(b.actual||0),0);
-  const totalPaid=items.reduce((s,b)=>s+Number(b.paid||0),0);
-  const unpaid=totalAct-totalPaid;
-  const budgetUsed=totalBudget?totalAct:0;
-  const budgetRemaining=totalBudget?totalBudget-totalAct:0;
-  const budgetPct=totalBudget?Math.round(totalAct/totalBudget*100):0;
-
-  // Budget meter
-  const meterEl=document.getElementById('budgetMeter');
-  if(meterEl){
-    if(totalBudget){
-      const barClass=budgetPct>100?'over':budgetPct>80?'warn':'ok';
-      meterEl.innerHTML=`
-        <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:4px;">
-          <span style="color:var(--text-muted);">Spent: <strong style="color:var(--earth);">₱${formatNum(totalAct)}</strong> of ₱${formatNum(totalBudget)}</span>
-          <span style="font-weight:600;color:${budgetPct>100?'var(--danger)':budgetPct>80?'var(--warn)':'var(--success)'};">${budgetPct}%</span>
-        </div>
-        <div class="budget-bar" style="height:12px;"><div class="budget-bar-fill ${barClass}" style="width:${Math.min(budgetPct,100)}%"></div></div>
-        <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--text-muted);margin-top:4px;">
-          <span>Remaining: <strong style="color:${budgetRemaining<0?'var(--danger)':'var(--success)'}">₱${formatNum(Math.abs(budgetRemaining))}</strong>${budgetRemaining<0?' OVER':''}</span>
-          <span>Unpaid: <strong style="color:${unpaid>0?'var(--warn)':'var(--success)'}">₱${formatNum(unpaid>0?unpaid:0)}</strong></span>
-        </div>`;
-    }else{meterEl.innerHTML=`<p style="font-size:0.82rem;color:var(--text-muted);margin-top:8px;">👈 Set your total wedding budget para makita ang progress bar!</p>`;}
-  }
-
   // Load total budget input
   loadTotalBudgetInput();
-
-  // Summary cards
-  document.getElementById('budgetSummary').innerHTML=`
-    <div class="stat-card"><div class="stat-num" style="color:var(--earth);">₱${formatNum(totalBudget||totalEst)}</div><div class="stat-label">${totalBudget?'Total Budget':'Est. Total'}</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:var(--warn);">₱${formatNum(totalAct)}</div><div class="stat-label">Actual Cost</div></div>
-    <div class="stat-card green"><div class="stat-num">₱${formatNum(totalPaid)}</div><div class="stat-label">Paid</div></div>
-    <div class="stat-card ${unpaid>0?'red':''}"><div class="stat-num">₱${formatNum(unpaid>0?unpaid:0)}</div><div class="stat-label">Unpaid</div></div>
-    <div class="stat-card ${budgetRemaining<0?'red':'blue'}"><div class="stat-num">₱${formatNum(Math.abs(totalBudget?budgetRemaining:(totalEst-totalAct)))}</div><div class="stat-label">${(totalBudget?budgetRemaining:(totalEst-totalAct))<0?'Over Budget':'Remaining'}</div></div>`;
+  // Update meter, summary cards
+  updateBudgetDisplay();
 
   // Table
   document.getElementById('budgetBody').innerHTML=filtered.length?filtered.map(b=>{
@@ -1037,28 +1062,56 @@ function loadGuests(){
 
 function renderGuestTable(guests){
   document.getElementById('guestCount').textContent=`(${guests.length})`;
-  document.getElementById('guestBody').innerHTML=guests.length?guests.map(g=>{
-    const sc='s-'+(g.invite_status||'pending');
-    return`<tr>
-      <td><strong>${esc(g.full_name)}</strong></td>
-      <td>${esc(g.group_label||'-')}</td>
-      <td style="font-size:0.78rem;">${esc(g.email||'-')}</td>
-      <td style="text-align:center;">${g.table_number||'-'}</td>
-      <td><code style="font-size:0.73rem;background:var(--cream);padding:2px 6px;border-radius:4px;">${esc(g.invite_code)}</code></td>
-      <td><span class="status ${sc}">${g.invite_status||'pending'}</span></td>
-      <td class="actions-cell">
-        <button class="btn btn-outline btn-sm" onclick="editGuest('${g.guest_id}')">Edit</button>
-        ${['expired','confirmed','declined'].includes(g.invite_status)?`<button class="btn btn-outline btn-sm" onclick="reopenInvite('${g.guest_id}')">Reopen</button>`:''}
-        ${g.email&&['pending','sent'].includes(g.invite_status||'pending')?`<button class="btn btn-outline btn-sm" onclick="sendInvite('${g.guest_id}')">Send</button>`:''}
-      </td>
-    </tr>`;
-  }).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">Walang guests pa.</td></tr>';
+
+  // Populate table filter dropdown
+  const tables=[...new Set(allGuests.map(g=>g.table_number).filter(Boolean))].sort((a,b)=>Number(a)-Number(b));
+  const tSel=document.getElementById('guestTableFilter');
+  if(tSel){const cv=tSel.value;tSel.innerHTML='<option value="all">All Tables</option>'+tables.map(t=>`<option value="${t}">Table ${t}</option>`).join('');tSel.value=cv;}
+
+  const groupByTable=document.getElementById('guestGroupByTable')?.checked;
+
+  if(groupByTable&&guests.length){
+    // Group by table
+    const groups={};
+    guests.forEach(g=>{const t=g.table_number||'Unassigned';if(!groups[t])groups[t]=[];groups[t].push(g);});
+    const sortedKeys=Object.keys(groups).sort((a,b)=>{if(a==='Unassigned')return 1;if(b==='Unassigned')return -1;return Number(a)-Number(b);});
+    let html='';
+    sortedKeys.forEach(tbl=>{
+      html+=`<tr><td colspan="7" style="background:var(--cream);font-weight:600;font-size:0.88rem;padding:10px 14px;color:var(--earth);">🪑 ${tbl==='Unassigned'?'Unassigned':('Table '+tbl)} <span style="font-weight:400;color:var(--text-muted);font-size:0.78rem;">(${groups[tbl].length} guests)</span></td></tr>`;
+      groups[tbl].forEach(g=>{html+=guestRowHtml(g);});
+    });
+    document.getElementById('guestBody').innerHTML=html;
+  }else{
+    document.getElementById('guestBody').innerHTML=guests.length?guests.map(g=>guestRowHtml(g)).join(''):'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-muted);">Walang guests pa.</td></tr>';
+  }
+}
+
+function guestRowHtml(g){
+  const sc='s-'+(g.invite_status||'pending');
+  return`<tr>
+    <td><strong>${esc(g.full_name)}</strong></td>
+    <td>${esc(g.group_label||'-')}</td>
+    <td style="font-size:0.78rem;">${esc(g.email||'-')}</td>
+    <td style="text-align:center;">${g.table_number||'-'}</td>
+    <td><code style="font-size:0.73rem;background:var(--cream);padding:2px 6px;border-radius:4px;">${esc(g.invite_code)}</code></td>
+    <td><span class="status ${sc}">${g.invite_status||'pending'}</span></td>
+    <td class="actions-cell">
+      <button class="btn btn-outline btn-sm" onclick="editGuest('${g.guest_id}')">Edit</button>
+      ${['expired','confirmed','declined'].includes(g.invite_status)?`<button class="btn btn-outline btn-sm" onclick="reopenInvite('${g.guest_id}')">Reopen</button>`:''}
+      ${g.email&&['pending','sent'].includes(g.invite_status||'pending')?`<button class="btn btn-outline btn-sm" onclick="sendInvite('${g.guest_id}')">Send</button>`:''}
+    </td>
+  </tr>`;
 }
 
 function filterGuests(){
   const q=(document.getElementById('guestSearch')?.value||'').toLowerCase();
-  if(!q)return renderGuestTable(allGuests);
-  renderGuestTable(allGuests.filter(g=>(g.full_name||'').toLowerCase().includes(q)||(g.email||'').toLowerCase().includes(q)||(g.group_label||'').toLowerCase().includes(q)||(g.invite_status||'').toLowerCase().includes(q)||(g.invite_code||'').toLowerCase().includes(q)));
+  const tableF=document.getElementById('guestTableFilter')?.value||'all';
+  const statusF=document.getElementById('guestStatusFilter')?.value||'all';
+  let filtered=allGuests;
+  if(q)filtered=filtered.filter(g=>(g.full_name||'').toLowerCase().includes(q)||(g.email||'').toLowerCase().includes(q)||(g.group_label||'').toLowerCase().includes(q)||(g.invite_code||'').toLowerCase().includes(q));
+  if(tableF!=='all')filtered=filtered.filter(g=>(g.table_number||'')==tableF);
+  if(statusF!=='all')filtered=filtered.filter(g=>(g.invite_status||'pending')===statusF);
+  renderGuestTable(filtered);
 }
 
 function editGuest(id){const g=allGuests.find(x=>x.guest_id===id);if(g){editId=id;openModal('guest',g);}}
@@ -1128,8 +1181,10 @@ function openModal(type,data){
     html=`
       <div class="form-group"><label>Task *</label><input type="text" id="f_text" value="${esc(d.text||'')}" placeholder="e.g. Book photographer"></div>
       <div class="form-row">
-        <div class="form-group"><label>Category</label><input type="text" id="f_category" value="${esc(d.category||'')}" placeholder="e.g. Venue, Attire" list="taskCats">
-          <datalist id="taskCats"><option value="Venue"><option value="Attire"><option value="Catering"><option value="Photo/Video"><option value="Flowers"><option value="Invitations"><option value="Entertainment"><option value="Transportation"><option value="Legal"><option value="Ceremony"><option value="Reception"><option value="Honeymoon"></datalist></div>
+        <div class="form-group"><label>Category</label><select id="f_category">
+          <option value="">— Select Category —</option>
+          ${['Venue','Attire','Catering','Photo/Video','Flowers & Decor','Invitations','Entertainment','Transportation','Legal','Ceremony','Reception','Hair & Makeup','Rings','Coordinator','Honeymoon','Miscellaneous'].map(c=>`<option value="${c}" ${d.category===c?'selected':''}>${c}</option>`).join('')}
+        </select></div>
         <div class="form-group"><label>Due Date</label><input type="date" id="f_due" value="${d.due||''}"></div>
       </div>
       <div class="form-group"><label>Notes</label><textarea id="f_notes" rows="2" placeholder="Optional notes...">${esc(d.notes||'')}</textarea></div>`;
