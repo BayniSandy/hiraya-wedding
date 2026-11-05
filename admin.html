@@ -730,6 +730,7 @@ table.dt tr:hover td{background:var(--cream);}
             <input type="number" id="seatingPerTable" min="4" max="20" value="10" onchange="renderSeating()" style="padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'Jost',sans-serif;width:100%;">
           </div>
           <button class="btn btn-gold" onclick="renderSeating()" style="margin-top:auto;">🔄 Refresh</button>
+          <button class="btn btn-outline" onclick="clearAllTableCats()" style="margin-top:auto;font-size:0.78rem;">🗑️ Clear All Categories</button>
         </div>
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:0.72rem;">
           <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:50%;background:var(--success-bg);border:2px solid var(--success);display:inline-block;"></span> Complete</span>
@@ -1875,6 +1876,10 @@ function saveTableSettings(){
 }
 function getTableCats(t){const s=getTableSettings();return(s.cats&&s.cats[t])||[];}
 function setTableCats(t,cats){const s=getTableSettings();if(!s.cats)s.cats={};s.cats[t]=cats;localStorage.setItem('hiraya_portal_tableSettings',JSON.stringify(s));}
+function clearAllTableCats(){
+  const s=getTableSettings();s.cats={};localStorage.setItem('hiraya_portal_tableSettings',JSON.stringify(s));
+  renderSeating();toast('All table categories cleared!','success');
+}
 function seatingToggleCat(tableNum,cat){
   let cats=getTableCats(tableNum);
   if(cats.includes(cat))cats=cats.filter(c=>c!==cat);
