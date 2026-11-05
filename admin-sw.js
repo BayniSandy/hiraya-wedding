@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hiraya-portal-v6';
+const CACHE_NAME = 'hiraya-portal-v7';
 const ASSETS = [
   './logo-rd-web.png',
   'https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap'

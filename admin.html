@@ -323,7 +323,12 @@ table.dt tr:hover td{background:var(--cream);}
 .mood-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
 .mood-card{background:var(--card);border-radius:12px;overflow:hidden;border:1.5px solid var(--border);transition:transform 0.2s;}
 .mood-card:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(92,74,61,0.1);}
-.mood-card img{width:100%;height:160px;object-fit:cover;display:block;}
+.mood-card img{width:100%;height:160px;object-fit:cover;display:block;cursor:pointer;}
+.lightbox-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:10000;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.25s;pointer-events:none;}
+.lightbox-overlay.active{opacity:1;pointer-events:auto;}
+.lightbox-overlay img{max-width:92vw;max-height:88vh;border-radius:10px;object-fit:contain;box-shadow:0 8px 40px rgba(0,0,0,0.4);}
+.lightbox-close{position:absolute;top:16px;right:20px;color:#fff;font-size:2rem;cursor:pointer;background:rgba(0,0,0,0.4);border:none;border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;line-height:1;}
+.lightbox-title{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#fff;font-size:0.95rem;font-family:'Jost',sans-serif;background:rgba(0,0,0,0.5);padding:6px 18px;border-radius:20px;max-width:80vw;text-align:center;}
 .mood-card .mc-body{padding:10px 12px;}
 .mood-card .mc-title{font-weight:600;font-size:0.85rem;}
 .mood-card .mc-cat{font-size:0.72rem;color:var(--gold);margin-top:2px;}
@@ -2494,7 +2499,7 @@ function renderMoodBoard(){
   if(!filtered.length){document.getElementById('moodGrid').innerHTML='<div class="card" style="text-align:center;color:var(--text-muted);padding:32px;grid-column:1/-1;">Walang inspirations pa. Click "+ Add Inspiration" para mag-add!</div>';return;}
   document.getElementById('moodGrid').innerHTML=filtered.map(m=>
     `<div class="mood-card">
-      ${m.image_url?`<img src="${esc(m.image_url)}" alt="${esc(m.title)}" onerror="this.style.display='none'">`:'<div style="height:100px;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:2rem;">🎨</div>'}
+      ${m.image_url?`<img src="${esc(m.image_url)}" alt="${esc(m.title)}" onerror="this.style.display='none'" onclick="openLightbox(this.src,'${esc(m.title||'')}')">`:'<div style="height:100px;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:2rem;">🎨</div>'}
       <div class="mc-body">
         <div class="mc-title">${esc(m.title||'Untitled')}</div>
         <div class="mc-cat">${esc(m.category||'Other')}</div>
@@ -2844,8 +2849,22 @@ document.getElementById('modal').addEventListener('click',function(e){if(e.targe
 // Close confirm on backdrop click
 document.getElementById('confirmOverlay').addEventListener('click',function(e){if(e.target===this)resolveConfirm(false);});
 
+// ============ LIGHTBOX ============
+function openLightbox(src,title){
+  const lb=document.getElementById('lightboxOverlay');
+  lb.querySelector('img').src=src;
+  lb.querySelector('.lightbox-title').textContent=title||'';
+  lb.classList.add('active');
+}
+function closeLightbox(){document.getElementById('lightboxOverlay').classList.remove('active');}
+
 // ============ SERVICE WORKER ============
 if('serviceWorker' in navigator){navigator.serviceWorker.register('admin-sw.js').catch(()=>{});}
 </script>
+<div class="lightbox-overlay" id="lightboxOverlay" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">×</button>
+  <img src="" alt="Preview">
+  <div class="lightbox-title"></div>
+</div>
 </body>
 </html>
