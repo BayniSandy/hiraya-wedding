@@ -950,7 +950,7 @@ const ENTOURAGE_ROLES=['Principal Sponsors (Ninong)','Principal Sponsors (Ninang
 // ============ LOCAL DATA (localStorage) ============
 const LS_KEY='hiraya_portal_';
 function lsGet(key){try{return JSON.parse(localStorage.getItem(LS_KEY+key))||[];}catch(e){return[];}}
-function lsSet(key,data){try{localStorage.setItem(LS_KEY+key,JSON.stringify(data));}catch(e){}}
+function lsSet(key,data){try{localStorage.setItem(LS_KEY+key,JSON.stringify(data));}catch(e){toast('Storage full! Try deleting old items.','error');}}
 function genId(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
 
 // ============ CONFIRM OVERLAY (replaces native confirm) ============
@@ -2519,10 +2519,23 @@ function handleMoodPhoto(input){
   if(file.size>10*1024*1024){toast('Max 10MB lang ang photo!','error');input.value='';return;}
   const reader=new FileReader();
   reader.onload=function(e){
-    document.getElementById('f_image_url').value=e.target.result;
-    const prev=document.getElementById('f_photo_preview');
-    prev.style.display='block';
-    prev.innerHTML=`<img src="${e.target.result}" style="max-width:100%;max-height:160px;border-radius:8px;object-fit:cover;">`;
+    const img=new Image();
+    img.onload=function(){
+      const MAX_W=1200,MAX_H=1200;
+      let w=img.width,h=img.height;
+      if(w>MAX_W){h=Math.round(h*(MAX_W/w));w=MAX_W;}
+      if(h>MAX_H){w=Math.round(w*(MAX_H/h));h=MAX_H;}
+      const canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,w,h);
+      const compressed=canvas.toDataURL('image/jpeg',0.7);
+      document.getElementById('f_image_url').value=compressed;
+      const prev=document.getElementById('f_photo_preview');
+      prev.style.display='block';
+      prev.innerHTML=`<img src="${compressed}" style="max-width:100%;max-height:160px;border-radius:8px;object-fit:cover;">`;
+    };
+    img.src=e.target.result;
   };
   reader.readAsDataURL(file);
 }
