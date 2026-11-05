@@ -443,6 +443,11 @@ table.dt tr:hover td{background:var(--cream);}
 
       <div class="stats-row" id="overviewStats"></div>
 
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header"><h3>💐🤵 Bride & Groom Side Breakdown</h3></div>
+        <div id="sideBreakdown" style="padding:4px 0;"></div>
+      </div>
+
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         <div class="card">
           <div class="card-header"><h3>RSVP Progress</h3></div>
@@ -1117,17 +1122,69 @@ function renderOverview(){
   const tasks=lsGet('checklist');
   const doneTasks=tasks.filter(t=>t.done).length;
 
+  // Per-side breakdown
+  const brideGuests=guests.filter(g=>g.side==='Bride');
+  const groomGuests=guests.filter(g=>g.side==='Groom');
+  const brideConf=brideGuests.filter(g=>g.invite_status==='confirmed'||g.invite_status==='proxy').length;
+  const groomConf=groomGuests.filter(g=>g.invite_status==='confirmed'||g.invite_status==='proxy').length;
+  const bridePend=brideGuests.filter(g=>!g.invite_status||g.invite_status==='pending'||g.invite_status==='sent').length;
+  const groomPend=groomGuests.filter(g=>!g.invite_status||g.invite_status==='pending'||g.invite_status==='sent').length;
+  const brideDec=brideGuests.filter(g=>g.invite_status==='declined').length;
+  const groomDec=groomGuests.filter(g=>g.invite_status==='declined').length;
   const memorialCount=guests.filter(g=>g.is_memorial==='TRUE').length;
-  const livingCount=guests.length-memorialCount;
+
   document.getElementById('overviewStats').innerHTML=`
-    <div class="stat-card"><div class="stat-num">${livingCount}</div><div class="stat-label">Living Guests</div></div>
-    ${memorialCount?`<div class="stat-card" style="border-left:3px solid #9e9e9e;"><div class="stat-num">🕊️ ${memorialCount}</div><div class="stat-label">Memorial Seats</div></div>`:''}
-    <div class="stat-card green"><div class="stat-num">${confirmed+proxy}</div><div class="stat-label">Attending</div></div>
+    <div class="stat-card"><div class="stat-num">${guests.length}</div><div class="stat-label">Total Guests</div></div>
+    <div class="stat-card green"><div class="stat-num">${confirmed+proxy}</div><div class="stat-label">Confirmed</div></div>
+    <div class="stat-card gold"><div class="stat-num">${pending}</div><div class="stat-label">Pending</div></div>
     <div class="stat-card red"><div class="stat-num">${declined}</div><div class="stat-label">Declined</div></div>
-    <div class="stat-card gold"><div class="stat-num">${pending}</div><div class="stat-label">Awaiting</div></div>
-    <div class="stat-card blue"><div class="stat-num">${tasks.length?Math.round(doneTasks/tasks.length*100):0}%</div><div class="stat-label">Tasks Done</div></div>
+    <div class="stat-card blue"><div class="stat-num">${proxy}</div><div class="stat-label">Proxy</div></div>
+    <div class="stat-card"><div class="stat-num">${tasks.length?Math.round(doneTasks/tasks.length*100):0}%</div><div class="stat-label">Tasks Done</div></div>
     <div class="stat-card"><div class="stat-num">₱${formatNum(totalSpent)}</div><div class="stat-label">Total Spent</div></div>
     <div class="stat-card green"><div class="stat-num">${lsGet('documents').filter(d=>d.status==='done').length}/${lsGet('documents').length}</div><div class="stat-label">Docs Secured</div></div>`;
+
+  // Bride vs Groom side breakdown card
+  const sideEl=document.getElementById('sideBreakdown');
+  if(sideEl) sideEl.innerHTML=`
+    <table style="width:100%;font-size:0.82rem;border-collapse:collapse;">
+      <thead><tr style="border-bottom:2px solid var(--border);text-align:left;">
+        <th style="padding:8px 6px;color:var(--text-muted);font-weight:500;"></th>
+        <th style="padding:8px 6px;color:#d4749a;font-weight:600;">💐 Bride Side</th>
+        <th style="padding:8px 6px;color:#5b86c4;font-weight:600;">🤵 Groom Side</th>
+        <th style="padding:8px 6px;color:var(--earth);font-weight:600;">Total</th>
+      </tr></thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:7px 6px;font-weight:500;">Total Guests</td>
+          <td style="padding:7px 6px;">${brideGuests.length}</td>
+          <td style="padding:7px 6px;">${groomGuests.length}</td>
+          <td style="padding:7px 6px;font-weight:600;">${guests.length}</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);background:var(--success-bg);">
+          <td style="padding:7px 6px;font-weight:500;">✅ Confirmed</td>
+          <td style="padding:7px 6px;">${brideConf}</td>
+          <td style="padding:7px 6px;">${groomConf}</td>
+          <td style="padding:7px 6px;font-weight:600;">${confirmed+proxy}</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:7px 6px;font-weight:500;">⏳ Pending</td>
+          <td style="padding:7px 6px;">${bridePend}</td>
+          <td style="padding:7px 6px;">${groomPend}</td>
+          <td style="padding:7px 6px;font-weight:600;">${pending}</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);background:var(--danger-bg);">
+          <td style="padding:7px 6px;font-weight:500;">❌ Declined</td>
+          <td style="padding:7px 6px;">${brideDec}</td>
+          <td style="padding:7px 6px;">${groomDec}</td>
+          <td style="padding:7px 6px;font-weight:600;">${declined}</td>
+        </tr>
+        ${memorialCount?`<tr style="background:#f5f5f5;">
+          <td style="padding:7px 6px;font-weight:500;">🕊️ Memorial Seats</td>
+          <td colspan="2" style="padding:7px 6px;"></td>
+          <td style="padding:7px 6px;font-weight:600;">${memorialCount}</td>
+        </tr>`:''}
+      </tbody>
+    </table>`;
 
   // RSVP donut
   drawDonut('rsvpChart',[
