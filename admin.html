@@ -1866,7 +1866,7 @@ async function reopenInvite(id){if(!await showConfirm('I-reopen ang invite code 
 async function sendInvite(id){if(!await showConfirm('I-send ang invitation email?','💌'))return;apiPost('admin_send_invite',{guest_id:id,base_url:SITE_URL}).then(d=>{if(d.status===200){toast(d.message,'success');loadGuests();}else toast(d.error||'Error','error');});}
 
 // ============ TABLES ============
-const TABLE_CATEGORIES=['Bride Relatives','Groom Relatives','Bride Friends','Groom Friends','Pinsan','Tito/Tita','Ninong/Ninang','Parents & Grandparents','Officemates','Churchmates','VIP','Mixed'];
+const TABLE_CATEGORIES=['Parents','Grandparents','Siblings','Pinsan','Tito','Tita','Ninong','Ninang','Bride Friends','Groom Friends','Bride Relatives','Groom Relatives','Officemates','Churchmates','Neighbors','Classmates','VIP','Kids','Mixed'];
 function getTableSettings(){try{return JSON.parse(localStorage.getItem('hiraya_portal_tableSettings')||'{}');}catch(e){return {};}}
 function saveTableSettings(){
   const s=getTableSettings();
@@ -1875,9 +1875,11 @@ function saveTableSettings(){
 }
 function getTableCats(t){const s=getTableSettings();return(s.cats&&s.cats[t])||[];}
 function setTableCats(t,cats){const s=getTableSettings();if(!s.cats)s.cats={};s.cats[t]=cats;localStorage.setItem('hiraya_portal_tableSettings',JSON.stringify(s));}
-function seatingSetCat(tableNum,cat){
-  if(cat)setTableCats(tableNum,[cat]);
-  else setTableCats(tableNum,[]);
+function seatingToggleCat(tableNum,cat){
+  let cats=getTableCats(tableNum);
+  if(cats.includes(cat))cats=cats.filter(c=>c!==cat);
+  else cats.push(cat);
+  setTableCats(tableNum,cats);
   renderSeating();
 }
 function toggleTableCat(tableNum,cat){
@@ -1989,20 +1991,17 @@ function renderSeating(){
       slots.push(`<span class="${cls}" title="${esc(g.full_name)}${isMemorial?' (Memorial)':''}" style="${isMemorial?'opacity:0.6;font-style:italic;':''}">${esc(g.full_name?.split(' ')[0]||'?')}${badge}</span>`);
     });
     for(let e=count;e<perTable;e++) slots.push('<span class="seat empty">—</span>');
-    // Category for this table
+    // Category tags for this table (multi-select)
     const cats=getTableCats(t);
     const selectedCatsLabel=cats.length?cats.join(', '):'';
-    const catDropdown=`<select onchange="seatingSetCat('${t}',this.value)" style="font-size:0.7rem;padding:3px 6px;border:1px solid var(--border);border-radius:6px;font-family:Jost,sans-serif;color:var(--earth);background:var(--cream);margin-top:6px;width:100%;max-width:180px;">
-      <option value="">— Assign category —</option>
-      ${TABLE_CATEGORIES.map(c=>`<option value="${c}"${cats.includes(c)?' selected':''}>${c}</option>`).join('')}
-    </select>`;
+    const catTags=`<div style="display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin-top:8px;">${TABLE_CATEGORIES.map(c=>`<button onclick="seatingToggleCat('${t}','${c}')" style="font-size:0.6rem;padding:2px 7px;border-radius:10px;border:1px solid ${cats.includes(c)?'var(--gold)':'var(--border)'};background:${cats.includes(c)?'var(--gold)':'transparent'};color:${cats.includes(c)?'#fff':'var(--text-muted)'};cursor:pointer;font-family:Jost,sans-serif;">${c}</button>`).join('')}</div>`;
     html+=`<div class="table-circle ${statusCls}">
       <div class="table-num">Table ${t}</div>
       ${selectedCatsLabel?`<div style="font-size:0.68rem;color:var(--gold);font-weight:600;margin-bottom:2px;">📋 ${esc(selectedCatsLabel)}</div>`:''}
       ${statusLabel?`<span class="table-status-badge ${statusBadgeCls}">${statusLabel}</span>`:''}
       <div class="table-count">${count}/${perTable} seated</div>
       <div class="table-seats">${slots.join('')}</div>
-      ${catDropdown}
+      ${catTags}
     </div>`;
   }
   document.getElementById('seatingChart').innerHTML=html;
