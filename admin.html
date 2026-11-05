@@ -186,21 +186,44 @@ table.dt tr:hover td{background:var(--cream);}
 .progress-ring{width:100px;height:100px;margin:0 auto;}
 
 /* RESPONSIVE */
-@media(max-width:768px){
-  .sidebar{width:60px;padding:10px 0;}
-  .sidebar-logo h2,.sidebar-logo span,.nav-item span,.nav-section,.sidebar-footer{display:none;}
-  .sidebar-logo{padding:8px 0 12px;}
-  .sidebar-logo img{width:36px;}
-  .nav-item{padding:12px 0;justify-content:center;border-left:none;border-right:3px solid transparent;}
-  .nav-item.active{border-right-color:var(--gold);border-left-color:transparent;}
-  .nav-item .icon{font-size:1.3rem;}
-  .content{margin-left:60px;padding:16px;}
+/* Hamburger button */
+.hamburger{display:none;position:fixed;top:12px;left:12px;z-index:1002;background:var(--earth);color:#fff;border:none;border-radius:10px;width:40px;height:40px;font-size:1.3rem;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.15);align-items:center;justify-content:center;}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:999;}
+.sidebar-overlay.show{display:block;}
+/* Refresh button in header */
+.refresh-btn{position:fixed;top:12px;right:12px;z-index:1001;background:var(--card);border:1.5px solid var(--border);border-radius:10px;width:40px;height:40px;font-size:1.1rem;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);display:flex;align-items:center;justify-content:center;}
+.refresh-btn:active{transform:scale(0.92);}
+.refresh-btn.spinning{animation:spin 0.6s ease;}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+
+@media(max-width:1024px){
+  .hamburger{display:flex;}
+  .sidebar{position:fixed;left:-260px;z-index:1000;transition:left 0.3s ease;box-shadow:4px 0 20px rgba(0,0,0,0.15);}
+  .sidebar.open{left:0;}
+  .content{margin-left:0;padding:16px;padding-top:60px;}
   .stats-row{grid-template-columns:repeat(2,1fr);}
   .form-row{grid-template-columns:1fr;}
   .countdown-nums{gap:12px;}
   .countdown-unit .num{font-size:1.4rem;}
   .modal{padding:24px 16px;}
   .seating-grid{grid-template-columns:repeat(2,1fr);}
+  .page-title{font-size:1.3rem;}
+  table.dt th,table.dt td{padding:8px 6px;font-size:0.72rem;}
+  .actions-cell{white-space:nowrap;}
+  .actions-cell .btn{padding:4px 8px;font-size:0.68rem;}
+  .search-bar{flex-wrap:wrap;gap:8px;}
+  .search-bar input,.search-bar select{min-width:0;flex:1 1 140px;}
+  .card{padding:14px;}
+  .card-header{flex-wrap:wrap;gap:8px;}
+}
+@media(max-width:480px){
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .stat-num{font-size:1.3rem;}
+  .stat-label{font-size:0.6rem;}
+  .stat-card{padding:12px 8px;}
+  .countdown-unit .num{font-size:1.1rem;}
+  .content{padding:10px;padding-top:56px;}
+  .page-title{font-size:1.1rem;}
 }
 
 /* SEATING CHART */
@@ -343,8 +366,11 @@ table.dt tr:hover td{background:var(--cream);}
 
 <!-- APP -->
 <div class="app" id="app">
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()">☰</button>
+  <button class="refresh-btn" id="refreshBtn" onclick="refreshPortal()" title="Refresh data">🔄</button>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebarEl">
     <div class="sidebar-logo">
       <img src="logo-rd-web.png" alt="R&D">
       <h2>Hiraya</h2>
@@ -635,6 +661,22 @@ table.dt tr:hover td{background:var(--cream);}
     <div class="page" id="pg-tables">
       <h1 class="page-title">Table Assignments</h1>
       <p class="page-sub">I-assign ang bawat guest sa kanilang table</p>
+      <div class="card" style="margin-bottom:12px;">
+        <div class="card-header">
+          <h3>⚙️ Table Settings</h3>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+          <div class="form-group" style="margin:0;flex:0 0 auto;">
+            <label style="font-size:0.75rem;">Max per Table</label>
+            <input type="number" id="tableCapacity" value="10" min="1" max="30" style="width:70px;padding:6px;border:1px solid var(--border);border-radius:8px;text-align:center;" onchange="saveTableSettings();renderTables(allGuests)">
+          </div>
+          <div style="font-size:0.75rem;color:var(--text-muted);display:flex;gap:12px;flex-wrap:wrap;">
+            <span>🟢 Sakto / May space pa</span>
+            <span>🔴 Over capacity</span>
+            <span>🕊️ May memorial seat</span>
+          </div>
+        </div>
+      </div>
       <div class="card">
         <div id="tableView"><div class="loading"><div class="spinner"></div>Loading...</div></div>
       </div>
@@ -958,14 +1000,39 @@ function apiPost(action,payload){payload.action=action;payload.admin_key=adminKe
 function navigate(page){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===page));
   document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id==='pg-'+page));
+  closeSidebar();
   // Lazy-render for guest-dependent and aggregated views
   if(page==='analytics')renderAnalytics();
   if(page==='companions')renderCompanions();
   if(page==='reminders')renderReminders();
 }
+// Sidebar toggle for mobile
+function toggleSidebar(){
+  const sb=document.getElementById('sidebarEl');
+  const ov=document.getElementById('sidebarOverlay');
+  sb.classList.toggle('open');
+  ov.classList.toggle('show',sb.classList.contains('open'));
+}
+function closeSidebar(){
+  const sb=document.getElementById('sidebarEl');
+  const ov=document.getElementById('sidebarOverlay');
+  if(sb)sb.classList.remove('open');
+  if(ov)ov.classList.remove('show');
+}
+// Refresh without re-login
+function refreshPortal(){
+  const btn=document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  loadAll();
+  setTimeout(()=>{btn.classList.remove('spinning');toast('Portal refreshed!','success');},800);
+}
 
 // ============ LOAD ALL ============
 function loadAll(){
+  // Restore table settings
+  const ts=getTableSettings();
+  const capEl=document.getElementById('tableCapacity');
+  if(capEl&&ts.capacity)capEl.value=ts.capacity;
   updateCountdown();
   loadGuests();
   renderChecklist();
@@ -1688,24 +1755,64 @@ async function reopenInvite(id){if(!await showConfirm('I-reopen ang invite code 
 async function sendInvite(id){if(!await showConfirm('I-send ang invitation email?','💌'))return;apiPost('admin_send_invite',{guest_id:id,base_url:SITE_URL}).then(d=>{if(d.status===200){toast(d.message,'success');loadGuests();}else toast(d.error||'Error','error');});}
 
 // ============ TABLES ============
+const TABLE_CATEGORIES=['Bride Relatives','Groom Relatives','Bride Friends','Groom Friends','Pinsan','Tito/Tita','Ninong/Ninang','Parents & Grandparents','Officemates','Churchmates','VIP','Mixed'];
+function getTableSettings(){try{return JSON.parse(localStorage.getItem('hiraya_portal_tableSettings')||'{}');}catch(e){return {};}}
+function saveTableSettings(){
+  const s=getTableSettings();
+  s.capacity=parseInt(document.getElementById('tableCapacity')?.value)||10;
+  localStorage.setItem('hiraya_portal_tableSettings',JSON.stringify(s));
+}
+function getTableCats(t){const s=getTableSettings();return(s.cats&&s.cats[t])||[];}
+function setTableCats(t,cats){const s=getTableSettings();if(!s.cats)s.cats={};s.cats[t]=cats;localStorage.setItem('hiraya_portal_tableSettings',JSON.stringify(s));}
+function toggleTableCat(tableNum,cat){
+  let cats=getTableCats(tableNum);
+  if(cats.includes(cat))cats=cats.filter(c=>c!==cat);
+  else cats.push(cat);
+  setTableCats(tableNum,cats);
+  renderTables(allGuests);
+}
 function renderTables(guests){
+  const capacity=parseInt(document.getElementById('tableCapacity')?.value)||10;
   const byTable={};
   guests.forEach(g=>{const t=g.table_number||'Unassigned';if(!byTable[t])byTable[t]=[];byTable[t].push(g);});
   const tables=Object.keys(byTable).sort((a,b)=>{if(a==='Unassigned')return 1;if(b==='Unassigned')return -1;return Number(a)-Number(b);});
   document.getElementById('tableView').innerHTML=tables.map(t=>{
-    const members=byTable[t];const conf=members.filter(m=>['confirmed','proxy'].includes(m.invite_status)).length;
-    return`<div style="background:var(--cream);border-radius:10px;padding:16px;margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+    const members=byTable[t];
+    const conf=members.filter(m=>['confirmed','proxy'].includes(m.invite_status)).length;
+    const memorials=members.filter(m=>m.is_memorial==='TRUE').length;
+    const isOver=t!=='Unassigned'&&members.length>capacity;
+    const isFull=t!=='Unassigned'&&members.length===capacity;
+    const borderColor=isOver?'var(--danger)':isFull?'var(--success)':'var(--border)';
+    const bgColor=isOver?'var(--danger-bg)':isFull?'var(--success-bg)':'var(--cream)';
+    const cats=getTableCats(t);
+    const catHtml=t!=='Unassigned'?`
+      <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:4px;">Table Category (multi-select):</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;">
+          ${TABLE_CATEGORIES.map(c=>`<button onclick="toggleTableCat('${t}','${c}')" style="font-size:0.65rem;padding:2px 8px;border-radius:12px;border:1px solid ${cats.includes(c)?'var(--gold)':'var(--border)'};background:${cats.includes(c)?'var(--gold)':'transparent'};color:${cats.includes(c)?'#fff':'var(--text-muted)'};cursor:pointer;font-family:Jost,sans-serif;">${c}</button>`).join('')}
+        </div>
+      </div>`:'';
+    return`<div style="background:${bgColor};border-radius:10px;padding:16px;margin-bottom:12px;border:1.5px solid ${borderColor};">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
         <strong style="color:var(--earth);">${t==='Unassigned'?'📋 Unassigned':'🪑 Table '+t}</strong>
-        <span style="font-size:0.8rem;color:var(--text-muted);">${conf}/${members.length} confirmed</span>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          ${memorials?`<span style="font-size:0.72rem;">🕊️ ${memorials} memorial</span>`:''}
+          <span style="font-size:0.8rem;font-weight:600;color:${isOver?'var(--danger)':isFull?'var(--success)':'var(--text-muted)'};">${members.length}${t!=='Unassigned'?'/'+capacity:''} ${isOver?'⚠️ OVER':''}${isFull?'✓ FULL':''}</span>
+          <span style="font-size:0.72rem;color:var(--text-muted);">${conf} confirmed</span>
+        </div>
       </div>
-      ${members.map(m=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);">
-        <span style="font-size:0.85rem;">${esc(m.full_name)}</span>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span class="status s-${m.invite_status||'pending'}" style="font-size:0.68rem;">${m.invite_status||'pending'}</span>
+      ${cats.length?`<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px;">${cats.map(c=>`<span style="font-size:0.62rem;background:var(--gold);color:#fff;padding:1px 7px;border-radius:10px;">${c}</span>`).join('')}</div>`:''}
+      ${members.map(m=>{
+        const mem=m.is_memorial==='TRUE';
+        return`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);${mem?'opacity:0.6;':''}">
+        <span style="font-size:0.85rem;">${esc(m.full_name)}${mem?' 🕊️':''}${m.side?` <span style="font-size:0.65rem;color:var(--text-muted);">(${m.side})</span>`:''}</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          ${m.relation?`<span style="font-size:0.68rem;color:var(--text-muted);">${esc(m.relation)}</span>`:''}
+          <span class="status s-${m.invite_status||'pending'}" style="font-size:0.68rem;">${mem?'🕊️':m.invite_status||'pending'}</span>
           <input type="number" value="${m.table_number||''}" min="1" style="width:50px;padding:4px;border:1px solid var(--border);border-radius:6px;font-size:0.8rem;text-align:center;" onchange="assignTable('${m.guest_id}',this.value)">
         </div>
-      </div>`).join('')}
+      </div>`}).join('')}
+      ${catHtml}
     </div>`;
   }).join('');
 }
