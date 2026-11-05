@@ -2516,7 +2516,7 @@ function filterMoodBoard(cat,btn){
 function editMoodItem(id){const items=lsGet('moodboard');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('moodboard',i);}}
 function handleMoodPhoto(input){
   const file=input.files[0];if(!file)return;
-  if(file.size>2*1024*1024){toast('Max 2MB lang ang photo!','error');input.value='';return;}
+  if(file.size>10*1024*1024){toast('Max 10MB lang ang photo!','error');input.value='';return;}
   const reader=new FileReader();
   reader.onload=function(e){
     document.getElementById('f_image_url').value=e.target.result;
