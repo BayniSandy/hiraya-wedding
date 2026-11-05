@@ -1581,8 +1581,14 @@ function renderTimeline(){
   const el=document.getElementById('timelineBody');
   if(!sorted.length){el.innerHTML='<p style="text-align:center;padding:30px;color:var(--text-muted);">Walang program events pa. Use Quick Add below or click "+ Add Event"!</p>';return;}
   el.innerHTML=sorted.map((t,i)=>
-    `<div class="tl-item" draggable="true" data-id="${t.id}" ondragstart="tlDragStart(event)" ondragover="tlDragOver(event)" ondrop="tlDrop(event)" ondragend="tlDragEnd(event)">
-      <div class="tl-time"><span class="rs-drag-handle" title="Drag to reorder">⠿</span><div class="time">${esc(t.time||'TBD')}</div><div class="dur">${esc(t.duration||'')}</div></div>
+    `<div class="tl-item" data-id="${t.id}">
+      <div class="tl-time">
+        <div style="display:flex;flex-direction:column;gap:2px;margin-right:4px;">
+          ${i>0?`<button onclick="tlMoveUp('${t.id}')" style="background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:0.7rem;padding:1px 5px;color:var(--earth);" title="Move up">▲</button>`:'<span style="width:24px;"></span>'}
+          ${i<sorted.length-1?`<button onclick="tlMoveDown('${t.id}')" style="background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:0.7rem;padding:1px 5px;color:var(--earth);" title="Move down">▼</button>`:'<span style="width:24px;"></span>'}
+        </div>
+        <div class="time">${esc(t.time||'TBD')}</div><div class="dur">${esc(t.duration||'')}</div>
+      </div>
       <div class="tl-dot"></div>
       <div class="tl-body"><h4>${esc(t.event)}</h4><p>${esc(t.details||'')}</p>
         <div style="margin-top:6px;"><button class="btn btn-outline btn-sm" onclick="editTimelineItem('${t.id}')">Edit</button> <button class="btn btn-outline btn-sm" onclick="deleteItem('timeline','${t.id}')">×</button></div>
@@ -1590,25 +1596,23 @@ function renderTimeline(){
     </div>`
   ).join('');
 }
-// Drag-to-reorder for program
-let tlDragId=null;
-function tlDragStart(e){tlDragId=e.currentTarget.dataset.id;e.currentTarget.style.opacity='0.4';e.dataTransfer.effectAllowed='move';}
-function tlDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';e.currentTarget.style.borderTop='2px solid var(--gold)';}
-function tlDrop(e){
-  e.preventDefault();e.currentTarget.style.borderTop='';
-  const targetId=e.currentTarget.dataset.id;
-  if(!tlDragId||tlDragId===targetId)return;
+// Move up/down for program events (works on mobile too)
+function tlMoveUp(id){
   const items=lsGet('timeline');
-  const dragIdx=items.findIndex(x=>x.id===tlDragId);const targetIdx=items.findIndex(x=>x.id===targetId);
-  if(dragIdx<0||targetIdx<0)return;
-  const dragItem=items.splice(dragIdx,1)[0];
-  const newIdx=targetIdx>dragIdx?targetIdx:targetIdx;
-  items.splice(newIdx,0,dragItem);
-  // Mark all items with manual order so renderTimeline preserves this order
+  const idx=items.findIndex(x=>x.id===id);
+  if(idx<=0)return;
+  [items[idx-1],items[idx]]=[items[idx],items[idx-1]];
   items.forEach((item,i)=>item.manualOrder=i);
-  lsSet('timeline',items);renderTimeline();toast('Event reordered!','success');
+  lsSet('timeline',items);renderTimeline();
 }
-function tlDragEnd(e){e.currentTarget.style.opacity='1';document.querySelectorAll('.tl-item').forEach(el=>el.style.borderTop='');}
+function tlMoveDown(id){
+  const items=lsGet('timeline');
+  const idx=items.findIndex(x=>x.id===id);
+  if(idx<0||idx>=items.length-1)return;
+  [items[idx],items[idx+1]]=[items[idx+1],items[idx]];
+  items.forEach((item,i)=>item.manualOrder=i);
+  lsSet('timeline',items);renderTimeline();
+}
 
 function editTimelineItem(id){const items=lsGet('timeline');const i=items.find(x=>x.id===id);if(i){editId=id;openModal('program',i);}}
 
