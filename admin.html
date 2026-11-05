@@ -1818,6 +1818,11 @@ function saveTableSettings(){
 }
 function getTableCats(t){const s=getTableSettings();return(s.cats&&s.cats[t])||[];}
 function setTableCats(t,cats){const s=getTableSettings();if(!s.cats)s.cats={};s.cats[t]=cats;localStorage.setItem('hiraya_portal_tableSettings',JSON.stringify(s));}
+function seatingSetCat(tableNum,cat){
+  if(cat)setTableCats(tableNum,[cat]);
+  else setTableCats(tableNum,[]);
+  renderSeating();
+}
 function toggleTableCat(tableNum,cat){
   let cats=getTableCats(tableNum);
   if(cats.includes(cat))cats=cats.filter(c=>c!==cat);
@@ -1927,15 +1932,20 @@ function renderSeating(){
       slots.push(`<span class="${cls}" title="${esc(g.full_name)}${isMemorial?' (Memorial)':''}" style="${isMemorial?'opacity:0.6;font-style:italic;':''}">${esc(g.full_name?.split(' ')[0]||'?')}${badge}</span>`);
     });
     for(let e=count;e<perTable;e++) slots.push('<span class="seat empty">—</span>');
-    // Category tags for this table
+    // Category for this table
     const cats=getTableCats(t);
-    const catHtml=`<div class="table-cats-row">${TABLE_CATEGORIES.map(c=>`<button class="cat-tag${cats.includes(c)?' active':''}" onclick="toggleTableCat('${t}','${c}');renderSeating();">${c}</button>`).join('')}</div>`;
+    const selectedCatsLabel=cats.length?cats.join(', '):'';
+    const catDropdown=`<select onchange="seatingSetCat('${t}',this.value)" style="font-size:0.7rem;padding:3px 6px;border:1px solid var(--border);border-radius:6px;font-family:Jost,sans-serif;color:var(--earth);background:var(--cream);margin-top:6px;width:100%;max-width:180px;">
+      <option value="">— Assign category —</option>
+      ${TABLE_CATEGORIES.map(c=>`<option value="${c}"${cats.includes(c)?' selected':''}>${c}</option>`).join('')}
+    </select>`;
     html+=`<div class="table-circle ${statusCls}">
       <div class="table-num">Table ${t}</div>
+      ${selectedCatsLabel?`<div style="font-size:0.68rem;color:var(--gold);font-weight:600;margin-bottom:2px;">📋 ${esc(selectedCatsLabel)}</div>`:''}
       ${statusLabel?`<span class="table-status-badge ${statusBadgeCls}">${statusLabel}</span>`:''}
       <div class="table-count">${count}/${perTable} seated</div>
       <div class="table-seats">${slots.join('')}</div>
-      ${catHtml}
+      ${catDropdown}
     </div>`;
   }
   document.getElementById('seatingChart').innerHTML=html;
