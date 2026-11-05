@@ -93,6 +93,9 @@ function doPost(e) {
       case 'admin_update_guest':
         result = adminUpdateGuest(payload);
         break;
+      case 'admin_delete_guest':
+        result = adminDeleteGuest(payload);
+        break;
       case 'admin_assign_table':
         result = adminAssignTable(payload);
         break;
@@ -634,6 +637,22 @@ function adminUpdateGuest(payload) {
       fields.updated_at = new Date();
       updateGuestFields(i + 1, headers, fields);
       return { status: 200, message: 'Guest updated!' };
+    }
+  }
+  return { error: 'Guest not found', status: 404 };
+}
+
+function adminDeleteGuest(payload) {
+  verifyAdmin(payload);
+  const sheet = getSheet('GUEST_LIST');
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0];
+  const idCol = headers.indexOf('guest_id');
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][idCol] === payload.guest_id) {
+      sheet.deleteRow(i + 1);
+      return { status: 200, message: 'Guest deleted!' };
     }
   }
   return { error: 'Guest not found', status: 404 };

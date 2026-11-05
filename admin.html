@@ -1729,10 +1729,19 @@ function guestRowHtml(g){
     <td><span class="status ${sc}">${memorial?'🕊️ memorial':g.invite_status||'pending'}</span></td>
     <td class="actions-cell">
       <button class="btn btn-outline btn-sm" onclick="editGuest('${g.guest_id}')">Edit</button>
+      <button class="btn btn-outline btn-sm" style="color:var(--danger);border-color:var(--danger);" onclick="deleteGuest('${g.guest_id}','${esc(g.full_name).replace(/'/g,"\\'")}')">×</button>
       ${['expired','confirmed','declined'].includes(g.invite_status)?`<button class="btn btn-outline btn-sm" onclick="reopenInvite('${g.guest_id}')">Reopen</button>`:''}
       ${g.email&&['pending','sent'].includes(g.invite_status||'pending')?`<button class="btn btn-outline btn-sm" onclick="sendInvite('${g.guest_id}')">Send</button>`:''}
     </td>
   </tr>`;
+}
+
+async function deleteGuest(id,name){
+  if(!await showConfirm(`I-delete si <strong>${name}</strong> sa guest list? Hindi na ito pwedeng i-undo.`,'🗑️'))return;
+  apiPost('admin_delete_guest',{guest_id:id}).then(d=>{
+    if(d.status===200){toast('Guest deleted!','success');loadGuests();}
+    else toast(d.error||'Error deleting guest','error');
+  });
 }
 
 function filterGuests(){
