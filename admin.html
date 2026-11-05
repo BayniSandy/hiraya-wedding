@@ -228,7 +228,17 @@ table.dt tr:hover td{background:var(--cream);}
 
 /* SEATING CHART */
 .seating-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;}
-.table-circle{background:var(--card);border-radius:16px;padding:20px;text-align:center;box-shadow:0 2px 12px rgba(92,74,61,0.06);border:1.5px solid var(--border);position:relative;}
+.table-circle{background:var(--card);border-radius:16px;padding:20px;text-align:center;box-shadow:0 2px 12px rgba(92,74,61,0.06);border:2px solid var(--border);position:relative;transition:border-color 0.2s,box-shadow 0.2s;}
+.table-circle.table-full{border-color:var(--success);box-shadow:0 2px 12px rgba(46,125,50,0.12);}
+.table-circle.table-over{border-color:var(--danger);box-shadow:0 2px 12px rgba(198,40,40,0.15);}
+.table-circle.table-incomplete{border-color:var(--info);box-shadow:0 2px 12px rgba(21,101,192,0.12);}
+.table-status-badge{display:inline-block;font-size:0.65rem;font-weight:600;padding:2px 10px;border-radius:10px;margin-bottom:6px;}
+.table-status-badge.full{background:var(--success-bg);color:var(--success);}
+.table-status-badge.over{background:var(--danger-bg);color:var(--danger);}
+.table-status-badge.incomplete{background:var(--info-bg);color:var(--info);}
+.table-cats-row{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin-top:8px;}
+.table-cats-row .cat-tag{font-size:0.6rem;padding:2px 7px;border-radius:10px;background:var(--cream);border:1px solid var(--border);color:var(--text-muted);}
+.table-cats-row .cat-tag.active{background:var(--gold);border-color:var(--gold);color:#fff;}
 .table-circle .table-num{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--earth);margin-bottom:4px;}
 .table-circle .table-count{font-size:0.7rem;color:var(--text-muted);margin-bottom:10px;}
 .table-seats{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;}
@@ -358,8 +368,14 @@ table.dt tr:hover td{background:var(--cream);}
       <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:12px;">Welcome, <strong id="loginWho"></strong>!</p>
       <input type="password" id="adminKeyInput" placeholder="Admin Key" autofocus>
       <div class="error" id="loginError">Invalid admin key. Try again.</div>
-      <button class="btn btn-gold" style="width:100%;margin-bottom:8px;" onclick="login()">Sign In</button>
+      <button class="btn btn-gold" style="width:100%;margin-bottom:8px;" id="loginBtn" onclick="login()">Sign In</button>
       <button class="btn btn-outline" style="width:100%;font-size:0.78rem;" onclick="backToStep1()">← Back</button>
+    </div>
+    <div id="loginLoading" style="display:none;text-align:center;padding:20px;">
+      <div style="font-size:2.5rem;animation:bounce 1s infinite;">💒</div>
+      <p style="font-size:0.9rem;color:var(--earth);margin-top:12px;font-weight:500;">Preparing your portal...</p>
+      <p style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Loading wedding data ✨</p>
+      <style>@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}</style>
     </div>
   </div>
 </div>
@@ -710,6 +726,12 @@ table.dt tr:hover td{background:var(--cream);}
           </div>
           <button class="btn btn-gold" onclick="renderSeating()" style="margin-top:auto;">🔄 Refresh</button>
         </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:0.72rem;">
+          <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:50%;background:var(--success-bg);border:2px solid var(--success);display:inline-block;"></span> Complete</span>
+          <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:50%;background:var(--danger-bg);border:2px solid var(--danger);display:inline-block;"></span> Over capacity</span>
+          <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:50%;background:var(--info-bg);border:2px solid var(--info);display:inline-block;"></span> Incomplete</span>
+          <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px dashed var(--border);display:inline-block;"></span> Empty</span>
+        </div>
       </div>
       <div id="seatingChart" class="seating-grid"></div>
       <div class="card" style="margin-top:16px;">
@@ -958,6 +980,11 @@ function login(){
   adminKey=document.getElementById('adminKeyInput').value.trim();
   if(!adminKey)return;
   document.getElementById('loginError').style.display='none';
+  // Show loading
+  document.getElementById('loginStep2').style.display='none';
+  document.getElementById('loginLoading').style.display='block';
+  const loginBtn=document.getElementById('loginBtn');
+  if(loginBtn)loginBtn.disabled=true;
   apiGet('admin_stats',{}).then(d=>{
     if(d.status===200){
       document.getElementById('loginScreen').style.display='none';
@@ -970,8 +997,18 @@ function login(){
       document.getElementById('userName').textContent=currentUser==='divine'?'Divine':'Rodnel';
       localStorage.setItem('hiraya_lastUser',currentUser);
       loadAll();
-    }else{document.getElementById('loginError').style.display='block';}
-  }).catch(()=>{document.getElementById('loginError').style.display='block';});
+    }else{
+      document.getElementById('loginLoading').style.display='none';
+      document.getElementById('loginStep2').style.display='block';
+      document.getElementById('loginError').style.display='block';
+      if(loginBtn)loginBtn.disabled=false;
+    }
+  }).catch(()=>{
+    document.getElementById('loginLoading').style.display='none';
+    document.getElementById('loginStep2').style.display='block';
+    document.getElementById('loginError').style.display='block';
+    if(loginBtn)loginBtn.disabled=false;
+  });
 }
 function logout(){adminKey='';allGuests=[];currentUser='';document.getElementById('app').style.display='none';document.getElementById('loginScreen').style.display='flex';document.getElementById('adminKeyInput').value='';document.getElementById('loginStep1').style.display='block';document.getElementById('loginStep2').style.display='none';document.getElementById('userBadge').style.display='none';}
 
@@ -1521,7 +1558,9 @@ function addAllProgramSuggestions(){
 }
 function renderTimeline(){
   const items=lsGet('timeline');
-  const sorted=[...items].sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
+  // Use manual order if any item has been reordered, otherwise sort by time
+  const hasManualOrder=items.some(x=>x.manualOrder!==undefined);
+  const sorted=hasManualOrder?[...items]:[...items].sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
   // Total hours
   let totalMins=0;items.forEach(x=>totalMins+=parseDurationMins(x.duration));
   const totalEl=document.getElementById('programTotal');
@@ -1563,8 +1602,10 @@ function tlDrop(e){
   const dragIdx=items.findIndex(x=>x.id===tlDragId);const targetIdx=items.findIndex(x=>x.id===targetId);
   if(dragIdx<0||targetIdx<0)return;
   const dragItem=items.splice(dragIdx,1)[0];
-  const newIdx=targetIdx>dragIdx?targetIdx-1:targetIdx;
+  const newIdx=targetIdx>dragIdx?targetIdx:targetIdx;
   items.splice(newIdx,0,dragItem);
+  // Mark all items with manual order so renderTimeline preserves this order
+  items.forEach((item,i)=>item.manualOrder=i);
   lsSet('timeline',items);renderTimeline();toast('Event reordered!','success');
 }
 function tlDragEnd(e){e.currentTarget.style.opacity='1';document.querySelectorAll('.tl-item').forEach(el=>el.style.borderTop='');}
@@ -1867,16 +1908,30 @@ function renderSeating(){
   let html='';
   for(let t=1;t<=numTables;t++){
     const seated=byTable[t]||[];
+    const count=seated.length;
+    // Color status
+    let statusCls='',statusLabel='',statusBadgeCls='';
+    if(count===0){statusCls='';statusLabel='';statusBadgeCls='';}
+    else if(count>=perTable && count===perTable){statusCls='table-full';statusLabel='✅ Complete';statusBadgeCls='full';}
+    else if(count>perTable){statusCls='table-over';statusLabel='⚠️ Over capacity';statusBadgeCls='over';}
+    else{statusCls='table-incomplete';statusLabel=`${perTable-count} seat${perTable-count>1?'s':''} left`;statusBadgeCls='incomplete';}
     const slots=[];
     seated.forEach(g=>{
-      const cls=g.invite_status==='confirmed'?'seat confirmed':'seat';
-      slots.push(`<span class="${cls}" title="${esc(g.full_name)}">${esc(g.full_name?.split(' ')[0]||'?')}</span>`);
+      const isMemorial=g.is_memorial==='TRUE';
+      const cls=isMemorial?'seat':g.invite_status==='confirmed'?'seat confirmed':'seat';
+      const badge=isMemorial?' 🕊️':'';
+      slots.push(`<span class="${cls}" title="${esc(g.full_name)}${isMemorial?' (Memorial)':''}" style="${isMemorial?'opacity:0.6;font-style:italic;':''}">${esc(g.full_name?.split(' ')[0]||'?')}${badge}</span>`);
     });
-    for(let e=seated.length;e<perTable;e++) slots.push('<span class="seat empty">—</span>');
-    html+=`<div class="table-circle">
+    for(let e=count;e<perTable;e++) slots.push('<span class="seat empty">—</span>');
+    // Category tags for this table
+    const cats=getTableCats(t);
+    const catHtml=`<div class="table-cats-row">${TABLE_CATEGORIES.map(c=>`<button class="cat-tag${cats.includes(c)?' active':''}" onclick="toggleTableCat('${t}','${c}');renderSeating();">${c}</button>`).join('')}</div>`;
+    html+=`<div class="table-circle ${statusCls}">
       <div class="table-num">Table ${t}</div>
-      <div class="table-count">${seated.length}/${perTable} seated</div>
+      ${statusLabel?`<span class="table-status-badge ${statusBadgeCls}">${statusLabel}</span>`:''}
+      <div class="table-count">${count}/${perTable} seated</div>
       <div class="table-seats">${slots.join('')}</div>
+      ${catHtml}
     </div>`;
   }
   document.getElementById('seatingChart').innerHTML=html;
